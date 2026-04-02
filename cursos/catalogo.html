@@ -1,0 +1,281 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo de Cursos | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../assets/css/header.css" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f7f9fc; color: #334155; margin: 0; }
+    .page { padding: 100px 0 60px; min-height: 100vh; }
+
+    /* Header */
+    .page-header { margin-bottom: 36px; }
+    .page-header h1 { font-size: clamp(28px, 4vw, 42px); font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    .page-header p { color: #64748b; font-size: 16px; max-width: 560px; }
+
+    /* Filters */
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+    .filter-btn { padding: 7px 16px; border-radius: 999px; border: 1.5px solid #dce3ed; background: #fff; color: #64748b; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; }
+    .filter-btn:hover, .filter-btn.active { background: #1565c0; color: #fff; border-color: #1565c0; }
+
+    /* Grid */
+    .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; }
+
+    /* Card */
+    .course-card {
+      background: #ffffff;
+      border: 1px solid #dce3ed;
+      border-radius: 16px; padding: 0; overflow: hidden;
+      transition: transform .25s, box-shadow .25s, border-color .25s;
+    }
+    .course-card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(15,23,42,.1); border-color: #bfdbfe; }
+    .cc-header { padding: 22px 22px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .cc-badge { padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+    .cc-badge.new { background: #dbeafe; color: #1565c0; }
+    .cc-badge.top { background: #0f172a; color: #60a5fa; }
+    .cc-badge.pro { background: #eef2f7; color: #334155; }
+    .cc-price { font-size: 13px; font-weight: 700; color: #1565c0; }
+    .cc-body { padding: 14px 22px 22px; }
+    .cc-body h3 { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px; line-height: 1.3; }
+    .cc-body p { color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
+    .cc-meta { display: flex; gap: 16px; margin-bottom: 18px; font-size: 13px; color: #64748b; }
+    .cc-meta span { display: flex; align-items: center; gap: 4px; }
+    .cc-meta .material-icons-round { font-size: 16px; color: #1e88e5; }
+    .cc-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+    .cc-tag { padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; background: #eff6ff; color: #1565c0; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; transition: all .2s; text-decoration: none; }
+    .btn-primary { background: #1565c0; color: #fff; width: 100%; }
+    .btn-primary:hover { background: #1e88e5; box-shadow: 0 4px 18px rgba(21,101,192,.3); }
+
+    /* Footer mini */
+    .page-footer { text-align: center; padding: 28px 0; color: #64748b; font-size: 13px; border-top: 1px solid #dce3ed; margin-top: 48px; }
+    .page-footer a { color: #1565c0; text-decoration: none; }
+
+    @media (max-width: 700px) {
+      .courses-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="top-bar">
+    <div class="container top-bar-inner">
+      <a class="brand" href="../index.html">
+        <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
+      </a>
+      <div class="top-bar-right">
+        <div class="navbar-actions" id="navActions"></div>
+        <a class="back-link" href="../index.html"><span class="material-icons-round">arrow_back</span> Inicio</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+
+      <div class="page-header">
+        <h1>Catálogo de cursos</h1>
+        <p>Programas especializados para profesionales de ingeniería, construcción y seguridad.</p>
+      </div>
+
+      <div class="filters">
+        <button class="filter-btn active">Todos</button>
+        <button class="filter-btn">Seguridad</button>
+        <button class="filter-btn">Costos</button>
+        <button class="filter-btn">Supervisión</button>
+        <button class="filter-btn">Gratuitos</button>
+      </div>
+
+      <div class="courses-grid">
+
+        <!-- CURSO 1: SST en Obras Civiles -->
+        <article class="course-card">
+          <div class="cc-header">
+            <span class="cc-badge new">Nuevo</span>
+            <span class="cc-price">Gratis</span>
+          </div>
+          <div class="cc-body">
+            <h3><a href="#" style="color:inherit;text-decoration:none">Seguridad y Salud en el Trabajo en Obras Civiles</a></h3>
+            <p>Conoce los fundamentos de la Seguridad y Salud en el Trabajo aplicados a obras civiles, incluyendo marco legal peruano, identificación de peligros y riesgos, investigación de incidentes y elaboración de análisis de riesgos según normativa vigente.</p>
+            <div class="cc-tags">
+              <span class="cc-tag">Seguridad</span>
+              <span class="cc-tag">Obras Civiles</span>
+              <span class="cc-tag">Normativa</span>
+            </div>
+            <div class="cc-meta">
+              <span><span class="material-icons-round">schedule</span> 1 hora</span>
+              <span><span class="material-icons-round">event_seat</span> Cupos disponibles</span>
+              <span><span class="material-icons-round">videocam</span> En vivo + Grabado</span>
+            </div>
+            <div class="course-action" data-course="sst-obras-civiles"></div>
+          </div>
+        </article>
+
+        <!-- CURSO 2: Metrados y Presupuestos -->
+        <article class="course-card">
+          <div class="cc-header">
+            <span class="cc-badge top">Top</span>
+            <span class="cc-price">S/ 50</span>
+          </div>
+          <div class="cc-body">
+            <h3><a href="curso.html?id=metrados-presupuestos" style="color:inherit;text-decoration:none">Metrados y Presupuestos</a></h3>
+            <p>Aprende a realizar metrados, análisis de partidas unitarias y elaboración de valorizaciones de obra según normativa vigente. Domina el costeo técnico y la gestión de presupuestos para proyectos de infraestructura.</p>
+            <div class="cc-tags">
+              <span class="cc-tag">Costos</span>
+              <span class="cc-tag">Presupuestos</span>
+              <span class="cc-tag">Valorizaciones</span>
+            </div>
+            <div class="cc-meta">
+              <span><span class="material-icons-round">schedule</span> 12 horas</span>
+              <span><span class="material-icons-round">people</span> 85 inscritos</span>
+              <span><span class="material-icons-round">videocam</span> En vivo</span>
+            </div>
+            <div class="course-action" data-course="metrados-presupuestos"></div>
+          </div>
+        </article>
+
+        <!-- CURSO 3: Supervisión de Obra -->
+        <article class="course-card">
+          <div class="cc-header">
+            <span class="cc-badge pro">Pro</span>
+            <span class="cc-price">S/ 80</span>
+          </div>
+          <div class="cc-body">
+            <h3><a href="curso.html?id=supervision-obra" style="color:inherit;text-decoration:none">Supervisión de Obra</a></h3>
+            <p>Desarrolla competencias en dirección técnica, control de calidad, gestión de cuaderno de obra y aplicación de buenas prácticas de supervisión. Enfocado en proyectos civiles y normativas actuales.</p>
+            <div class="cc-tags">
+              <span class="cc-tag">Supervisión</span>
+              <span class="cc-tag">Control de Calidad</span>
+              <span class="cc-tag">Dirección</span>
+            </div>
+            <div class="cc-meta">
+              <span><span class="material-icons-round">schedule</span> 16 horas</span>
+              <span><span class="material-icons-round">people</span> 64 inscritos</span>
+              <span><span class="material-icons-round">videocam</span> En vivo + Grabado</span>
+            </div>
+            <div class="course-action" data-course="supervision-obra"></div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="page-footer">
+    <div class="container">
+      <p>© 2026 FQ INGENIEROS · <a href="../index.html">Inicio</a> · <a href="../empresa/about.html">Nosotros</a></p>
+    </div>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/auth-ui.js"></script>
+
+<!-- Script reutilizable de lógica dinámica de catálogo (idéntico a index.html, solo para cards del catálogo) -->
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  var courseStates = {
+    'sst-obras-civiles': 'disponible',
+    'metrados-presupuestos': 'proximamente',
+    'supervision-obra': 'proximamente'
+  };
+
+  document.querySelectorAll('.course-action[data-course]').forEach(function(container) {
+    var courseId = container.getAttribute('data-course');
+    var state = courseStates[courseId] || 'disponible';
+    container.innerHTML = '';
+    if (state === 'disponible') {
+      var btn = document.createElement('a');
+      btn.href = '#';
+      btn.className = 'btn btn-primary btn-block btn-sm course-link';
+      btn.setAttribute('data-course', courseId);
+      btn.textContent = 'Inscribirme';
+      btn.onclick = function(e) {
+        e.preventDefault();
+        // Navegación robusta: siempre ir a la descripción del curso correcto
+        var base = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
+        window.location.href = base + 'curso.html?id=' + courseId;
+        return false;
+      };
+      container.appendChild(btn);
+    } else if (state === 'proximamente') {
+      var badge = document.createElement('span');
+      badge.className = 'cbadge';
+      badge.style.background = '#fef3c7';
+      badge.style.color = '#92400e';
+      badge.style.fontSize = '13px';
+      badge.style.padding = '5px 14px';
+      badge.style.display = 'block';
+      badge.style.textAlign = 'center';
+      badge.style.marginBottom = '8px';
+      badge.style.borderRadius = '18px';
+      badge.innerHTML = '<span class="material-icons-round" style="font-size:16px;vertical-align:middle;">upcoming</span> Próximamente';
+      container.appendChild(badge);
+    }
+  });
+
+  if (typeof auth !== 'undefined' && typeof db !== 'undefined') {
+    auth.onAuthStateChanged(function(user) {
+      if (!user) return;
+      document.querySelectorAll('.course-action[data-course]').forEach(function(container) {
+        var courseId = container.getAttribute('data-course');
+        var cacheKey = 'enrollment_' + user.uid + '_' + courseId;
+        function setEnrolledUI() {
+          container.innerHTML = '';
+          var btn = document.createElement('a');
+          btn.href = '../sesiones/index.html?course=' + courseId;
+          btn.className = 'btn btn-success btn-block btn-sm';
+          btn.innerHTML = '<span class="material-icons-round">play_circle</span> Ir al curso';
+          container.appendChild(btn);
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '../sesiones/index.html?course=' + courseId;
+          });
+        }
+        try {
+          var cached = localStorage.getItem(cacheKey);
+          if (cached) {
+            var data = JSON.parse(cached);
+            if (data.enrolled) setEnrolledUI();
+          }
+        } catch (_) {}
+        db.collection('enrollments').doc(user.uid + '_' + courseId).get()
+          .then(function(doc) {
+            if (doc.exists && doc.data().status === 'active') {
+              setEnrolledUI();
+              try {
+                localStorage.setItem(cacheKey, JSON.stringify({
+                  enrolled: true,
+                  schedule: doc.data().schedule || null,
+                  ts: Date.now()
+                }));
+              } catch (_) {}
+            }
+          });
+      });
+    });
+  }
+
+  // Ocultar info detallada en cursos Próximamente
+  document.querySelectorAll('.course-action[data-course]').forEach(function(container) {
+    var courseId = container.getAttribute('data-course');
+    var state = courseStates[courseId] || 'disponible';
+    var meta = container.parentElement.querySelector('.cc-meta');
+    if (meta) {
+      meta.style.display = (state === 'proximamente') ? 'none' : '';
+    }
+  });
+});
+</script>
+</body>
+</html>

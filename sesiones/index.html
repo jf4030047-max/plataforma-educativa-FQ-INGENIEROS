@@ -1,0 +1,925 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Curso | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/notifications.css" />
+  <link rel="stylesheet" href="../assets/css/header.css" />
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
+    .container{width:min(900px,92%);margin:0 auto}
+
+    .page{padding:88px 0 60px}
+
+    /* States */
+    .state-box{text-align:center;padding:60px 20px;background:#fff;border:1px solid #dce3ed;border-radius:16px}
+    .state-box .material-icons-round{font-size:56px;color:#dce3ed;margin-bottom:12px}
+    .state-box h2{font-size:18px;color:#0f172a;margin-bottom:6px}
+    .state-box p{font-size:14px;color:#64748b;margin-bottom:20px}
+
+    /* Course header */
+    .course-hero{background:#fff;border:1px solid #dce3ed;border-radius:16px;padding:28px;margin-bottom:20px}
+    .course-hero-top{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+    .course-icon{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#1565c0,#1e88e5);display:grid;place-items:center;flex-shrink:0}
+    .course-icon .material-icons-round{font-size:28px;color:#fff}
+    .course-hero-info{flex:1;min-width:0}
+    .course-hero-info h1{font-size:clamp(20px,3vw,26px);font-weight:800;color:#0f172a;margin-bottom:4px;line-height:1.2}
+    .course-hero-info .enrolled-tag{display:inline-flex;align-items:center;gap:4px;background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700}
+    .course-hero-info .enrolled-tag .material-icons-round{font-size:14px}
+
+    .course-meta-row{display:flex;gap:20px;flex-wrap:wrap}
+    .course-meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:#475569}
+    .course-meta-item .material-icons-round{font-size:16px;color:#1565c0}
+
+    /* Schedule box */
+    .schedule-box{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#eff6ff;border-radius:12px;margin-bottom:20px}
+    .schedule-box .material-icons-round{font-size:20px;color:#1565c0}
+    .schedule-box-text{font-size:14px;color:#1565c0;font-weight:600}
+    .schedule-box-text small{font-weight:400;color:#475569;display:block;font-size:12px;margin-top:2px}
+
+    /* Panel cards */
+    .panel-card{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:24px;margin-bottom:16px}
+    .panel-card-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+    .panel-card-header .material-icons-round{font-size:22px;color:#1565c0}
+    .panel-card-header h2{font-size:17px;font-weight:700;color:#0f172a}
+
+    /* Session action */
+    .session-action-box{text-align:center;padding:20px}
+    .session-action-box .session-label{font-size:13px;color:#64748b;margin-bottom:12px}
+    .session-action-box .session-countdown{font-size:14px;color:#475569;margin-top:10px}
+    .session-action-box .session-countdown .material-icons-round{font-size:16px;vertical-align:middle;margin-right:4px}
+
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .2s;text-decoration:none}
+    .btn-primary{background:#1565c0;color:#fff}
+    .btn-primary:hover{background:#1e88e5}
+    .btn-success{background:#16a34a;color:#fff}
+    .btn-success:hover{background:#15803d}
+    .btn-outline{background:#fff;color:#1565c0;border:1.5px solid #1565c0}
+    .btn-outline:hover{background:#eff6ff}
+    .btn-disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed;pointer-events:none}
+    .btn-lg{padding:14px 32px;font-size:15px;border-radius:12px}
+    .btn-full{width:100%}
+
+    @keyframes pulse-live{0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,.4)}70%{box-shadow:0 0 0 10px rgba(22,163,74,0)}}
+    .btn-live{animation:pulse-live 2s infinite}
+
+    /* Credential cards */
+    .credential-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .credential-card{border:1px solid #dce3ed;border-radius:12px;padding:20px;text-align:center;transition:box-shadow .2s}
+    .credential-card:hover{box-shadow:0 4px 16px rgba(15,23,42,.06)}
+    .credential-card .material-icons-round{font-size:36px;margin-bottom:8px}
+    .credential-card h3{font-size:14px;font-weight:700;color:#0f172a;margin-bottom:4px}
+    .credential-card p{font-size:12px;color:#64748b;margin-bottom:12px;line-height:1.4}
+    .credential-card.locked{opacity:.65}
+    .credential-card.locked .cred-icon{color:#94a3b8}
+    .credential-card.available .cred-icon{color:#16a34a}
+    .credential-card .cred-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:6px;margin-bottom:10px}
+    .cred-tag.free{background:#d1fae5;color:#065f46}
+    .cred-tag.paid{background:#fef3c7;color:#92400e}
+    .cred-tag.lock{background:#f1f5f9;color:#64748b}
+
+    /* Temario inside panel */
+    .temario-list{list-style:none;padding:0}
+    .temario-list li{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px;color:#334155}
+    .temario-list li:last-child{border-bottom:none}
+    .temario-num{width:24px;height:24px;border-radius:7px;background:#eff6ff;color:#1565c0;font-size:11px;font-weight:700;display:grid;place-items:center;flex-shrink:0}
+
+    /* Schedule management */
+    .schedule-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+    .btn-sm{padding:6px 14px;font-size:12px;border-radius:8px}
+    .btn-ghost{background:transparent;color:#1565c0;border:none;cursor:pointer;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:6px;transition:background .15s}
+    .btn-ghost:hover{background:#eff6ff}
+    .btn-danger-ghost{background:transparent;color:#dc2626;border:none;cursor:pointer;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:6px;transition:background .15s}
+    .btn-danger-ghost:hover{background:#fef2f2}
+    .btn-danger-outline{background:#fff;color:#dc2626;border:1.5px solid #dc2626}
+    .btn-danger-outline:hover{background:#fef2f2}
+
+    /* Schedule picker (inline) */
+    .schedule-picker{background:#f8fafc;border:1px solid #dce3ed;border-radius:12px;padding:16px;margin-bottom:20px;display:none}
+    .schedule-picker.open{display:block}
+    .schedule-picker h3{font-size:14px;font-weight:700;color:#0f172a;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+    .schedule-picker h3 .material-icons-round{font-size:18px;color:#1565c0}
+    .sched-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid #dce3ed;border-radius:10px;cursor:pointer;margin-bottom:8px;background:#fff;transition:all .15s}
+    .sched-opt:hover{border-color:#1565c0;background:#eff6ff}
+    .sched-opt.active{border-color:#1565c0;background:#eff6ff}
+    .sched-opt .material-icons-round{font-size:18px;color:#1565c0}
+    .sched-opt-text{flex:1;font-size:13px;font-weight:600;color:#0f172a}
+    .sched-opt-text small{font-weight:400;color:#64748b;display:block;font-size:11px}
+    .sched-opt-check{width:18px;height:18px;border-radius:50%;border:2px solid #dce3ed;display:grid;place-items:center;flex-shrink:0}
+    .sched-opt.active .sched-opt-check{border-color:#1565c0;background:#1565c0}
+    .sched-opt.active .sched-opt-check::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff}
+    .schedule-picker-actions{display:flex;gap:8px;margin-top:12px}
+
+    /* Progress status badge */
+    .progress-status{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;margin-bottom:6px}
+    .progress-status .material-icons-round{font-size:18px}
+    .progress-status.status-pending{background:#fef3c7;color:#92400e}
+    .progress-status.status-attended{background:#d1fae5;color:#065f46}
+    .progress-status.status-watched{background:#dbeafe;color:#1565c0}
+    .progress-status.status-completed{background:#d1fae5;color:#065f46}
+
+    /* Progress bar */
+    .progress-bar-wrap{margin-bottom:20px}
+    .progress-bar-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .progress-bar-info span{font-size:12px;color:#64748b;font-weight:500}
+    .progress-bar-info strong{font-size:13px;font-weight:700}
+    .progress-bar-info strong.pct-0{color:#92400e}
+    .progress-bar-info strong.pct-100{color:#065f46}
+    .progress-bar-track{height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+    .progress-bar-fill{height:100%;border-radius:99px;transition:width .6s ease}
+    .progress-bar-fill.fill-0{width:0;background:#e2e8f0}
+    .progress-bar-fill.fill-100{width:100%;background:linear-gradient(90deg,#16a34a,#22c55e)}
+
+    /* Manage card */
+    .manage-card{background:#fff;border:1px solid #fecaca;border-radius:14px;padding:20px;margin-bottom:16px}
+    .manage-card-header{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+    .manage-card-header .material-icons-round{font-size:20px;color:#dc2626}
+    .manage-card-header h2{font-size:15px;font-weight:700;color:#0f172a}
+    .manage-card p{font-size:12px;color:#64748b;margin-bottom:14px}
+    .manage-card-locked{opacity:.5;pointer-events:none}
+    .manage-card-locked .locked-msg{display:flex;align-items:center;gap:6px;font-size:12px;color:#94a3b8;font-weight:600}
+    .manage-card-locked .locked-msg .material-icons-round{font-size:16px}
+
+    /* Confirm modal overlay */
+    .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;backdrop-filter:blur(4px)}
+    .modal-box{background:#fff;border-radius:16px;width:100%;max-width:400px;padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+    .modal-box .modal-icon{text-align:center;margin-bottom:14px}
+    .modal-box .modal-icon .material-icons-round{font-size:44px;color:#dc2626}
+    .modal-box h3{text-align:center;font-size:17px;font-weight:700;color:#0f172a;margin-bottom:6px}
+    .modal-box p{text-align:center;font-size:13px;color:#64748b;line-height:1.5;margin-bottom:20px}
+    .modal-actions{display:flex;gap:10px}
+    .modal-actions .btn{flex:1}
+
+    .page-footer{text-align:center;padding:28px 0;color:#64748b;font-size:13px;border-top:1px solid #dce3ed;margin-top:48px}
+    .page-footer a{color:#1565c0;text-decoration:none}
+
+    .loading{text-align:center;padding:40px;color:#64748b;font-size:14px}
+
+    @media(max-width:640px){
+      .credential-grid{grid-template-columns:1fr}
+      .course-meta-row{gap:10px}
+      .course-hero-top{flex-wrap:wrap}
+      .schedule-box{flex-wrap:wrap}
+      .schedule-actions{margin-left:0;width:100%}
+      .modal-actions{flex-direction:column}
+    }
+
+    /* Offline banner */
+    .offline-banner{position:fixed;bottom:0;left:0;right:0;background:#fef3c7;color:#92400e;padding:10px 16px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600;z-index:9999;transform:translateY(100%);transition:transform .3s ease;border-top:1px solid #fcd34d}
+    .offline-banner.visible{transform:translateY(0)}
+    .offline-banner .material-icons-round{font-size:18px}
+  </style>
+</head>
+<body>
+
+  <header class="top-bar">
+    <div class="container top-bar-inner">
+      <a class="brand" href="../index.html">
+        <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
+      </a>
+      <div class="top-bar-right">
+        <div class="navbar-actions" id="navActions"></div>
+        <a class="back-link" href="../dashboard/index.html"><span class="material-icons-round">arrow_back</span> Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+      <div id="content">
+        <div class="loading"><span class="material-icons-round" style="font-size:28px;color:#dce3ed;display:block;margin-bottom:8px">hourglass_top</span>Cargando curso...</div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="page-footer">
+    <div class="container">
+      <p>© 2026 FQ INGENIEROS · <a href="../index.html">Inicio</a> · <a href="../empresa/about.html">Nosotros</a></p>
+    </div>
+  </footer>
+
+  <!-- Offline banner -->
+  <div class="offline-banner" id="offlineBanner">
+    <span class="material-icons-round">wifi_off</span> Estás sin conexión — Los datos guardados están disponibles
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/auth-ui.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+
+  <script>
+    /* ══════════════════════════════════════════════
+       Course data (mirrors cursos/curso.html)
+       ══════════════════════════════════════════════ */
+    var COURSES = {
+      'sst-obras-civiles': {
+        name: 'Seguridad y Salud en el Trabajo en Obras Civiles',
+        icon: 'health_and_safety',
+        duration: '1 hora',
+        sessions: 1,
+        modality: 'En vivo',
+        /* Session datetime per schedule (Peru = UTC-5) */
+        sessionDate: '2026-03-30',
+        scheduleTime: {
+          h1: { start: '17:00', end: '18:00' },
+          h2: { start: '19:00', end: '20:00' }
+        },
+        temario: [
+          'Introducción a la SST',
+          'Marco Legal en el Perú',
+          'Peligros y Riesgos',
+          'Incidentes y Accidentes',
+          'Análisis de Riesgos'
+        ]
+      },
+      'metrados-presupuestos': {
+        name: 'Metrados y Presupuestos',
+        icon: 'calculate',
+        duration: '12 horas',
+        sessions: 8,
+        modality: 'En vivo',
+        sessionDate: null,
+        scheduleTime: {},
+        temario: [
+          'Fundamentos de costos en construcción',
+          'Análisis de precios unitarios',
+          'Metrado de partidas principales',
+          'Presupuesto base y fórmulas polinómicas',
+          'Valorizaciones mensuales',
+          'Reajuste de precios',
+          'Software S10 — Introducción práctica',
+          'Caso práctico integral'
+        ]
+      },
+      'supervision-obra': {
+        name: 'Supervisión de Obra',
+        icon: 'engineering',
+        duration: '16 horas',
+        sessions: 10,
+        modality: 'En vivo + Grabado',
+        sessionDate: null,
+        scheduleTime: {},
+        temario: [
+          'Rol del supervisor de obra',
+          'Marco legal y contractual',
+          'Control de calidad de materiales',
+          'Cuaderno de obra digital',
+          'Control de avance físico y financiero',
+          'Recepción de obra y liquidación',
+          'Gestión de adicionales y deductivos',
+          'Resolución de controversias',
+          'Supervisión en proyectos públicos (OSCE)',
+          'Caso práctico integral'
+        ]
+      }
+    };
+
+    var courseId = new URLSearchParams(window.location.search).get('course');
+
+    /* Available schedules for SST (mirrors cursos/curso.html) */
+    var SCHEDULES = {
+      'sst-obras-civiles': [
+        { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Lunes 9 de abril' },
+        { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Lunes 9 de abril' }
+      ]
+    };
+
+    /* ══════════════════════════════════════════════
+       Helpers
+       ══════════════════════════════════════════════ */
+
+    /** Build a Peru-local Date from "YYYY-MM-DD" + "HH:MM" */
+    function peruDate(dateStr, timeStr) {
+      return new Date(dateStr + 'T' + timeStr + ':00-05:00');
+    }
+
+    /** Get session state: 'before' | 'live' | 'after' */
+    function getSessionState(courseData, scheduleId) {
+      if (!courseData.sessionDate || !courseData.scheduleTime[scheduleId]) return 'before';
+      var times = courseData.scheduleTime[scheduleId];
+      var now = new Date();
+      var start = peruDate(courseData.sessionDate, times.start);
+      var end   = peruDate(courseData.sessionDate, times.end);
+      if (now < start) return 'before';
+      if (now >= start && now <= end) return 'live';
+      return 'after';
+    }
+
+    /** Render countdown text */
+    function formatCountdown(courseData, scheduleId) {
+      if (!courseData.sessionDate || !courseData.scheduleTime[scheduleId]) return '';
+      var times = courseData.scheduleTime[scheduleId];
+      var start = peruDate(courseData.sessionDate, times.start);
+      var diff = start - new Date();
+      if (diff <= 0) return '';
+      var days  = Math.floor(diff / 86400000);
+      var hours = Math.floor((diff % 86400000) / 3600000);
+      var mins  = Math.floor((diff % 3600000) / 60000);
+      var parts = [];
+      if (days > 0) parts.push(days + 'd');
+      if (hours > 0) parts.push(hours + 'h');
+      parts.push(mins + 'min');
+      return 'Faltan ' + parts.join(' ');
+    }
+
+    /* ══════════════════════════════════════════════
+       Helper: cache enrollment to localStorage
+       ══════════════════════════════════════════════ */
+    function cacheEnrollment(uid, data) {
+      try {
+        var key = 'session_enrollment_' + uid + '_' + courseId;
+        localStorage.setItem(key, JSON.stringify({
+          schedule: data.schedule || null,
+          status: data.status || 'active',
+          progress: data.progress || 0,
+          attended: !!data.attended,
+          watched: !!data.watched,
+          completed: !!data.completed,
+          ts: Date.now()
+        }));
+      } catch (_) {}
+    }
+
+    /* ══════════════════════════════════════════════
+       Auth & render
+       ══════════════════════════════════════════════ */
+    auth.onAuthStateChanged(function(user) {
+      var contentEl = document.getElementById('content');
+
+      if (!user) {
+        contentEl.innerHTML =
+          '<div class="state-box">' +
+          '<span class="material-icons-round">lock</span>' +
+          '<h2>Inicia sesión para ver tu curso</h2>' +
+          '<p>Debes iniciar sesión para acceder al contenido de tu curso.</p>' +
+          '<a href="../auth/login.html?redirect=' + encodeURIComponent(window.location.href) + '" class="btn btn-primary">Iniciar sesión</a>' +
+          '</div>';
+        return;
+      }
+
+      if (!courseId || !COURSES[courseId]) {
+        contentEl.innerHTML =
+          '<div class="state-box">' +
+          '<span class="material-icons-round">search_off</span>' +
+          '<h2>Curso no encontrado</h2>' +
+          '<p>El curso solicitado no existe o el enlace es incorrecto.</p>' +
+          '<a href="../dashboard/index.html" class="btn btn-primary">Ir al dashboard</a>' +
+          '</div>';
+        return;
+      }
+
+      var cacheKey = 'session_enrollment_' + user.uid + '_' + courseId;
+
+      /* 1️⃣ Instant: render from localStorage first */
+      try {
+        var cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          var cachedData = JSON.parse(cached);
+          if (cachedData.status === 'active') {
+            renderPanel(COURSES[courseId], cachedData);
+          }
+        }
+      } catch (_) {}
+
+      /* 2️⃣ Background: validate with Firestore */
+      db.collection('enrollments').doc(user.uid + '_' + courseId).get()
+        .then(function(doc) {
+          if (!doc.exists || doc.data().status !== 'active') {
+            try { localStorage.removeItem(cacheKey); } catch (_) {}
+            contentEl.innerHTML =
+              '<div class="state-box">' +
+              '<span class="material-icons-round">block</span>' +
+              '<h2>No estás matriculado</h2>' +
+              '<p>Necesitas matricularte para acceder al contenido de este curso.</p>' +
+              '<a href="../cursos/curso.html?id=' + courseId + '" class="btn btn-primary">Ver curso e inscribirme</a>' +
+              '</div>';
+            return;
+          }
+
+          var fbData = doc.data();
+          cacheEnrollment(user.uid, fbData);
+          renderPanel(COURSES[courseId], fbData);
+        })
+        .catch(function() {
+          /* Offline: if panel already rendered from cache, keep it */
+          if (!navigator.onLine) {
+            try { if (localStorage.getItem(cacheKey)) return; } catch (_) {}
+          }
+          contentEl.innerHTML =
+            '<div class="state-box">' +
+            '<span class="material-icons-round">error_outline</span>' +
+            '<h2>Error al cargar</h2>' +
+            '<p>No pudimos verificar tu matrícula. Intenta recargar la página.</p>' +
+            '</div>';
+        });
+    });
+
+    /* ══════════════════════════════════════════════
+       Render course panel
+       ══════════════════════════════════════════════ */
+    function renderPanel(course, enrollment) {
+      var scheduleId = (enrollment.schedule && enrollment.schedule.id) || 'h1';
+      var state = getSessionState(course, scheduleId);
+
+      document.title = course.name + ' | FQ INGENIEROS';
+
+      var html = '';
+
+      /* ── Course hero ── */
+      html += '<div class="course-hero">';
+      html += '<div class="course-hero-top">';
+      html += '<div class="course-icon"><span class="material-icons-round">' + course.icon + '</span></div>';
+      html += '<div class="course-hero-info">';
+      html += '<h1>' + course.name + '</h1>';
+      html += '<span class="enrolled-tag"><span class="material-icons-round">check_circle</span> Matriculado</span>';
+      html += '</div></div>';
+      html += '<div class="course-meta-row">';
+      html += '<div class="course-meta-item"><span class="material-icons-round">schedule</span>' + course.duration + '</div>';
+      html += '<div class="course-meta-item"><span class="material-icons-round">video_library</span>' + course.sessions + ' sesión</div>';
+      html += '<div class="course-meta-item"><span class="material-icons-round">videocam</span>' + course.modality + '</div>';
+      html += '</div></div>';
+
+      /* ── Check if changes are allowed (before event date) ── */
+      var canManage = false;
+      if (course.sessionDate) {
+        var eventStart = peruDate(course.sessionDate, '00:00');
+        canManage = new Date() < eventStart;
+      }
+
+      /* ── Schedule ── */
+      if (enrollment.schedule && enrollment.schedule.label) {
+        html += '<div class="schedule-box">';
+        html += '<span class="material-icons-round">event</span>';
+        html += '<div class="schedule-box-text">' + enrollment.schedule.detail + ' · ' + enrollment.schedule.label;
+        html += '<small>Tu horario seleccionado</small></div>';
+        if (canManage) {
+          html += '<div class="schedule-actions">';
+          html += '<button class="btn-ghost" id="btnChangeSchedule" type="button"><span class="material-icons-round" style="font-size:14px">swap_horiz</span> Cambiar horario</button>';
+          html += '</div>';
+        }
+        html += '</div>';
+      }
+
+      /* ── Schedule picker (hidden by default) ── */
+      if (canManage && SCHEDULES[courseId]) {
+        html += '<div class="schedule-picker" id="schedulePicker">';
+        html += '<h3><span class="material-icons-round">schedule</span> Selecciona tu nuevo horario</h3>';
+        SCHEDULES[courseId].forEach(function(s) {
+          var isActive = enrollment.schedule && enrollment.schedule.id === s.id;
+          html += '<div class="sched-opt' + (isActive ? ' active' : '') + '" data-id="' + s.id + '" onclick="selectNewSchedule(this)">';
+          html += '<span class="material-icons-round">access_time</span>';
+          html += '<div class="sched-opt-text">' + s.label + '<small>' + s.detail + '</small></div>';
+          html += '<div class="sched-opt-check"></div>';
+          html += '</div>';
+        });
+        html += '<div class="schedule-picker-actions">';
+        html += '<button class="btn btn-outline btn-sm" id="btnCancelSchedule" type="button">Cancelar</button>';
+        html += '<button class="btn btn-primary btn-sm" id="btnSaveSchedule" type="button">Guardar horario</button>';
+        html += '</div></div>';
+      }
+
+      /* ── Attendance / progress from enrollment doc ── */
+      var attended  = !!enrollment.attended;
+      var watched   = !!enrollment.watched;
+      var completed = attended || watched;
+      var progressPct = completed ? 100 : 0;
+
+      /* ── Progress status badge ── */
+      var statusClass, statusIcon, statusText;
+      if (attended) {
+        statusClass = 'status-attended'; statusIcon = 'check_circle'; statusText = 'Completado (en vivo)';
+      } else if (watched) {
+        statusClass = 'status-watched'; statusIcon = 'play_circle'; statusText = 'Completado (grabación)';
+      } else {
+        statusClass = 'status-pending'; statusIcon = 'pending'; statusText = 'Pendiente';
+      }
+
+      html += '<div class="progress-status ' + statusClass + '">';
+      html += '<span class="material-icons-round">' + statusIcon + '</span>' + statusText;
+      html += '</div>';
+
+      /* ── Progress bar ── */
+      html += '<div class="progress-bar-wrap" id="progressWrap">';
+      html += '<div class="progress-bar-info"><span>Progreso del curso</span><strong class="pct-' + progressPct + '">' + progressPct + '%</strong></div>';
+      html += '<div class="progress-bar-track"><div class="progress-bar-fill fill-' + progressPct + '" id="progressFill"></div></div>';
+      html += '</div>';
+
+      /* ── Session action card ── */
+      html += '<div class="panel-card">';
+      html += '<div class="panel-card-header"><span class="material-icons-round">videocam</span><h2>Sesión en vivo</h2></div>';
+      html += '<div class="session-action-box">';
+
+      if (state === 'before') {
+        var countdown = formatCountdown(course, scheduleId);
+        html += '<p class="session-label">La sesión aún no ha comenzado</p>';
+        html += '<a href="#" class="btn btn-disabled btn-lg btn-full" onclick="return false"><span class="material-icons-round">videocam</span> Acceder a la sesión en vivo</a>';
+        if (countdown) {
+          html += '<p class="session-countdown"><span class="material-icons-round">timer</span>' + countdown + '</p>';
+        }
+      } else if (state === 'live') {
+        html += '<p class="session-label">¡La sesión está en curso!</p>';
+        html += '<a href="#" class="btn btn-success btn-lg btn-full btn-live" id="btnJoinSession" onclick="markAttended(event)"><span class="material-icons-round">videocam</span> Unirme ahora</a>';
+        if (attended) {
+          html += '<p class="session-countdown" style="color:#065f46"><span class="material-icons-round">check_circle</span> Ya registraste tu asistencia</p>';
+        }
+      } else {
+        html += '<p class="session-label">La sesión ya finalizó</p>';
+        html += '<a href="#" class="btn btn-primary btn-lg btn-full" id="btnWatchRecording" onclick="markWatched(event)"><span class="material-icons-round">play_circle</span> Ver grabación</a>';
+        if (watched) {
+          html += '<p class="session-countdown" style="color:#1565c0"><span class="material-icons-round">check_circle</span> Grabación vista</p>';
+        }
+      }
+
+      html += '</div></div>';
+
+      /* ── Credentials card ── */
+      html += '<div class="panel-card">';
+      html += '<div class="panel-card-header"><span class="material-icons-round">workspace_premium</span><h2>Constancia y Certificado</h2></div>';
+      html += '<div class="credential-grid">';
+
+      /* Constancia — unlocked only when certificateFreeUnlocked is true */
+      var constanciaUnlocked = enrollment.certificateFreeUnlocked === true;
+      html += '<div class="credential-card ' + (constanciaUnlocked ? 'available' : 'locked') + '">';
+      html += '<span class="material-icons-round cred-icon">' + (constanciaUnlocked ? 'verified' : 'lock') + '</span>';
+      html += '<div class="cred-tag free">Gratuita</div>';
+      html += '<h3>Constancia de participación</h3>';
+      if (constanciaUnlocked) {
+        html += '<p>Descarga tu constancia digital de participación.</p>';
+        html += '<a href="#" class="btn btn-outline" id="btnConstancia"><span class="material-icons-round">download</span> Descargar</a>';
+      } else {
+        html += '<p>Disponible después de asistir a la sesión en vivo o ver la grabación.</p>';
+        html += '<span class="cred-tag lock"><span class="material-icons-round" style="font-size:12px">lock</span> Bloqueada</span>';
+      }
+      html += '</div>';
+
+      /* Certificado — unlocked only when completed */
+      html += '<div class="credential-card ' + (completed ? '' : 'locked') + '">';
+      html += '<span class="material-icons-round cred-icon">' + (completed ? 'workspace_premium' : 'lock') + '</span>';
+      html += '<div class="cred-tag paid">S/ 20</div>';
+      html += '<h3>Certificado</h3>';
+      if (completed) {
+        html += '<p>Rinde el examen de evaluación y obtén tu certificado oficial.</p>';
+        html += '<a href="#" class="btn btn-outline" id="btnCertificado"><span class="material-icons-round">quiz</span> Iniciar evaluación</a>';
+      } else {
+        html += '<p>Requiere asistencia + evaluación aprobada + pago de S/ 20.</p>';
+        html += '<span class="cred-tag lock"><span class="material-icons-round" style="font-size:12px">lock</span> Bloqueado</span>';
+      }
+      html += '</div>';
+      html += '</div></div>';
+
+      /* ── Temario card ── */
+      html += '<div class="panel-card">';
+      html += '<div class="panel-card-header"><span class="material-icons-round">menu_book</span><h2>Temario</h2></div>';
+      html += '<ul class="temario-list">';
+      course.temario.forEach(function(t, i) {
+        html += '<li><span class="temario-num">' + (i + 1) + '</span>' + t + '</li>';
+      });
+      html += '</ul></div>';
+
+      /* ── Enrollment management card ── */
+      if (canManage) {
+        html += '<div class="manage-card">';
+        html += '<div class="manage-card-header"><span class="material-icons-round">settings</span><h2>Gestionar inscripción</h2></div>';
+        html += '<p>Puedes cancelar tu inscripción antes de la fecha del evento.</p>';
+        html += '<button class="btn btn-danger-outline btn-sm" id="btnCancelEnroll" type="button"><span class="material-icons-round" style="font-size:14px">cancel</span> Cancelar inscripción</button>';
+        html += '</div>';
+      } else if (course.sessionDate) {
+        html += '<div class="manage-card manage-card-locked">';
+        html += '<div class="manage-card-header"><span class="material-icons-round">settings</span><h2>Gestionar inscripción</h2></div>';
+        html += '<div class="locked-msg"><span class="material-icons-round">lock</span> Los cambios ya no están disponibles (el evento ya inició o finalizó)</div>';
+        html += '</div>';
+      }
+
+      document.getElementById('content').innerHTML = html;
+
+      /* ── Wire up management buttons ── */
+      var btnChangeSchedule = document.getElementById('btnChangeSchedule');
+      var schedulePicker = document.getElementById('schedulePicker');
+      var btnCancelSchedule = document.getElementById('btnCancelSchedule');
+      var btnSaveSchedule = document.getElementById('btnSaveSchedule');
+      var btnCancelEnroll = document.getElementById('btnCancelEnroll');
+
+      if (btnChangeSchedule && schedulePicker) {
+        btnChangeSchedule.addEventListener('click', function() {
+          schedulePicker.classList.toggle('open');
+        });
+        btnCancelSchedule.addEventListener('click', function() {
+          schedulePicker.classList.remove('open');
+        });
+        btnSaveSchedule.addEventListener('click', function() {
+          saveScheduleChange(enrollment);
+        });
+      }
+
+      if (btnCancelEnroll) {
+        btnCancelEnroll.addEventListener('click', function() {
+          showCancelConfirm(enrollment);
+        });
+      }
+
+      /* Auto-refresh countdown every minute if session hasn't started */
+      if (state === 'before') {
+        setInterval(function() {
+          var newState = getSessionState(course, scheduleId);
+          if (newState !== 'before') { location.reload(); return; }
+          var el = document.querySelector('.session-countdown');
+          if (el) {
+            var cd = formatCountdown(course, scheduleId);
+            el.innerHTML = cd ? '<span class="material-icons-round">timer</span>' + cd : '';
+          }
+        }, 60000);
+      }
+
+      /* Auto-reload when session ends (if currently live) */
+      if (state === 'live' && course.sessionDate && course.scheduleTime[scheduleId]) {
+        var endTime = peruDate(course.sessionDate, course.scheduleTime[scheduleId].end);
+        var msToEnd = endTime - new Date();
+        if (msToEnd > 0) {
+          setTimeout(function() { location.reload(); }, msToEnd + 1000);
+        }
+      }
+    }
+
+    /* ══════════════════════════════════════════════
+       Attendance tracking
+       ══════════════════════════════════════════════
+
+       ESCALABILIDAD — Integración futura con Zoom API:
+       Actualmente la asistencia se registra al hacer clic en "Unirme ahora".
+       Para validar asistencia real con Zoom:
+       1. Usar Zoom Meeting Reports API: GET /v2/report/meetings/{meetingId}/participants
+       2. Cloud Function que reciba webhook "meeting.participant_joined"
+       3. Comparar email del participante con enrollment.userEmail
+       4. Auto-marcar attended:true si el tiempo en sesión >= umbral (ej. 80%)
+       La estructura de Firestore (attended, attendedAt, zoomVerified) ya soporta esto.
+       ══════════════════════════════════════════════ */
+
+    /** Mark attended when user clicks "Unirme ahora" */
+    function markAttended(e) {
+      if (!navigator.onLine) {
+        FQNotify.toast('No hay conexión a internet. Conéctate para registrar tu asistencia.', 'warning');
+        return;
+      }
+      var user = auth.currentUser;
+      if (!user) return;
+      var docId = user.uid + '_' + courseId;
+
+      db.collection('enrollments').doc(docId).get().then(function(doc) {
+        var data = doc.data() || {};
+        var updateObj = {
+          attended: true,
+          attendedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          completed: true,
+          progress: 100
+        };
+        if (data.certificateFreeUnlocked !== true) {
+          updateObj.certificateFreeUnlocked = true;
+        }
+        return db.collection('enrollments').doc(docId).update(updateObj);
+      }).then(function() {
+        console.log('[Asistencia] ✅ attended=true, progress=100');
+        FQNotify.toast('Asistencia registrada. ¡Disfruta la sesión!', 'success');
+        /* Update badge + progress bar without full reload */
+        var badge = document.querySelector('.progress-status');
+        if (badge) {
+          badge.className = 'progress-status status-attended';
+          badge.innerHTML = '<span class="material-icons-round">check_circle</span>Completado (en vivo)';
+        }
+        updateProgressBar(100);
+      }).catch(function(err) {
+        console.error('[Asistencia] Error:', err.code, err.message);
+      });
+    }
+
+    /** Mark watched when user clicks "Ver grabación" */
+    function markWatched(e) {
+      if (!navigator.onLine) {
+        FQNotify.toast('No hay conexión a internet. Conéctate para ver la grabación.', 'warning');
+        return;
+      }
+      var user = auth.currentUser;
+      if (!user) return;
+      var docId = user.uid + '_' + courseId;
+
+      db.collection('enrollments').doc(docId).get().then(function(doc) {
+        var data = doc.data() || {};
+        var updateObj = {
+          watched: true,
+          watchedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          completed: true,
+          progress: 100
+        };
+        if (data.certificateFreeUnlocked !== true) {
+          updateObj.certificateFreeUnlocked = true;
+        }
+        return db.collection('enrollments').doc(docId).update(updateObj);
+      }).then(function() {
+        console.log('[Grabación] ✅ watched=true, progress=100');
+        FQNotify.toast('Reproduciendo grabación. Tu progreso se ha registrado.', 'success');
+        /* Update badge + progress bar */
+        var badge = document.querySelector('.progress-status');
+        if (badge && !badge.classList.contains('status-attended')) {
+          badge.className = 'progress-status status-watched';
+          badge.innerHTML = '<span class="material-icons-round">play_circle</span>Completado (grabación)';
+        }
+        updateProgressBar(100);
+        /* Unlock credentials visually after short delay */
+        setTimeout(function() { location.reload(); }, 1500);
+      }).catch(function(err) {
+        console.error('[Grabación] Error:', err.code, err.message);
+      });
+    }
+
+    /** Update progress bar UI */
+    function updateProgressBar(pct) {
+      var fill = document.getElementById('progressFill');
+      if (fill) {
+        fill.className = 'progress-bar-fill fill-' + pct;
+      }
+      var info = document.querySelector('.progress-bar-info strong');
+      if (info) {
+        info.className = 'pct-' + pct;
+        info.textContent = pct + '%';
+      }
+    }
+
+    /* ══════════════════════════════════════════════
+       Schedule selector helper
+       ══════════════════════════════════════════════ */
+    var _selectedNewScheduleId = null;
+
+    function selectNewSchedule(el) {
+      document.querySelectorAll('.sched-opt').forEach(function(o) { o.classList.remove('active'); });
+      el.classList.add('active');
+      _selectedNewScheduleId = el.getAttribute('data-id');
+    }
+
+    /* ══════════════════════════════════════════════
+       Save schedule change to Firestore
+       ══════════════════════════════════════════════ */
+    function saveScheduleChange(enrollment) {
+      if (!navigator.onLine) {
+        FQNotify.toast('No hay conexión a internet. Conéctate para cambiar el horario.', 'warning');
+        return;
+      }
+      if (!_selectedNewScheduleId) {
+        FQNotify.toast('Selecciona un horario diferente.', 'warning');
+        return;
+      }
+
+      /* Don't save if same schedule */
+      if (enrollment.schedule && enrollment.schedule.id === _selectedNewScheduleId) {
+        FQNotify.toast('Ya tienes este horario seleccionado.', 'info');
+        document.getElementById('schedulePicker').classList.remove('open');
+        return;
+      }
+
+      var schedules = SCHEDULES[courseId];
+      var newSched = null;
+      schedules.forEach(function(s) { if (s.id === _selectedNewScheduleId) newSched = s; });
+      if (!newSched) return;
+
+      var user = auth.currentUser;
+      if (!user) return;
+
+      var docId = user.uid + '_' + courseId;
+      var btn = document.getElementById('btnSaveSchedule');
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+
+      db.collection('enrollments').doc(docId).update({
+        schedule: { id: newSched.id, label: newSched.label, detail: newSched.detail }
+      })
+      .then(function() {
+        FQNotify.toast('Horario actualizado correctamente.', 'success');
+        setTimeout(function() { location.reload(); }, 800);
+      })
+      .catch(function(err) {
+        console.error('[Horario] Error:', err.code, err.message);
+        FQNotify.toast('No se pudo actualizar el horario. Intenta nuevamente.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Guardar horario';
+      });
+    }
+
+    /* ══════════════════════════════════════════════
+       Cancel enrollment — confirm modal
+       ══════════════════════════════════════════════ */
+    function showCancelConfirm(enrollment) {
+      var overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.innerHTML =
+        '<div class="modal-box">' +
+        '<div class="modal-icon"><span class="material-icons-round">warning</span></div>' +
+        '<h3>¿Cancelar inscripción?</h3>' +
+        '<p>Se eliminará tu matrícula del curso. Podrás volver a inscribirte más adelante si hay cupos disponibles.</p>' +
+        '<div class="modal-actions">' +
+        '<button class="btn btn-outline" id="modalCancel" type="button">Volver</button>' +
+        '<button class="btn btn-danger-outline" id="modalConfirm" type="button"><span class="material-icons-round" style="font-size:16px">delete</span> Sí, cancelar</button>' +
+        '</div></div>';
+      document.body.appendChild(overlay);
+
+      document.getElementById('modalCancel').addEventListener('click', function() {
+        overlay.remove();
+      });
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) overlay.remove();
+      });
+
+      document.getElementById('modalConfirm').addEventListener('click', function() {
+        executeCancelEnrollment(overlay);
+      });
+    }
+
+    function executeCancelEnrollment(overlay) {
+      if (!navigator.onLine) {
+        overlay.remove();
+        FQNotify.toast('No hay conexión a internet. Conéctate para cancelar la inscripción.', 'warning');
+        return;
+      }
+      var user = auth.currentUser;
+      if (!user) return;
+
+      var confirmBtn = document.getElementById('modalConfirm');
+      confirmBtn.disabled = true;
+      confirmBtn.innerHTML = '<span class="material-icons-round" style="font-size:16px">hourglass_top</span> Cancelando...';
+
+      var docId = user.uid + '_' + courseId;
+
+      db.collection('enrollments').doc(docId).delete()
+        .then(function() {
+          /* Clear both localStorage caches */
+          try { localStorage.removeItem('session_enrollment_' + user.uid + '_' + courseId); } catch (_) {}
+          try { localStorage.removeItem('enrollment_' + user.uid + '_' + courseId); } catch (_) {}
+          overlay.remove();
+          FQNotify.toast('Tu inscripción ha sido cancelada.', 'success');
+          setTimeout(function() {
+            window.location.href = '../cursos/curso.html?id=' + courseId;
+          }, 1200);
+        })
+        .catch(function(err) {
+          console.error('[Cancelar] Error:', err.code, err.message);
+          overlay.remove();
+          FQNotify.toast('No se pudo cancelar la inscripción. Intenta nuevamente.', 'error');
+        });
+    }
+
+    /* ══════════════════════════════════════════════
+       Offline / Online detection
+       ══════════════════════════════════════════════ */
+    function updateOfflineBanner() {
+      var banner = document.getElementById('offlineBanner');
+      if (!navigator.onLine) {
+        if (banner) banner.classList.add('visible');
+      } else {
+        if (banner) banner.classList.remove('visible');
+      }
+    }
+
+    window.addEventListener('online', function() {
+      updateOfflineBanner();
+      FQNotify.toast('Conexión restaurada', 'success');
+      /* Re-sync: reload enrollment from Firestore */
+      var user = auth.currentUser;
+      if (user && courseId && COURSES[courseId]) {
+        var cacheKey = 'session_enrollment_' + user.uid + '_' + courseId;
+        db.collection('enrollments').doc(user.uid + '_' + courseId).get()
+          .then(function(doc) {
+            if (doc.exists && doc.data().status === 'active') {
+              var fbData = doc.data();
+              cacheEnrollment(user.uid, fbData);
+              renderPanel(COURSES[courseId], fbData);
+            } else {
+              try { localStorage.removeItem(cacheKey); } catch (_) {}
+              document.getElementById('content').innerHTML =
+                '<div class="state-box">' +
+                '<span class="material-icons-round">block</span>' +
+                '<h2>No estás matriculado</h2>' +
+                '<p>Necesitas matricularte para acceder al contenido de este curso.</p>' +
+                '<a href="../cursos/curso.html?id=' + courseId + '" class="btn btn-primary">Ver curso e inscribirme</a>' +
+                '</div>';
+            }
+          });
+      }
+    });
+
+    window.addEventListener('offline', function() {
+      updateOfflineBanner();
+      FQNotify.toast('Se perdió la conexión a internet', 'warning');
+    });
+
+    updateOfflineBanner();
+  </script>
+</body>
+</html>

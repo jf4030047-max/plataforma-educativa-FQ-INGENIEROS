@@ -1,0 +1,16 @@
+Backup realizado el 27-03-2026.
+
+Archivos principales recientemente modificados:
+
+- admin/index.html
+- index.html (raíz del proyecto)
+- cursos/curso.html
+- assets/js/index-dynamic.js
+- dashboard/index.html
+- styles.css
+- sesiones/index.html
+- cursos/panel.html
+- dashboard/dashboard-dynamic.js
+- assets/css/header.css
+
+Si necesitas el contenido exacto de algún archivo, indícalo y lo copio aquí.

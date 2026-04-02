@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Restablecer contraseña | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/header.css" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh;display:flex;flex-direction:column}
+
+    .page{flex:1;display:flex;align-items:center;justify-content:center;padding:36px 16px}
+    .card{background:#fff;border:1px solid #dce3ed;border-radius:18px;width:100%;max-width:460px;padding:40px 36px;box-shadow:0 4px 24px rgba(15,23,42,.06)}
+    .card-header{text-align:center;margin-bottom:28px}
+    .card-header .icon{width:64px;height:64px;border-radius:16px;display:inline-grid;place-items:center;margin-bottom:16px}
+    .card-header .icon .material-icons-round{font-size:32px;color:#fff}
+    .card-header .icon-reset{background:linear-gradient(135deg,#1565c0,#1e88e5)}
+    .card-header .icon-success{background:linear-gradient(135deg,#16a34a,#22c55e)}
+    .card-header .icon-error{background:linear-gradient(135deg,#dc2626,#ef4444)}
+    .card-header .icon-expired{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
+    .card-header h1{font-size:22px;font-weight:800;color:#0f172a;margin-bottom:8px}
+    .card-header p{font-size:14px;color:#64748b;line-height:1.6}
+
+    .form-group{margin-bottom:18px}
+    .form-label{display:block;margin-bottom:6px;font-size:13px;font-weight:600;color:#334155}
+    .form-control{
+      width:100%;padding:12px 14px;background:#f7f9fc;
+      border:1.5px solid #dce3ed;border-radius:10px;
+      color:#0f172a;font-size:14px;font-family:inherit;transition:border-color .2s;
+      box-sizing:border-box;
+    }
+    .form-control:focus{outline:none;border-color:#1e88e5;box-shadow:0 0 0 3px rgba(30,136,229,.1);background:#fff}
+
+    .pw-field-wrap{position:relative}
+    .pw-field-wrap .form-control{padding-right:44px}
+    .pw-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#64748b;display:grid;place-items:center;padding:0}
+    .pw-toggle:hover{color:#1565c0}
+
+    .pw-strength-wrap{height:6px;border-radius:3px;background:#eef2f7;margin-top:6px;overflow:hidden}
+    .pw-strength-bar{height:100%;width:0;border-radius:3px;transition:width .3s,background .3s}
+
+    .pw-requirements{margin-top:8px;font-size:12px;color:#64748b;line-height:1.8}
+    .pw-requirements span{display:flex;align-items:center;gap:6px}
+    .pw-requirements .met{color:#16a34a;font-weight:600}
+
+    .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:10px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all .2s;font-family:inherit}
+    .btn-primary{background:#1565c0;color:#fff}
+    .btn-primary:hover{background:#1e88e5;box-shadow:0 4px 18px rgba(21,101,192,.3)}
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed}
+    .btn-outline{background:#fff;color:#1565c0;border:1.5px solid #1565c0}
+    .btn-outline:hover{background:#eff6ff}
+
+    .alert{padding:14px 18px;border-radius:12px;font-size:13px;display:none;align-items:flex-start;gap:12px;margin-bottom:18px;line-height:1.5;animation:alertIn .3s ease}
+    .alert-error{display:flex;background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#b91c1c;border:1px solid #fecaca}
+    .alert-success{display:flex;background:linear-gradient(135deg,#f0fdf4,#dcfce7);color:#15803d;border:1px solid #bbf7d0}
+    .alert .alert-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .alert-error .alert-icon{background:#fee2e2;color:#dc2626}
+    .alert-success .alert-icon{background:#dcfce7;color:#16a34a}
+    .alert .alert-content{flex:1}
+    .alert .alert-title{font-weight:700;font-size:14px;margin-bottom:2px}
+    @keyframes alertIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+    .security-badge{display:flex;align-items:center;gap:8px;padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;margin-top:20px;font-size:12px;color:#64748b;line-height:1.5}
+    .security-badge .material-icons-round{font-size:18px;color:#1565c0;flex-shrink:0}
+
+    .match-hint{font-size:12px;margin-top:4px;display:flex;align-items:center;gap:6px}
+
+    /* Views */
+    .view{display:none}
+    .view.active{display:block}
+
+    /* Success animation */
+    .success-check{width:80px;height:80px;margin:0 auto 20px;position:relative}
+    .success-check .circle{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);display:flex;align-items:center;justify-content:center;animation:scaleIn .5s ease}
+    .success-check .material-icons-round{font-size:40px;color:#fff;animation:checkIn .3s .3s ease both}
+    @keyframes scaleIn{from{transform:scale(0)}to{transform:scale(1)}}
+    @keyframes checkIn{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+
+    .page-footer{text-align:center;padding:18px;color:#64748b;font-size:12px;border-top:1px solid #dce3ed}
+
+    .loading-spinner{display:inline-block;width:20px;height:20px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    @media(max-width:480px){.card{padding:28px 20px}}
+  </style>
+</head>
+<body>
+
+  <header class="top-bar">
+    <div class="container top-bar-inner">
+      <a class="brand" href="../index.html">
+        <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
+      </a>
+      <div class="top-bar-right">
+        <a class="back-link" href="../index.html"><span class="material-icons-round">arrow_back</span> Inicio</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="card">
+
+      <!-- View: Loading -->
+      <div class="view active" id="viewLoading">
+        <div class="card-header">
+          <div class="icon icon-reset"><span class="material-icons-round">hourglass_empty</span></div>
+          <h1>Verificando enlace...</h1>
+          <p>Estamos validando tu solicitud de restablecimiento. Esto solo toma un momento.</p>
+        </div>
+      </div>
+
+      <!-- View: Reset Form -->
+      <div class="view" id="viewReset">
+        <div class="card-header">
+          <div class="icon icon-reset"><span class="material-icons-round">lock_reset</span></div>
+          <h1>Crea tu nueva contraseña</h1>
+          <p>Ingresa una nueva contraseña segura para tu cuenta en <strong>FQ INGENIEROS</strong>.</p>
+        </div>
+
+        <div class="alert" id="resetAlert">
+          <div class="alert-icon"><span class="material-icons-round" style="font-size:20px" id="resetAlertIcon">error</span></div>
+          <div class="alert-content"><div class="alert-title" id="resetAlertTitle"></div><div id="resetAlertMsg"></div></div>
+        </div>
+
+        <form id="resetForm" onsubmit="handleReset(event)">
+          <div class="form-group">
+            <label class="form-label">Nueva contraseña</label>
+            <div class="pw-field-wrap">
+              <input type="password" class="form-control" id="newPw" placeholder="Mínimo 8 caracteres" required oninput="checkStrength()" autocomplete="new-password" />
+              <button type="button" class="pw-toggle" onclick="togglePw('newPw',this)"><span class="material-icons-round" style="font-size:20px">visibility_off</span></button>
+            </div>
+            <div class="pw-strength-wrap"><div class="pw-strength-bar" id="strengthBar"></div></div>
+            <div class="pw-requirements">
+              <span id="rLen">✗ Mínimo 8 caracteres</span>
+              <span id="rUpper">✗ Una letra mayúscula</span>
+              <span id="rNum">✗ Un número</span>
+              <span id="rSpecial">✗ Un carácter especial</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Confirmar nueva contraseña</label>
+            <div class="pw-field-wrap">
+              <input type="password" class="form-control" id="confirmPw" placeholder="Repite la nueva contraseña" required oninput="checkMatch()" autocomplete="new-password" />
+              <button type="button" class="pw-toggle" onclick="togglePw('confirmPw',this)"><span class="material-icons-round" style="font-size:20px">visibility_off</span></button>
+            </div>
+            <div class="match-hint" id="matchHint"></div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="btnSubmit">
+            <span class="material-icons-round" style="font-size:18px">vpn_key</span> Restablecer contraseña
+          </button>
+        </form>
+
+        <div class="security-badge">
+          <span class="material-icons-round">verified_user</span>
+          <span>Esta página es segura y pertenece a <strong>FQ INGENIEROS</strong>. Tu contraseña se actualiza directamente en Firebase Authentication.</span>
+        </div>
+      </div>
+
+      <!-- View: Success -->
+      <div class="view" id="viewSuccess">
+        <div class="card-header">
+          <div class="success-check">
+            <div class="circle"><span class="material-icons-round">check</span></div>
+          </div>
+          <h1>¡Contraseña actualizada!</h1>
+          <p>Tu nueva contraseña ha sido guardada correctamente. Ya puedes iniciar sesión con ella.</p>
+        </div>
+        <a href="login.html" class="btn btn-primary" style="text-decoration:none">
+          <span class="material-icons-round" style="font-size:18px">login</span> Ir a Iniciar sesión
+        </a>
+        <div class="security-badge">
+          <span class="material-icons-round">schedule</span>
+          <span>Si no realizaste este cambio, contacta a soporte inmediatamente: <strong>fq.ingenieros.empresa@gmail.com</strong></span>
+        </div>
+      </div>
+
+      <!-- View: Error / Expired -->
+      <div class="view" id="viewError">
+        <div class="card-header">
+          <div class="icon icon-expired"><span class="material-icons-round">link_off</span></div>
+          <h1 id="errorTitle">Enlace inválido o expirado</h1>
+          <p id="errorMsg">Este enlace de restablecimiento ya fue utilizado o ha expirado. Por seguridad, los enlaces son válidos por un tiempo limitado.</p>
+        </div>
+        <a href="login.html" class="btn btn-outline" style="text-decoration:none;margin-bottom:12px">
+          <span class="material-icons-round" style="font-size:18px">login</span> Ir a Iniciar sesión
+        </a>
+        <button type="button" class="btn btn-primary" onclick="requestNewReset()">
+          <span class="material-icons-round" style="font-size:18px">forward_to_inbox</span> Solicitar nuevo enlace
+        </button>
+      </div>
+
+      <!-- View: New Reset Request -->
+      <div class="view" id="viewNewReset">
+        <div class="card-header">
+          <div class="icon icon-reset"><span class="material-icons-round">forward_to_inbox</span></div>
+          <h1>Solicitar nuevo enlace</h1>
+          <p>Ingresa tu correo electrónico y te enviaremos un nuevo enlace de restablecimiento.</p>
+        </div>
+        <form id="newResetForm" onsubmit="handleNewReset(event)">
+          <div class="form-group">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" id="resetEmail" placeholder="correo@ejemplo.com" required />
+          </div>
+          <button type="submit" class="btn btn-primary" id="btnNewReset">
+            <span class="material-icons-round" style="font-size:18px">send</span> Enviar enlace
+          </button>
+        </form>
+      </div>
+
+      <!-- View: Email Sent -->
+      <div class="view" id="viewSent">
+        <div class="card-header">
+          <div class="icon icon-success"><span class="material-icons-round">mark_email_read</span></div>
+          <h1>Correo enviado</h1>
+          <p>Te hemos enviado un nuevo enlace de restablecimiento. Revisa tu bandeja de entrada y la carpeta de spam.</p>
+        </div>
+        <a href="login.html" class="btn btn-primary" style="text-decoration:none">
+          <span class="material-icons-round" style="font-size:18px">login</span> Ir a Iniciar sesión
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="page-footer">© 2026 FQ INGENIEROS · Plataforma Educativa</footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+
+  <script>
+    /* ── Parse URL parameters ── */
+    var urlParams = new URLSearchParams(window.location.search);
+    var mode = urlParams.get('mode');
+    var oobCode = urlParams.get('oobCode');
+
+    function showView(id) {
+      document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+      document.getElementById(id).classList.add('active');
+    }
+
+    /* ── Toggle password visibility ── */
+    function togglePw(id, btn) {
+      var input = document.getElementById(id);
+      var icon = btn.querySelector('.material-icons-round');
+      if (input.type === 'password') { input.type = 'text'; icon.textContent = 'visibility'; }
+      else { input.type = 'password'; icon.textContent = 'visibility_off'; }
+    }
+
+    /* ── Password strength ── */
+    function checkStrength() {
+      var pw = document.getElementById('newPw').value;
+      var bar = document.getElementById('strengthBar');
+      var hasLen = pw.length >= 8;
+      var hasUpper = /[A-Z]/.test(pw);
+      var hasNum = /[0-9]/.test(pw);
+      var hasSpecial = /[^A-Za-z0-9]/.test(pw);
+      var update = function(id, met, text) {
+        var el = document.getElementById(id);
+        el.className = met ? 'met' : '';
+        el.textContent = (met ? '✓' : '✗') + ' ' + text;
+      };
+      update('rLen', hasLen, 'Mínimo 8 caracteres');
+      update('rUpper', hasUpper, 'Una letra mayúscula');
+      update('rNum', hasNum, 'Un número');
+      update('rSpecial', hasSpecial, 'Un carácter especial');
+      var score = (hasLen ? 1 : 0) + (hasUpper ? 1 : 0) + (hasNum ? 1 : 0) + (hasSpecial ? 1 : 0);
+      var colors = ['#dc2626','#f59e0b','#1e88e5','#16a34a'];
+      var widths = ['25%','50%','75%','100%'];
+      bar.style.width = score ? widths[score - 1] : '0';
+      bar.style.background = score ? colors[score - 1] : '#dce3ed';
+      checkMatch();
+    }
+
+    function checkMatch() {
+      var pw = document.getElementById('newPw').value;
+      var confirm = document.getElementById('confirmPw').value;
+      var hint = document.getElementById('matchHint');
+      if (!confirm) { hint.textContent = ''; return; }
+      if (pw === confirm) { hint.textContent = '✓ Las contraseñas coinciden'; hint.style.color = '#16a34a'; }
+      else { hint.textContent = '✗ Las contraseñas no coinciden'; hint.style.color = '#dc2626'; }
+    }
+
+    function showResetAlert(title, msg, isError) {
+      var alert = document.getElementById('resetAlert');
+      alert.className = 'alert ' + (isError ? 'alert-error' : 'alert-success');
+      document.getElementById('resetAlertIcon').textContent = isError ? 'error' : 'check_circle';
+      document.getElementById('resetAlertTitle').textContent = title;
+      document.getElementById('resetAlertMsg').textContent = msg;
+    }
+
+    /* ── Verify the reset code ── */
+    function init() {
+      if (mode === 'resetPassword' && oobCode) {
+        auth.verifyPasswordResetCode(oobCode).then(function(email) {
+          showView('viewReset');
+        }).catch(function(err) {
+          if (err.code === 'auth/expired-action-code') {
+            document.getElementById('errorTitle').textContent = 'Enlace expirado';
+            document.getElementById('errorMsg').textContent = 'Este enlace de restablecimiento ha expirado. Por seguridad, los enlaces solo son válidos por 1 hora. Solicita uno nuevo.';
+          } else if (err.code === 'auth/invalid-action-code') {
+            document.getElementById('errorTitle').textContent = 'Enlace ya utilizado';
+            document.getElementById('errorMsg').textContent = 'Este enlace ya fue utilizado para cambiar tu contraseña. Si necesitas cambiarlo de nuevo, solicita un nuevo enlace.';
+          }
+          showView('viewError');
+        });
+      } else {
+        document.getElementById('errorTitle').textContent = 'Enlace no válido';
+        document.getElementById('errorMsg').textContent = 'No se recibieron los parámetros necesarios. Asegúrate de usar el enlace completo del correo electrónico.';
+        showView('viewError');
+      }
+    }
+
+    /* ── Handle password reset ── */
+    async function handleReset(e) {
+      e.preventDefault();
+      var newPw = document.getElementById('newPw').value;
+      var confirmPw = document.getElementById('confirmPw').value;
+      var alert = document.getElementById('resetAlert');
+      alert.className = 'alert';
+
+      if (newPw.length < 8) { showResetAlert('Contraseña muy corta', 'Usa al menos 8 caracteres.', true); return; }
+      if (!/[A-Z]/.test(newPw)) { showResetAlert('Falta mayúscula', 'Incluye al menos una letra mayúscula.', true); return; }
+      if (!/[0-9]/.test(newPw)) { showResetAlert('Falta número', 'Incluye al menos un número.', true); return; }
+      if (!/[^A-Za-z0-9]/.test(newPw)) { showResetAlert('Falta carácter especial', 'Incluye al menos un carácter especial (@, #, $, etc.).', true); return; }
+      if (newPw !== confirmPw) { showResetAlert('No coinciden', 'Las contraseñas no coinciden. Verifica e intenta de nuevo.', true); return; }
+
+      var btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading-spinner"></span> Actualizando...';
+
+      try {
+        await auth.confirmPasswordReset(oobCode, newPw);
+        showView('viewSuccess');
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-icons-round" style="font-size:18px">vpn_key</span> Restablecer contraseña';
+        if (err.code === 'auth/expired-action-code') {
+          showView('viewError');
+        } else if (err.code === 'auth/weak-password') {
+          showResetAlert('Contraseña débil', 'Firebase requiere una contraseña más segura.', true);
+        } else {
+          showResetAlert('Error', 'No se pudo actualizar la contraseña: ' + err.message, true);
+        }
+      }
+    }
+
+    /* ── Request new reset ── */
+    function requestNewReset() { showView('viewNewReset'); }
+
+    async function handleNewReset(e) {
+      e.preventDefault();
+      var email = document.getElementById('resetEmail').value.trim();
+      var btn = document.getElementById('btnNewReset');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading-spinner"></span> Enviando...';
+      try {
+        var actionCodeSettings = {
+          url: window.location.origin + '/auth/login.html',
+          handleCodeInApp: false
+        };
+        await auth.sendPasswordResetEmail(email, actionCodeSettings);
+        showView('viewSent');
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-icons-round" style="font-size:18px">send</span> Enviar enlace';
+        // Don't reveal if email exists
+        showView('viewSent');
+      }
+    }
+
+    init();
+  </script>
+
+</body>
+</html>

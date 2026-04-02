@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Administrador | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link href="../assets/css/notifications.css" rel="stylesheet" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
+
+    /* Layout */
+    .layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+
+    /* Sidebar */
+    .sidebar{background:#0f172a;color:#e2e8f0;padding:0;display:flex;flex-direction:column}
+    .sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 22px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .sidebar-brand img{width:36px;height:36px;border-radius:8px;object-fit:cover}
+    .sidebar-brand strong{font-size:13px;color:#fff}
+    .sidebar-brand span{font-size:10px;color:#60a5fa;letter-spacing:1px;text-transform:uppercase;display:block;font-weight:600}
+    .sidebar-nav{flex:1;padding:16px 12px}
+    .nav-label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding:12px 10px 6px;margin-top:8px}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s;cursor:pointer;margin-bottom:2px}
+    .nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+    .nav-item.active{background:#1565c0;color:#fff}
+    .nav-item .material-icons-round{font-size:20px}
+    .nav-item .badge-count{margin-left:auto;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;min-width:20px;text-align:center}
+    .sidebar-footer{padding:16px 22px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:#64748b}
+    .sidebar-footer a{color:#60a5fa;text-decoration:none}
+
+    /* Main */
+    .main{padding:0;overflow-y:auto;max-height:100vh}
+    .top-bar{background:#fff;border-bottom:1px solid #dce3ed;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:10}
+    .top-bar h2{font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px}
+    .top-bar-actions{display:flex;align-items:center;gap:14px}
+    .admin-badge{background:#eff6ff;color:#1565c0;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
+    .btn-logout{background:none;border:1.5px solid #dce3ed;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;color:#334155;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;font-family:inherit}
+    .btn-logout:hover{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+
+    .content{padding:28px 32px}
+
+    /* Stats */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:32px}
+    .stat-card{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:22px;display:flex;align-items:center;gap:16px;transition:box-shadow .2s}
+    .stat-card:hover{box-shadow:0 4px 16px rgba(15,23,42,.08)}
+    .stat-icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center}
+    .stat-icon .material-icons-round{font-size:24px;color:#fff}
+    .stat-icon.blue{background:linear-gradient(135deg,#1565c0,#1e88e5)}
+    .stat-icon.dark{background:linear-gradient(135deg,#0f172a,#334155)}
+    .stat-icon.green{background:linear-gradient(135deg,#16a34a,#22c55e)}
+    .stat-icon.orange{background:linear-gradient(135deg,#ea580c,#f97316)}
+    .stat-info strong{display:block;font-size:28px;font-weight:800;color:#0f172a}
+    .stat-info span{font-size:13px;color:#64748b}
+
+    /* Panels / sections */
+    .panel{display:none}
+    .panel.active{display:block}
+    .panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+    .panel-header h3{font-size:20px;font-weight:700;color:#0f172a}
+    .search-box{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #dce3ed;border-radius:10px;padding:8px 14px;width:280px;transition:border-color .2s}
+    .search-box:focus-within{border-color:#1e88e5}
+    .search-box input{border:none;outline:none;font-size:14px;font-family:inherit;width:100%;color:#0f172a;background:transparent}
+    .search-box .material-icons-round{font-size:20px;color:#64748b}
+
+    /* Table */
+    .table-wrap{background:#fff;border:1px solid #dce3ed;border-radius:14px;overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    thead{background:#f7f9fc}
+    th{text-align:left;padding:12px 16px;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #dce3ed}
+    td{padding:12px 16px;font-size:14px;color:#334155;border-bottom:1px solid #eef2f7}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#f7f9fc}
+    .user-cell{display:flex;align-items:center;gap:10px}
+    .user-avatar{width:34px;height:34px;border-radius:50%;background:#1565c0;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:700;flex-shrink:0}
+    .user-name{font-weight:600;color:#0f172a}
+    .user-email{font-size:12px;color:#64748b}
+    .status-badge{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+    .status-badge.active{background:#f0fdf4;color:#16a34a}
+    .status-badge.pending{background:#fffbeb;color:#d97706}
+    .status-badge.paid{background:#eff6ff;color:#1565c0}
+    .action-btn{background:none;border:1px solid #dce3ed;border-radius:8px;padding:5px 8px;cursor:pointer;color:#64748b;transition:all .2s;display:inline-flex;align-items:center;gap:4px;font-size:12px;font-family:inherit}
+    .action-btn:hover{background:#eff6ff;border-color:#1565c0;color:#1565c0}
+    .action-btn.danger:hover{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+
+    .empty-state{text-align:center;padding:48px 20px;color:#64748b}
+    .empty-state .material-icons-round{font-size:48px;color:#dce3ed;margin-bottom:12px}
+    .empty-state p{font-size:15px}
+
+    /* Courses panel */
+    .course-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+    .course-item{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:8px}
+    .course-item h4{font-size:16px;font-weight:700;color:#0f172a}
+    .course-item p{font-size:13px;color:#64748b}
+    .course-meta{display:flex;gap:16px;font-size:12px;color:#64748b;margin-top:4px}
+    .course-meta span{display:flex;align-items:center;gap:4px}
+    .course-meta .material-icons-round{font-size:16px;color:#1565c0}
+
+    /* Settings */
+    .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .setting-card{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:24px}
+    .setting-card h4{font-size:16px;font-weight:700;color:#0f172a;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .setting-card p{font-size:13px;color:#64748b;margin-bottom:14px}
+    .setting-card .btn-sm{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .2s;font-family:inherit}
+    .btn-blue{background:#1565c0;color:#fff}
+    .btn-blue:hover{background:#1e88e5}
+    .btn-outline-sm{background:transparent;border:1.5px solid #dce3ed;color:#334155}
+    .btn-outline-sm:hover{background:#eff6ff;border-color:#1565c0;color:#1565c0}
+
+    @media(max-width:900px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{display:none}
+      .stats-grid{grid-template-columns:1fr 1fr}
+      .settings-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:600px){
+      .stats-grid{grid-template-columns:1fr}
+      .content{padding:20px 16px}
+      .top-bar{padding:0 16px}
+    }
+
+    /* ── Auth Overlay ── */
+    .auth-overlay{position:fixed;inset:0;z-index:200;background:#f7f9fc;display:flex;align-items:center;justify-content:center;padding:20px}
+    .auth-card{background:#fff;border-radius:18px;width:100%;max-width:440px;padding:40px;box-shadow:0 8px 32px rgba(15,23,42,.10);text-align:center}
+    .auth-card .icon-box{width:64px;height:64px;border-radius:16px;display:inline-grid;place-items:center;margin-bottom:16px}
+    .auth-card h2{font-size:22px;font-weight:800;color:#0f172a;margin-bottom:6px}
+    .auth-card p{font-size:14px;color:#64748b;margin-bottom:24px;line-height:1.5}
+    .auth-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:600;border:none;cursor:pointer;font-family:inherit;transition:background .2s}
+    .auth-btn-primary{background:#1565c0;color:#fff}
+    .auth-btn-primary:hover{background:#0d47a1}
+    .auth-btn-google{background:#fff;color:#334155;border:1.5px solid #dce3ed}
+    .auth-btn-google:hover{background:#f7f9fc}
+    .auth-btn-back{background:transparent;color:#64748b;font-size:13px;margin-top:12px}
+    .auth-spinner{display:inline-block;width:20px;height:20px;border:2.5px solid #e2e8f0;border-top-color:#1565c0;border-radius:50%;animation:spin .6s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+
+  <!-- ═══ AUTH: Pantalla de login ═══ -->
+  <div id="authOverlay" class="auth-overlay">
+    <div class="auth-card">
+      <div class="icon-box" style="background:linear-gradient(135deg,#1565c0,#1e88e5)">
+        <span class="material-icons-round" style="font-size:30px;color:#fff">admin_panel_settings</span>
+      </div>
+      <h2>Panel Administrador</h2>
+      <p id="authMsg">Inicia sesión con tu cuenta de administrador para acceder al panel.</p>
+      <div id="authActions">
+        <button class="auth-btn auth-btn-google" onclick="loginWithGoogle()" style="width:100%;justify-content:center;margin-bottom:10px">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.9 7.35 2.56 10.53l7.97-5.94z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.94C6.51 42.62 14.62 48 24 48z"/></svg>
+          Iniciar sesión con Google
+        </button>
+        <button class="auth-btn auth-btn-back" onclick="window.location.href='../index.html'">
+          <span class="material-icons-round" style="font-size:16px">arrow_back</span> Volver al inicio
+        </button>
+      </div>
+      <div id="authLoading" style="display:none">
+        <div class="auth-spinner"></div>
+        <p style="margin-top:12px;font-size:13px;color:#64748b">Verificando permisos...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ AUTH: Acceso denegado ═══ -->
+  <div id="authDenied" class="auth-overlay" style="display:none">
+    <div class="auth-card">
+      <div class="icon-box" style="background:linear-gradient(135deg,#dc2626,#ef4444)">
+        <span class="material-icons-round" style="font-size:30px;color:#fff">block</span>
+      </div>
+      <h2>Acceso restringido</h2>
+      <p id="deniedMsg">Tu cuenta no tiene permisos de administrador. Contacta al administrador del sistema.</p>
+      <p id="deniedEmail" style="font-size:12px;color:#94a3b8;margin-bottom:20px"></p>
+      <button class="auth-btn auth-btn-primary" onclick="logoutAndRetry()" style="width:100%;justify-content:center;margin-bottom:8px">
+        <span class="material-icons-round" style="font-size:18px">swap_horiz</span> Cambiar de cuenta
+      </button>
+      <button class="auth-btn auth-btn-back" onclick="window.location.href='../index.html'">
+        <span class="material-icons-round" style="font-size:16px">arrow_back</span> Volver al inicio
+      </button>
+    </div>
+  </div>
+
+    <div class="layout" id="adminLayout" style="display:none">
+
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="../assets/img/logo-fq.png" alt="FQ" />
+        <div><strong>FQ INGENIEROS</strong><span>Admin Panel</span></div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-label">Principal</div>
+        <a class="nav-item active" onclick="showPanel('dashboard')">
+          <span class="material-icons-round">dashboard</span> Dashboard
+        </a>
+        <a class="nav-item" onclick="showPanel('users')">
+          <span class="material-icons-round">people</span> Usuarios
+          <span class="badge-count" id="userCount">0</span>
+        </a>
+
+        <div class="nav-label">Gestión</div>
+        <a class="nav-item" onclick="showPanel('courses')">
+          <span class="material-icons-round">menu_book</span> Cursos
+        </a>
+        <a class="nav-item" onclick="showPanel('payments')">
+          <span class="material-icons-round">payments</span> Pagos
+          <span class="badge-count" id="payCount">0</span>
+        </a>
+        <a class="nav-item" onclick="showPanel('exams')">
+          <span class="material-icons-round">quiz</span> Exámenes
+        </a>
+        <a class="nav-item" onclick="showPanel('certificates')">
+          <span class="material-icons-round">workspace_premium</span> Certificados
+        </a>
+
+        <div class="nav-label">Sistema</div>
+        <a class="nav-item" onclick="showPanel('settings')">
+          <span class="material-icons-round">settings</span> Configuración
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="../index.html">← Volver al sitio</a>
+      </div>
+    </aside>
+
+    <!-- ═══ MAIN ═══ -->
+    <div class="main">
+      <header class="top-bar">
+        <h2><span class="material-icons-round">admin_panel_settings</span> Panel de Administración</h2>
+        <div class="top-bar-actions">
+          <span class="admin-badge" id="originBadge" style="font-size:11px;cursor:help" title="Origen actual del servidor"></span>
+          <span class="admin-badge"><span class="material-icons-round" style="font-size:16px">shield</span> Administrador</span>
+          <button class="btn-logout" onclick="logout()"><span class="material-icons-round" style="font-size:16px">logout</span> Salir</button>
+        </div>
+      </header>
+
+      <div class="content">
+
+        <!-- ═══ DASHBOARD ═══ -->
+        <div class="panel active" id="panel-dashboard">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon blue"><span class="material-icons-round">people</span></div>
+              <div class="stat-info"><strong id="statUsers">0</strong><span>Usuarios registrados</span></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon dark"><span class="material-icons-round">menu_book</span></div>
+              <div class="stat-card">
+  <div class="stat-icon dark">
+    <span class="material-icons-round">menu_book</span>
+  </div>
+  <div class="stat-info">
+    <strong id="statCursos">0</strong>
+    <span>Cursos activos</span>
+  </div>
+</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon orange"><span class="material-icons-round">receipt_long</span></div>
+              <div class="stat-info"><strong id="statPayments">0</strong><span>Pagos recibidos</span></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green"><span class="material-icons-round">verified</span></div>
+              <div class="stat-info"><strong id="statCerts">0</strong><span>Certificados emitidos</span></div>
+            </div>
+          </div>
+
+          <div class="panel-header">
+            <h3>Últimos usuarios registrados</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Usuario</th><th>Fecha registro</th><th>Estado</th></tr></thead>
+              <tbody id="recentUsersTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ═══ USUARIOS ═══ -->
+        <div class="panel" id="panel-users">
+          <div class="panel-header">
+            <h3>Todos los usuarios</h3>
+            <div class="search-box">
+              <span class="material-icons-round">search</span>
+              <input type="text" placeholder="Buscar por nombre o correo..." id="searchUsers" oninput="renderUsers()" />
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Usuario</th><th>Documento</th><th>Teléfono</th><th>Fecha</th><th>Método</th><th>Perfil</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody id="usersTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ═══ CURSOS ═══ -->
+        <div class="panel" id="panel-courses">
+          <div class="panel-header">
+            <h3>Cursos disponibles</h3>
+          </div>
+          <div class="course-list">
+            <div class="course-item">
+              <h4>Seguridad y Salud en el Trabajo en Obras Civiles</h4>
+              <p>Identificación de riesgos, medidas preventivas, inspección de campo y protocolos de seguridad.</p>
+              <div class="course-meta">
+                <span><span class="material-icons-round">schedule</span> 1 hora</span>
+                <span><span class="material-icons-round">people</span> <span id="course1Count">0</span> inscritos</span>
+                <span><span class="material-icons-round">sell</span> Gratis</span>
+              </div>
+            </div>
+            <div class="course-item">
+              <h4>Metrados y Presupuestos</h4>
+              <p>Costeo técnico, análisis de partidas unitarias y elaboración de valorizaciones de obra.</p>
+              <div class="course-meta">
+                <span><span class="material-icons-round">schedule</span> 12 horas</span>
+                <span><span class="material-icons-round">people</span> 0 inscritos</span>
+                <span><span class="material-icons-round">sell</span> S/ 50</span>
+              </div>
+            </div>
+            <div class="course-item">
+              <h4>Supervisión de Obra</h4>
+              <p>Dirección técnica, control de calidad, cuaderno de obra y buenas prácticas de supervisión.</p>
+              <div class="course-meta">
+                <span><span class="material-icons-round">schedule</span> 16 horas</span>
+                <span><span class="material-icons-round">people</span> 0 inscritos</span>
+                <span><span class="material-icons-round">sell</span> S/ 80</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ PAGOS ═══ -->
+        <div class="panel" id="panel-payments">
+          <div class="panel-header">
+            <h3>Comprobantes de pago</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Usuario</th><th>Curso</th><th>Método</th><th>N° Operación</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody id="paymentsTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ═══ EXÁMENES ═══ -->
+        <div class="panel" id="panel-exams">
+          <div class="panel-header">
+            <h3>Resultados de exámenes</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Estudiante</th><th>Curso</th><th>Nota</th><th>Estado</th><th>Fecha</th></tr></thead>
+              <tbody id="examsTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ═══ CERTIFICADOS ═══ -->
+        <div class="panel" id="panel-certificates">
+          <div class="panel-header">
+            <h3>Certificados emitidos</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Estudiante</th><th>Curso</th><th>Tipo</th><th>Fecha emisión</th></tr></thead>
+              <tbody id="certsTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ═══ CONFIGURACIÓN ═══ -->
+        <div class="panel" id="panel-settings">
+          <div class="panel-header">
+            <h3>Configuración del sistema</h3>
+          </div>
+          <div class="settings-grid">
+            <div class="setting-card">
+              <h4><span class="material-icons-round" style="font-size:20px;color:#1565c0">admin_panel_settings</span> Credenciales de administrador</h4>
+              <p>Cambia el correo y contraseña del acceso de administrador.</p>
+              <div style="margin-bottom:10px">
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:4px">Correo admin</label>
+                <input type="email" id="adminEmail" value="admin@fqingenieros.com" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+              </div>
+              <div style="margin-bottom:14px">
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:4px">Contraseña admin</label>
+                <input type="password" id="adminPw" value="admin123" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+              </div>
+              <button class="btn-sm btn-blue" onclick="saveAdminCreds()">Guardar cambios</button>
+            </div>
+
+            <div class="setting-card">
+              <h4><span class="material-icons-round" style="font-size:20px;color:#1565c0">payments</span> Datos de pago</h4>
+              <p>Número de Yape/Plin y cuentas bancarias para cobrar certificados.</p>
+              <div style="margin-bottom:10px">
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:4px">Yape / Plin</label>
+                <input type="text" id="setYape" value="958 003 888" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+              </div>
+              <button class="btn-sm btn-outline-sm" onclick="FQNotify.toast('Datos de pago guardados.', 'success')">Guardar</button>
+            </div>
+
+            <div class="setting-card">
+              <h4><span class="material-icons-round" style="font-size:20px;color:#1565c0">delete_sweep</span> Datos del sistema</h4>
+              <p>Limpiar todos los datos de usuarios, pagos y exámenes almacenados localmente.</p>
+              <button class="btn-sm btn-outline-sm" style="border-color:#fecaca;color:#dc2626" onclick="clearAllData()">
+                <span class="material-icons-round" style="font-size:16px">warning</span> Limpiar todos los datos
+              </button>
+            </div>
+
+            <div class="setting-card">
+              <h4><span class="material-icons-round" style="font-size:20px;color:#1565c0">download</span> Exportar datos</h4>
+              <p>Descarga un archivo con todos los usuarios registrados en formato CSV.</p>
+              <button class="btn-sm btn-blue" onclick="exportUsersCSV()">
+                <span class="material-icons-round" style="font-size:16px">file_download</span> Exportar usuarios CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+
+  <script>
+    // ═══ NAVIGATION ═══
+    function showPanel(name) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    // ═══ DATA (Firestore) ═══
+    let usersData = [];
+    let paymentsData = [];
+    let examsData = [];
+    let certsData = [];
+
+    function getInitials(name) {
+      return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    }
+
+    // ═══ AUTH GATE ═══
+    function loginWithGoogle() {
+      var provider = new firebase.auth.GoogleAuthProvider();
+      document.getElementById('authActions').style.display = 'none';
+      document.getElementById('authLoading').style.display = '';
+      auth.signInWithPopup(provider).catch(function(err) {
+        document.getElementById('authActions').style.display = '';
+        document.getElementById('authLoading').style.display = 'none';
+        document.getElementById('authMsg').textContent = 'Error: ' + err.message;
+      });
+    }
+
+    function logoutAndRetry() {
+      auth.signOut().then(function() {
+        document.getElementById('authDenied').style.display = 'none';
+        document.getElementById('authOverlay').style.display = 'flex';
+        document.getElementById('authActions').style.display = '';
+        document.getElementById('authLoading').style.display = 'none';
+        document.getElementById('authMsg').textContent = 'Inicia sesión con tu cuenta de administrador para acceder al panel.';
+      });
+    }
+
+    function checkAdminAccess(user) {
+      // 1. Check Firestore role field (scalable)
+      db.collection('users').doc(user.uid).get().then(function(doc) {
+        var data = doc.exists ? doc.data() : {};
+        if (data.role === 'admin' || user.email === ADMIN_EMAIL) {
+          // Grant access
+          document.getElementById('authOverlay').style.display = 'none';
+          document.getElementById('authDenied').style.display = 'none';
+          document.getElementById('adminLayout').style.display = '';
+          initAdminPanel();
+
+          // Ensure role is set in Firestore for future checks
+          if (data.role !== 'admin') {
+            db.collection('users').doc(user.uid).set({ role: 'admin' }, { merge: true });
+          }
+        } else {
+          // Deny access
+          document.getElementById('authOverlay').style.display = 'none';
+          document.getElementById('authDenied').style.display = 'flex';
+          document.getElementById('deniedEmail').textContent = 'Cuenta: ' + user.email;
+        }
+      }).catch(function() {
+        // Firestore read failed — fallback to email check
+        if (user.email === ADMIN_EMAIL) {
+          document.getElementById('authOverlay').style.display = 'none';
+          document.getElementById('authDenied').style.display = 'none';
+          document.getElementById('adminLayout').style.display = '';
+          initAdminPanel();
+        } else {
+          document.getElementById('authOverlay').style.display = 'none';
+          document.getElementById('authDenied').style.display = 'flex';
+          document.getElementById('deniedEmail').textContent = 'Cuenta: ' + user.email;
+        }
+      });
+    }
+
+    auth.onAuthStateChanged(function(user) {
+      if (user) {
+        document.getElementById('authActions').style.display = 'none';
+        document.getElementById('authLoading').style.display = '';
+        checkAdminAccess(user);
+      } else {
+        // Not logged in — show login screen
+        document.getElementById('adminLayout').style.display = 'none';
+        document.getElementById('authDenied').style.display = 'none';
+        document.getElementById('authOverlay').style.display = 'flex';
+        document.getElementById('authActions').style.display = '';
+        document.getElementById('authLoading').style.display = 'none';
+      }
+    });
+
+    // ═══ INIT ADMIN PANEL (Firestore real-time listeners) ═══
+    let listenersActive = false;
+    function initAdminPanel() {
+      if (listenersActive) return;
+      listenersActive = true;
+
+      // Users listener
+      db.collection('users').onSnapshot(function(snapshot) {
+        usersData = [];
+        snapshot.forEach(function(doc) {
+          usersData.push({ id: doc.id, ...doc.data() });
+        });
+        renderDashboard();
+        renderUsers();
+      });
+
+      // Payments listener
+      db.collection('payments').onSnapshot(function(snapshot) {
+        paymentsData = [];
+        snapshot.forEach(function(doc) {
+          paymentsData.push({ id: doc.id, ...doc.data() });
+        });
+        renderPayments();
+        renderDashboard();
+      });
+
+      // Exams listener
+      db.collection('exams').onSnapshot(function(snapshot) {
+        examsData = [];
+        snapshot.forEach(function(doc) {
+          examsData.push({ id: doc.id, ...doc.data() });
+        });
+        renderExams();
+        renderDashboard();
+      });
+
+      // Certificates listener
+      db.collection('certificates').onSnapshot(function(snapshot) {
+        certsData = [];
+        snapshot.forEach(function(doc) {
+          certsData.push({ id: doc.id, ...doc.data() });
+        });
+        renderCerts();
+        renderDashboard();
+      });
+    }
+
+    // ═══ RENDER DASHBOARD ═══
+    function renderDashboard() {
+      document.getElementById('statUsers').textContent = usersData.length;
+      document.getElementById('statPayments').textContent = paymentsData.length;
+      document.getElementById('statCerts').textContent = certsData.length;
+      document.getElementById('userCount').textContent = usersData.length;
+      document.getElementById('payCount').textContent = paymentsData.length;
+      document.getElementById('course1Count').textContent = usersData.length;
+
+      // Origin badge
+      const badge = document.getElementById('originBadge');
+      if (badge) {
+        badge.textContent = 'Firebase — ' + usersData.length + ' usuario(s)';
+        badge.style.color = usersData.length > 0 ? '#388e3c' : '#c62828';
+      }
+
+      // Recent users (last 5)
+      const recent = usersData.slice(-5).reverse();
+      const tbody = document.getElementById('recentUsersTable');
+      if (recent.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#64748b;padding:32px">No hay usuarios registrados aún.</td></tr>';
+      } else {
+        tbody.innerHTML = recent.map(u => `
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar">${getInitials(u.name || 'U')}</div>
+                <div><div class="user-name">${u.name || '—'}</div><div class="user-email">${u.email}</div></div>
+              </div>
+            </td>
+            <td>${u.date || '—'}</td>
+            <td><span class="status-badge active">Activo</span></td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // ═══ RENDER USERS TABLE ═══
+    function renderUsers() {
+      const query = (document.getElementById('searchUsers').value || '').toLowerCase();
+      const users = usersData.filter(u => {
+        const text = ((u.name || '') + ' ' + u.email).toLowerCase();
+        return text.includes(query);
+      });
+
+      const tbody = document.getElementById('usersTable');
+      if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#64748b;padding:32px">No se encontraron usuarios.</td></tr>';
+      } else {
+        tbody.innerHTML = users.map(u => {
+          const isComplete = u.profileComplete === true;
+          const method = u.method || 'manual';
+          const methodLabel = method === 'google' ? '<span style="color:#ea4335;font-weight:600">Google</span>'
+            : method === 'apple' ? '<span style="color:#333;font-weight:600">Apple</span>'
+            : method === 'phone' ? '<span style="color:#1e88e5;font-weight:600">Teléfono</span>'
+            : '<span style="color:#64748b;font-weight:600">Manual</span>';
+          const profileBadge = isComplete
+            ? '<span class="status-badge active">Sí</span>'
+            : '<span class="status-badge pending">No</span>';
+          return `
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="user-avatar">${getInitials(u.name || 'U')}</div>
+                <div><div class="user-name">${u.name || '—'}</div><div class="user-email">${u.email}</div></div>
+              </div>
+            </td>
+            <td>${u.docType ? u.docType + ': ' + (u.docNumber || '—') : '<span style="color:#dc2626;font-size:12px">Sin dato</span>'}</td>
+            <td>${u.phone || '<span style="color:#dc2626;font-size:12px">Sin dato</span>'}</td>
+            <td>${u.date || '—'}</td>
+            <td>${methodLabel}</td>
+            <td>${profileBadge}</td>
+            <td><span class="status-badge active">Activo</span></td>
+            <td>
+              <button class="action-btn" onclick="viewUser('${u.id}')"><span class="material-icons-round" style="font-size:16px">visibility</span> Ver</button>
+              <button class="action-btn danger" onclick="deleteUser('${u.id}')"><span class="material-icons-round" style="font-size:16px">delete</span></button>
+            </td>
+          </tr>
+        `;
+        }).join('');
+      }
+    }
+
+    function viewUser(id) {
+      const u = usersData.find(x => x.id === id);
+      if (!u) return;
+      const isComplete = u.profileComplete === true;
+      const method = u.method || 'manual';
+      FQNotify.toast(
+        '<strong>' + (u.name || 'Sin nombre') + '</strong><br>' +
+        'Correo: ' + u.email + '<br>' +
+        'Doc: ' + (u.docType || '—') + ' ' + (u.docNumber || '') + '<br>' +
+        'Tel: ' + (u.phone || '—') + ' · Registro: ' + method + '<br>' +
+        'Perfil completo: ' + (isComplete ? 'Sí' : 'No'),
+        'info', { title: 'Datos del usuario', duration: 8000 }
+      );
+    }
+
+    async function deleteUser(id) {
+      if (!confirm('¿Estás seguro de eliminar este usuario? (Solo se eliminarán sus datos de Firestore)')) return;
+      await db.collection('users').doc(id).delete();
+    }
+
+    // ═══ RENDER PAYMENTS ═══
+    function renderPayments() {
+      const tbody = document.getElementById('paymentsTable');
+      if (paymentsData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#64748b;padding:32px">No hay comprobantes de pago registrados.</td></tr>';
+      } else {
+        tbody.innerHTML = paymentsData.map(p => `
+          <tr>
+            <td>${p.name || '—'}</td>
+            <td>${p.course || '—'}</td>
+            <td>${p.method || '—'}</td>
+            <td>${p.opNumber || '—'}</td>
+            <td>${p.date || '—'}</td>
+            <td><span class="status-badge ${p.status === 'Aprobado' ? 'paid' : 'pending'}">${p.status || 'Pendiente'}</span></td>
+            <td>
+              <button class="action-btn" onclick="approvePayment('${p.id}')"><span class="material-icons-round" style="font-size:16px">check_circle</span> Aprobar</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    async function approvePayment(id) {
+      await db.collection('payments').doc(id).update({ status: 'Aprobado' });
+    }
+
+    // ═══ RENDER EXAMS ═══
+    function renderExams() {
+      const tbody = document.getElementById('examsTable');
+      if (examsData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:32px">No hay exámenes realizados.</td></tr>';
+      } else {
+        tbody.innerHTML = examsData.map(e => `
+          <tr>
+            <td>${e.student || '—'}</td>
+            <td>${e.course || '—'}</td>
+            <td><strong>${e.score || 0}</strong>/20</td>
+            <td><span class="status-badge ${e.score >= 14 ? 'active' : 'pending'}">${e.score >= 14 ? 'Aprobado' : 'Desaprobado'}</span></td>
+            <td>${e.date || '—'}</td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // ═══ RENDER CERTIFICATES ═══
+    function renderCerts() {
+      const tbody = document.getElementById('certsTable');
+      if (certsData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#64748b;padding:32px">No hay certificados emitidos.</td></tr>';
+      } else {
+        tbody.innerHTML = certsData.map(c => `
+          <tr>
+            <td>${c.student || '—'}</td>
+            <td>${c.course || '—'}</td>
+            <td>${c.type || 'Constancia'}</td>
+            <td>${c.date || '—'}</td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // ═══ SETTINGS ═══
+    async function saveAdminCreds() {
+      const pw = document.getElementById('adminPw').value;
+      if (!pw || pw.length < 6) { FQNotify.toast('La contraseña debe tener al menos 6 caracteres.', 'warning'); return; }
+      try {
+        await auth.currentUser.updatePassword(pw);
+        FQNotify.toast('Contraseña de administrador actualizada.', 'success');
+      } catch (error) {
+        FQNotify.toast('Error al actualizar contraseña. Si ha pasado tiempo, cierra sesión y vuelve a entrar.', 'error', { duration: 5000 });
+      }
+    }
+
+    async function clearAllData() {
+      if (!confirm('⚠️ Esto eliminará TODOS los usuarios, pagos, exámenes y certificados de Firestore. ¿Continuar?')) return;
+      const collections = ['users', 'payments', 'exams', 'certificates'];
+      for (const col of collections) {
+        const snapshot = await db.collection(col).get();
+        const batch = db.batch();
+        snapshot.forEach(function(doc) { batch.delete(doc.ref); });
+        await batch.commit();
+      }
+      FQNotify.toast('Todos los datos han sido eliminados de Firestore.', 'success');
+    }
+
+    function exportUsersCSV() {
+      if (usersData.length === 0) { FQNotify.toast('No hay usuarios para exportar.', 'info'); return; }
+      const header = 'Nombre,Correo,Tipo Doc,N° Doc,Teléfono,Dirección,Fecha Registro,Método,Perfil Completo\n';
+      const rows = usersData.map(u =>
+        `"${u.name || ''}","${u.email}","${u.docType || ''}","${u.docNumber || ''}","${u.phone || ''}","${u.address || ''}","${u.date || ''}","${u.method || 'manual'}","${u.profileComplete === true ? 'Sí' : 'No'}"`
+      ).join('\n');
+      const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'usuarios_fq_ingenieros.csv';
+      link.click();
+    }
+
+    function logout() {
+      if (confirm('¿Cerrar sesión del panel administrador?')) {
+        auth.signOut().then(function() {
+          window.location.href = '../index.html';
+        });
+      }
+    }
+  </script>
+
+</body>
+</html>

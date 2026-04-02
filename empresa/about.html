@@ -1,0 +1,199 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre Nosotros | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../assets/css/header.css" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f7f9fc; color: #334155; margin: 0; }
+    .page { padding: 100px 0 60px; min-height: 100vh; }
+
+    .page-header { text-align: center; margin-bottom: 48px; }
+    .page-header h1 { font-size: clamp(28px, 4vw, 42px); font-weight: 800; color: #0f172a; margin-bottom: 10px; }
+    .page-header p { color: #64748b; font-size: 16px; max-width: 600px; margin: 0 auto; }
+
+    .about-intro { display: grid; grid-template-columns: 1fr 320px; gap: 40px; align-items: center; margin-bottom: 56px; }
+    .about-intro-text h2 { font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 14px; }
+    .about-intro-text p { color: #64748b; font-size: 15px; line-height: 1.7; margin-bottom: 12px; }
+    .about-intro-img { text-align: center; }
+    .about-intro-img img { width: 220px; border-radius: 16px; border: 1px solid #dce3ed; box-shadow: 0 4px 16px rgba(15,23,42,.08); }
+
+    .section-title { font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 24px; text-align: center; }
+    .section-title .material-icons-round { vertical-align: middle; margin-right: 8px; color: #1565c0; }
+
+    .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-bottom: 56px; }
+    .service-card { background: #fff; border: 1px solid #dce3ed; border-radius: 16px; padding: 28px 24px; transition: transform .25s, box-shadow .25s; }
+    .service-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(15,23,42,.1); }
+    .service-icon { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; margin-bottom: 16px; }
+    .service-icon .material-icons-round { font-size: 26px; color: #fff; }
+    .service-icon.water { background: linear-gradient(135deg, #1565c0, #1e88e5); }
+    .service-icon.build { background: linear-gradient(135deg, #0f172a, #334155); }
+    .service-icon.lab { background: linear-gradient(135deg, #0d47a1, #1565c0); }
+    .service-card h3 { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+    .service-card p { color: #64748b; font-size: 14px; line-height: 1.6; }
+
+    .contact-section { background: #fff; border: 1px solid #dce3ed; border-radius: 16px; padding: 36px; margin-bottom: 56px; }
+    .contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .contact-item { display: flex; align-items: flex-start; gap: 14px; }
+    .contact-icon { width: 44px; height: 44px; border-radius: 12px; background: #eff6ff; display: grid; place-items: center; flex-shrink: 0; }
+    .contact-icon .material-icons-round { font-size: 22px; color: #1565c0; }
+    .contact-item h4 { font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .contact-item p { font-size: 13px; color: #64748b; line-height: 1.5; }
+    .contact-item a { color: #1565c0; text-decoration: none; font-size: 13px; }
+    .contact-item a:hover { text-decoration: underline; }
+
+    .social-row { display: flex; gap: 12px; justify-content: center; margin-bottom: 56px; }
+    .social-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; text-decoration: none; border: 1.5px solid #dce3ed; color: #334155; background: #fff; transition: all .2s; }
+    .social-btn:hover { background: #eff6ff; border-color: #1565c0; color: #1565c0; }
+
+    .slogan-banner { background: linear-gradient(160deg, #0f172a, #0d47a1); border-radius: 16px; padding: 40px; text-align: center; color: #fff; }
+    .slogan-banner h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .slogan-banner p { font-size: 15px; color: #bfdbfe; }
+    .slogan-banner .btn { margin-top: 20px; }
+
+    .page-footer { text-align: center; padding: 28px 0; color: #64748b; font-size: 13px; border-top: 1px solid #dce3ed; margin-top: 48px; }
+    .page-footer a { color: #1565c0; text-decoration: none; }
+
+    @media (max-width: 800px) {
+      .about-intro { grid-template-columns: 1fr; }
+      .services-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="top-bar">
+    <div class="container top-bar-inner">
+      <a class="brand" href="../index.html">
+        <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
+      </a>
+      <div class="top-bar-right">
+        <div class="navbar-actions" id="navActions"></div>
+        <a class="back-link" href="../index.html"><span class="material-icons-round">arrow_back</span> Inicio</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+
+      <div class="page-header">
+        <h1>Acerca de FQ Ingenieros</h1>
+        <p>Ingeniería confiable para el desarrollo de proyectos sostenibles.</p>
+      </div>
+
+      <!-- Intro -->
+      <div class="about-intro">
+        <div class="about-intro-text">
+          <h2>¿Quiénes somos?</h2>
+          <p>
+            FQ Ingenieros es una empresa dedicada a la ingeniería, saneamiento y construcción,
+            que brinda soluciones técnicas eficientes, sostenibles y de alta calidad para el
+            sector público y privado.
+          </p>
+          <p>
+            Desarrollamos proyectos de agua potable, saneamiento e infraestructura, respaldados
+            por criterios técnicos especializados, cumplimiento normativo y el uso de equipos
+            topográficos y de laboratorio de suelos. Acompañamos cada proyecto desde el diseño
+            hasta la ejecución, contribuyendo al desarrollo sostenible de las comunidades.
+          </p>
+        </div>
+        <div class="about-intro-img">
+          <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        </div>
+      </div>
+
+      <!-- Servicios -->
+      <h2 class="section-title"><span class="material-icons-round">build_circle</span> Nuestros Servicios</h2>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon water"><span class="material-icons-round">water_drop</span></div>
+          <h3>Ingeniería y Saneamiento</h3>
+          <p>Brindamos soluciones técnicas para el fortalecimiento y mejora de los sistemas de agua potable y saneamiento, mediante evaluaciones, estudios de calidad del agua, asistencia técnica y capacitación especializada.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon build"><span class="material-icons-round">construction</span></div>
+          <h3>Construcción y Obras</h3>
+          <p>Ejecutamos obras civiles e infraestructura básica, incluyendo la construcción, ampliación, rehabilitación y mantenimiento de sistemas de agua potable y saneamiento, cumpliendo estrictamente la normativa vigente.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon lab"><span class="material-icons-round">science</span></div>
+          <h3>Laboratorio de Suelos</h3>
+          <p>Realizamos ensayos y estudios de mecánica de suelos que respaldan el diseño y la ejecución de obras, garantizando seguridad, estabilidad y confiabilidad técnica en proyectos de infraestructura.</p>
+        </div>
+      </div>
+
+      <!-- Contacto -->
+      <h2 class="section-title"><span class="material-icons-round">contact_mail</span> Contacto</h2>
+      <div class="contact-section">
+        <div class="contact-grid">
+          <div class="contact-item">
+            <div class="contact-icon"><span class="material-icons-round">location_on</span></div>
+            <div>
+              <h4>Oficina Central</h4>
+              <p>Jr. Los Gladiolos 150 - La Ribera</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon"><span class="material-icons-round">phone</span></div>
+            <div>
+              <h4>Teléfono</h4>
+              <a href="tel:+51958003888">958 003 888</a>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon"><span class="material-icons-round">email</span></div>
+            <div>
+              <h4>Correo electrónico</h4>
+              <a href="mailto:fq.ingenieros.empresa@gmail.com">fq.ingenieros.empresa@gmail.com</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Redes sociales -->
+      <h2 class="section-title"><span class="material-icons-round">share</span> Síguenos</h2>
+      <div class="social-row">
+        <a href="https://www.facebook.com/share/17czybpTGT/" target="_blank" rel="noopener" class="social-btn">
+          <span class="material-icons-round">group</span> Facebook
+        </a>
+        <a href="https://www.instagram.com/fq_ingenieros" target="_blank" rel="noopener" class="social-btn">
+          <span class="material-icons-round">photo_camera</span> Instagram
+        </a>
+        <a href="https://www.linkedin.com/in/fq-ingenieros-a834193a2" target="_blank" rel="noopener" class="social-btn">
+          <span class="material-icons-round">work</span> LinkedIn
+        </a>
+      </div>
+
+      <!-- Slogan CTA -->
+      <div class="slogan-banner">
+        <h3>"Diseñando para la excelencia, creando soluciones que perduran"</h3>
+        <p>Estamos listos para acompañarlo en su próximo proyecto.</p>
+        <a href="../cursos/catalogo.html" class="btn btn-primary btn-lg">Explorar cursos</a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="page-footer">
+    <div class="container">
+      <p>© 2026 FQ INGENIEROS · <a href="../index.html">Inicio</a> · <a href="mailto:fq.ingenieros.empresa@gmail.com">Contacto</a></p>
+    </div>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/auth-ui.js"></script>
+</body>
+</html>

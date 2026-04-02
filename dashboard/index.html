@@ -1,0 +1,1645 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Panel | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../assets/css/notifications.css" />
+  <style>
+    body{background:#f7f9fc}
+
+    /* ── Top bar ── */
+    .top-bar{position:fixed;top:0;left:0;right:0;z-index:30;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid #dce3ed}
+    .top-bar .container{display:flex;align-items:center;justify-content:space-between;height:64px}
+    .top-bar .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#0f172a}
+    .top-bar .brand img{width:36px;height:36px;border-radius:8px;object-fit:cover}
+    .top-bar .brand strong{font-size:13px;letter-spacing:.4px}
+    .top-bar .brand span{font-size:10px;color:#1565c0;letter-spacing:1.2px;text-transform:uppercase;display:block;font-weight:600}
+
+    /* ── Layout ── */
+    .dash{padding:88px 0 60px;min-height:100vh}
+    .dash-grid{display:grid;grid-template-columns:260px 1fr;gap:24px;align-items:start}
+
+    /* ── Sidebar ── */
+    .sidebar{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:14px;position:sticky;top:88px;max-height:calc(100vh - 96px);overflow-y:auto}
+    .sidebar-avatar{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#1565c0,#1e88e5);color:#fff;font-size:18px;font-weight:800;display:grid;place-items:center;margin:0 auto 6px}
+    .sidebar-name{text-align:center;font-size:14px;font-weight:700;color:#0f172a;margin-bottom:1px}
+    .sidebar-email{text-align:center;font-size:11px;color:#64748b;margin-bottom:12px;word-break:break-all}
+    .sidebar-section{margin-bottom:2px}
+    .sidebar-label{font-size:9px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:#94a3b8;padding:4px 10px 2px;margin-top:0}
+    .sidebar-nav{list-style:none}
+    .sidebar-nav li{margin-bottom:1px}
+    .sidebar-nav a,.sidebar-nav button{display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:8px;font-size:13px;font-weight:500;color:#334155;text-decoration:none;border:none;background:none;cursor:pointer;transition:all .15s;font-family:inherit;line-height:1.2}
+    .sidebar-nav a:hover,.sidebar-nav button:hover{background:#eff6ff;color:#1565c0}
+    .sidebar-nav a.active{background:#1565c0;color:#fff}
+    .sidebar-nav a.active .material-icons-round{color:#fff}
+    .sidebar-nav .material-icons-round{font-size:18px;color:#64748b}
+    .sidebar-nav a:hover .material-icons-round{color:#1565c0}
+    .sidebar-divider{height:1px;background:#e2e8f0;margin:6px 10px}
+    .sidebar-nav .nav-logout{color:#dc2626;margin-top:2px}
+    .sidebar-nav .nav-logout:hover{background:#fef2f2}
+    .sidebar-nav .nav-logout .material-icons-round{color:#dc2626}
+
+    /* ── Main content ── */
+    .dash-main{display:flex;flex-direction:column;gap:18px}
+
+    /* ── Welcome ── */
+    .welcome-card{background:linear-gradient(135deg,#1565c0,#0d47a1);border-radius:16px;padding:22px 26px;color:#fff;position:relative;overflow:hidden}
+    .welcome-card::after{content:'';position:absolute;top:-30%;right:-10%;width:250px;height:250px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none}
+    .welcome-card h1{font-size:22px;font-weight:800;margin-bottom:4px}
+    .welcome-card p{display:none}
+    .welcome-date{font-size:12px;color:#93c5fd;margin-top:6px;display:flex;align-items:center;gap:6px}
+    .welcome-date .material-icons-round{font-size:16px}
+    .welcome-stats{display:flex;gap:20px;margin-top:14px}
+    .welcome-stat{display:flex;align-items:center;gap:8px}
+    .welcome-stat .material-icons-round{font-size:20px;color:#93c5fd}
+    .welcome-stat-value{font-size:20px;font-weight:800;color:#fff;line-height:1}
+    .welcome-stat-label{font-size:11px;color:#bfdbfe;margin-top:1px}
+
+    /* ── Stats grid (kept for backwards compat, hidden) ── */
+    .stats-grid{display:none}
+    .stat-card{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:18px 20px;transition:transform .2s,box-shadow .2s}
+    .stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(15,23,42,.08)}
+    .stat-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;margin-bottom:10px}
+    .stat-icon .material-icons-round{font-size:22px;color:#fff}
+    .stat-icon.blue{background:linear-gradient(135deg,#1565c0,#1e88e5)}
+    .stat-icon.green{background:linear-gradient(135deg,#16a34a,#22c55e)}
+    .stat-icon.orange{background:linear-gradient(135deg,#ea580c,#f97316)}
+    .stat-icon.purple{background:linear-gradient(135deg,#7c3aed,#a78bfa)}
+    .stat-value{font-size:28px;font-weight:800;color:#0f172a;line-height:1}
+    .stat-label{font-size:13px;color:#64748b;margin-top:4px}
+
+    /* ── Hero course card (course in progress) ── */
+    .hero-course{background:#fff;border:1px solid #dce3ed;border-radius:16px;padding:20px 22px;display:flex;align-items:center;gap:18px}
+    .hero-course:hover{box-shadow:0 4px 16px rgba(15,23,42,.06)}
+    .hero-course-icon{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#1565c0,#1e88e5);display:grid;place-items:center;flex-shrink:0}
+    .hero-course-icon .material-icons-round{font-size:26px;color:#fff}
+    .hero-course-body{flex:1;min-width:0}
+    .hero-course-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#1565c0;margin-bottom:4px}
+    .hero-course-body h3{font-size:16px;font-weight:700;color:#0f172a;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .hero-course-meta{font-size:12px;color:#64748b;margin-bottom:8px}
+    .hero-course-progress{display:flex;align-items:center;gap:10px}
+    .hero-course-progress .progress-bar{flex:1;height:7px}
+    .hero-course-pct{font-size:14px;font-weight:800;color:#1565c0}
+    .hero-course-action{flex-shrink:0}
+    .hero-course-action .btn{white-space:nowrap}
+
+    /* ── Section cards ── */
+    .card{background:#fff;border:1px solid #dce3ed;border-radius:16px;padding:20px;transition:box-shadow .2s}
+    .card:hover{box-shadow:0 4px 16px rgba(15,23,42,.06)}
+    .card-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .card-title h2{font-size:16px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px}
+    .card-title h2 .material-icons-round{font-size:20px;color:#1565c0}
+    .card-title a{font-size:12px;color:#1565c0;text-decoration:none;font-weight:600;display:flex;align-items:center;gap:4px}
+    .card-title a:hover{text-decoration:underline}
+    .card-footer{text-align:center;padding-top:12px;border-top:1px solid #eef2f7;margin-top:4px}
+    .card-footer a{font-size:13px;color:#1565c0;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+    .card-footer a:hover{text-decoration:underline}
+    .card-footer .material-icons-round{font-size:16px}
+
+    /* ── Course progress ── */
+    .course-item{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #eef2f7}
+    .course-item:last-child{border-bottom:none;padding-bottom:0}
+    .course-icon{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;flex-shrink:0}
+    .course-icon .material-icons-round{font-size:22px;color:#fff}
+    .course-icon.ci-blue{background:linear-gradient(135deg,#1565c0,#1e88e5)}
+    .course-icon.ci-dark{background:linear-gradient(135deg,#0f172a,#334155)}
+    .course-icon.ci-teal{background:linear-gradient(135deg,#0d9488,#14b8a6)}
+    .course-info{flex:1;min-width:0}
+    .course-info h4{font-size:13px;font-weight:600;color:#0f172a;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .course-info small{font-size:11px;color:#64748b}
+    .progress-bar{height:6px;background:#eef2f7;border-radius:3px;margin-top:5px;overflow:hidden}
+    .progress-fill{height:100%;border-radius:3px;transition:width .5s}
+    .progress-fill.pf-blue{background:linear-gradient(90deg,#1565c0,#1e88e5)}
+    .progress-fill.pf-green{background:linear-gradient(90deg,#16a34a,#22c55e)}
+    .progress-fill.pf-orange{background:linear-gradient(90deg,#ea580c,#f97316)}
+    .course-pct{font-size:13px;font-weight:700;color:#1565c0;white-space:nowrap;min-width:36px;text-align:right}
+
+    /* ── Recent classes ── */
+    .class-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #eef2f7}
+    .class-item:last-child{border-bottom:none}
+    .class-thumb{width:48px;height:36px;border-radius:8px;background:#eef2f7;display:grid;place-items:center;flex-shrink:0}
+    .class-thumb .material-icons-round{font-size:20px;color:#1565c0}
+    .class-info{flex:1;min-width:0}
+    .class-info h4{font-size:13px;font-weight:600;color:#0f172a;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .class-info small{font-size:11px;color:#64748b}
+    .class-action .btn-sm{padding:6px 12px;font-size:11px;border-radius:8px}
+
+    /* ── Calendar schedule ── */
+    .schedule-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #eef2f7}
+    .schedule-item:last-child{border-bottom:none}
+    .schedule-item.highlight{background:#eff6ff;margin:0 -20px;padding:10px 20px;border-radius:10px;border-bottom:none}
+    .sched-date{width:44px;text-align:center;flex-shrink:0}
+    .sched-date .day{font-size:20px;font-weight:800;color:#1565c0;line-height:1}
+    .sched-date .month{font-size:10px;font-weight:600;color:#64748b;text-transform:uppercase}
+    .sched-info h4{font-size:13px;font-weight:600;color:#0f172a;margin-bottom:2px}
+    .sched-info p{font-size:11px;color:#64748b;display:flex;align-items:center;gap:4px}
+    .sched-info .material-icons-round{font-size:14px}
+    .sched-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;margin-top:4px}
+    .sched-badge.live{background:#dbeafe;color:#1565c0}
+    .sched-badge.exam{background:#fef3c7;color:#92400e}
+    .sched-badge.cert{background:#d1fae5;color:#065f46}
+
+    /* ── Notifications ── */
+    .notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #eef2f7}
+    .notif-item:last-child{border-bottom:none}
+    .notif-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+    .notif-dot.blue{background:#1565c0}
+    .notif-dot.green{background:#16a34a}
+    .notif-dot.orange{background:#f97316}
+    .notif-info h4{font-size:12px;font-weight:600;color:#0f172a;margin-bottom:1px}
+    .notif-info p{font-size:11px;color:#64748b;line-height:1.4}
+
+    /* ── Two column layout ── */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+    /* ── Footer ── */
+    .dash-footer{text-align:center;padding:24px 0;font-size:12px;color:#64748b;border-top:1px solid #dce3ed;margin-top:20px}
+
+    /* ── Panels ── */
+    .dash-panel{display:none}
+    .dash-panel.active{display:block}
+
+    /* ── Profile View ── */
+    .profile-header{display:flex;align-items:center;gap:20px;margin-bottom:28px}
+    .profile-avatar-lg{width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#1565c0,#1e88e5);color:#fff;display:grid;place-items:center;font-size:28px;font-weight:800;flex-shrink:0}
+    .profile-header-info h2{font-size:20px;font-weight:800;color:#0f172a;margin-bottom:2px}
+    .profile-header-info p{font-size:14px;color:#64748b}
+    .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .profile-field{background:#f7f9fc;border:1px solid #eef2f7;border-radius:12px;padding:14px 16px}
+    .profile-field label{display:block;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .profile-field span{font-size:15px;font-weight:600;color:#0f172a}
+    .profile-field span.empty{color:#94a3b8;font-weight:400;font-style:italic}
+
+    /* ── Settings ── */
+    .settings-section{margin-bottom:28px}
+    .settings-section h3{font-size:16px;font-weight:700;color:#0f172a;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .settings-section h3 .material-icons-round{font-size:20px;color:#1565c0}
+    .settings-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .form-field{display:flex;flex-direction:column;gap:4px}
+    .form-field label{font-size:12px;font-weight:600;color:#334155}
+    .form-field input,.form-field select{padding:10px 13px;background:#f7f9fc;border:1.5px solid #dce3ed;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box;transition:border-color .2s}
+    .form-field input:focus,.form-field select:focus{outline:none;border-color:#1565c0}
+    .form-field .field-hint{font-size:11px;color:#64748b}
+    .form-field .field-error{font-size:11px;color:#dc2626;display:none}
+    .settings-actions{display:flex;gap:10px;margin-top:20px}
+    .btn-save{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:#1565c0;color:#fff;transition:background .2s}
+    .btn-save:hover{background:#0d47a1}
+    .btn-save:disabled{opacity:.6;cursor:not-allowed}
+    .btn-outline{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:600;border:1.5px solid #dce3ed;cursor:pointer;font-family:inherit;background:#fff;color:#334155;transition:all .2s}
+    .btn-outline:hover{border-color:#1565c0;color:#1565c0;background:#eff6ff}
+    /* ── Enhanced Alerts (via notifications.css) ── */
+
+    /* ── Password fields ── */
+    .pw-field-wrap{position:relative}
+    .pw-field-wrap input{padding-right:44px}
+    .pw-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#64748b;display:grid;place-items:center;padding:0}
+    .pw-toggle:hover{color:#1565c0}
+    .pw-strength-bar-wrap{height:6px;border-radius:3px;background:#eef2f7;margin-top:6px;overflow:hidden}
+    .pw-strength-fill{height:100%;width:0;border-radius:3px;transition:width .3s,background .3s}
+    .pw-requirements{margin-top:8px;font-size:12px;color:#64748b;line-height:1.8}
+    .pw-requirements span{display:flex;align-items:center;gap:6px}
+    .pw-requirements .met{color:#16a34a;font-weight:600}
+    .pw-security-note{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;margin-top:16px;font-size:12px;color:#64748b;line-height:1.5}
+    .pw-security-note .material-icons-round{font-size:18px;color:#1565c0;flex-shrink:0;margin-top:1px}
+    .pw-divider{display:flex;align-items:center;gap:12px;margin:24px 0 18px;font-size:12px;color:#94a3b8;font-weight:500}
+    .pw-divider::before,.pw-divider::after{content:'';flex:1;height:1px;background:#e2e8f0}
+    .pw-email-option{display:flex;align-items:center;gap:16px;padding:18px 20px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;transition:all .2s}
+    .pw-email-option:hover{border-color:#1565c0;background:#eff6ff}
+    .pw-email-option .pw-email-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#eff6ff,#dbeafe);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .pw-email-option .pw-email-icon .material-icons-round{font-size:22px;color:#1565c0}
+    .pw-email-option .pw-email-info{flex:1}
+    .pw-email-option .pw-email-info strong{display:block;font-size:14px;color:#0f172a;margin-bottom:2px}
+    .pw-email-option .pw-email-info span{font-size:12px;color:#64748b}
+
+    /* ── Not logged in ── */
+    .no-session{text-align:center;padding:120px 20px}
+    .no-session .material-icons-round{font-size:64px;color:#dce3ed;margin-bottom:16px}
+    .no-session h2{font-size:22px;font-weight:700;color:#0f172a;margin-bottom:8px}
+    .no-session p{color:#64748b;font-size:15px;margin-bottom:24px}
+
+    /* ── Responsive ── */
+    @media(max-width:900px){
+      .dash-grid{grid-template-columns:1fr}
+      .sidebar{position:static;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 14px;max-height:none;overflow-y:visible}
+      .sidebar-avatar{width:38px;height:38px;font-size:14px;margin:0;border-radius:10px}
+      .sidebar-name,.sidebar-email{text-align:left;margin-bottom:0}
+      .sidebar-name{font-size:14px}
+      .sidebar-email{display:none}
+      .sidebar-nav{display:flex;flex-wrap:wrap;gap:4px;width:100%;margin-top:0}
+      .sidebar-nav li{margin-bottom:0}
+      .sidebar-nav a,.sidebar-nav button{padding:8px 12px;font-size:13px}
+      .sidebar-section{margin-bottom:4px}
+      .sidebar-label{display:none}
+      .sidebar-divider{display:none}
+      .stats-grid{grid-template-columns:repeat(2,1fr)}
+      .two-col{grid-template-columns:1fr}
+      .hero-course{flex-wrap:wrap}
+      .hero-course-action{width:100%;margin-top:4px}
+      .welcome-stats{flex-wrap:wrap;gap:14px}
+      .profile-grid,.settings-form-grid{grid-template-columns:1fr}
+      .profile-header{flex-direction:column;text-align:center}
+    }
+    @media(max-width:600px){
+      .stats-grid{grid-template-columns:1fr 1fr}
+      .stat-value{font-size:22px}
+    }
+  </style>
+</head>
+<body>
+  <!-- Firebase SDKs: solo una vez y en orden correcto -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <!-- Configuración de Firebase (después de los SDKs) -->
+  <script src="../assets/js/firebase-config.js"></script>
+  <!-- Scripts personalizados (después de Firebase) -->
+  <script src="dashboard-dynamic.js"></script>
+
+  <!-- ── Top bar ── -->
+  <header class="top-bar">
+    <div class="container">
+      <a class="brand" href="../index.html">
+        <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
+      </a>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="navbar-actions" id="navActions"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── No Session View ── -->
+  <div class="no-session" id="noSession" style="display:none">
+    <span class="material-icons-round">lock</span>
+    <h2>Acceso restringido</h2>
+    <p>Debes iniciar sesión para acceder a tu panel de estudiante.</p>
+    <a href="../auth/login.html" class="btn btn-primary btn-lg"><span class="material-icons-round">login</span> Iniciar sesión</a>
+  </div>
+
+  <!-- ── Dashboard ── -->
+  <main class="dash" id="dashMain" style="display:none">
+    <div class="container">
+      <div class="dash-grid">
+
+        <!-- ── Sidebar ── -->
+        <aside class="sidebar" id="sidebar">
+          <div class="sidebar-avatar" id="sidebarAvatar">—</div>
+          <div class="sidebar-name" id="sidebarName">Estudiante</div>
+          <div class="sidebar-email" id="sidebarEmail">—</div>
+
+          <!-- Principal -->
+          <div class="sidebar-section">
+            <div class="sidebar-label">Principal</div>
+            <ul class="sidebar-nav">
+              <li><a href="#" class="active" onclick="showDashPanel('dashboard',this);return false"><span class="material-icons-round">dashboard</span> Dashboard</a></li>
+              <li><a href="../cursos/catalogo.html"><span class="material-icons-round">school</span> Mis cursos</a></li>
+              <li><a href="../cursos/explorar.html"><span class="material-icons-round">explore</span> Explorar cursos</a></li>
+              <li><a href="../sesiones/index.html"><span class="material-icons-round">videocam</span> Sesiones</a></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <!-- Cuenta -->
+          <div class="sidebar-section">
+            <div class="sidebar-label">Cuenta</div>
+            <ul class="sidebar-nav">
+              <li><a href="#" onclick="showDashPanel('profile',this);return false"><span class="material-icons-round">person</span> Mi perfil</a></li>
+              <li><a href="#" onclick="showDashPanel('settings',this);return false"><span class="material-icons-round">settings</span> Configuración</a></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <!-- Logros -->
+          <div class="sidebar-section">
+            <div class="sidebar-label">Logros</div>
+            <ul class="sidebar-nav">
+              <li><a href="../certificado/pago.html"><span class="material-icons-round">workspace_premium</span> Certificados</a></li>
+            </ul>
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <!-- Acción -->
+          <div class="sidebar-section">
+            <ul class="sidebar-nav">
+              <li><button class="nav-logout" id="sidebarLogout"><span class="material-icons-round">logout</span> Cerrar sesión</button></li>
+            </ul>
+          </div>
+        </aside>
+
+        <!-- ── Main Content ── -->
+        <div class="dash-main">
+          <!-- ═══ PANEL: Dashboard ═══ -->
+          <div class="dash-panel active" id="panel-dashboard">
+            <!-- Welcome (compact with inline stats) -->
+            <div class="welcome-card">
+              <h1 id="welcomeMsg">¡Bienvenido, <span id="welcomeName">Estudiante</span>!</h1>
+              <div class="welcome-date" id="welcomeDate"><span class="material-icons-round">calendar_today</span> <span id="currentDate">Fecha</span></div>
+              <div class="welcome-stats">
+                <div class="welcome-stat">
+                  <span class="material-icons-round">menu_book</span>
+                  <div><div class="welcome-stat-value" id="totalCourses">0</div><div class="welcome-stat-label">Cursos</div></div>
+                </div>
+                <div class="welcome-stat">
+                  <span class="material-icons-round">play_circle</span>
+                  <div><div class="welcome-stat-value" id="totalClasses">0</div><div class="welcome-stat-label">Clases</div></div>
+                </div>
+                <div class="welcome-stat">
+                  <span class="material-icons-round">trending_up</span>
+                  <div><div class="welcome-stat-value" id="totalProgress">0%</div><div class="welcome-stat-label">Progreso</div></div>
+                </div>
+                <div class="welcome-stat">
+                  <span class="material-icons-round">emoji_events</span>
+                  <div><div class="welcome-stat-value" id="totalCertificates">0</div><div class="welcome-stat-label">Certificados</div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats grid (hidden, kept for compat) -->
+            <div class="stats-grid"></div>
+
+            <!-- Hero: curso en progreso -->
+            <div class="hero-course">
+              <div class="hero-course-icon"><span class="material-icons-round">health_and_safety</span></div>
+              <div class="hero-course-body"></div>
+              <div class="hero-course-action"></div>
+            </div>
+
+            <!-- Two column: Mis cursos + Próximas clases -->
+            <div class="two-col">
+              <!-- Mis cursos (máx 2, con Ver todos) -->
+              <div class="card">
+                <div class="card-title">
+                  <h2><span class="material-icons-round">school</span> Mis cursos</h2>
+                </div>
+                <div id="coursesList">
+                  <div class="course-item">
+                    <div class="course-icon ci-dark"><span class="material-icons-round">calculate</span></div>
+                    <div class="course-info">
+                      <h4><a href="../cursos/curso.html?id=metrados-presupuestos" data-course-id="metrados-presupuestos" class="dash-course-link" style="color:inherit;text-decoration:none">Metrados y Presupuestos</a></h4>
+                      <small>8 sesiones · Próximamente</small>
+                    </div>
+                    <div class="course-pct" style="color:#64748b">0%</div>
+                  </div>
+                  <div class="course-item">
+                    <div class="course-icon ci-teal"><span class="material-icons-round">engineering</span></div>
+                    <div class="course-info">
+                      <h4><a href="../cursos/curso.html?id=supervision-obra" data-course-id="supervision-obra" class="dash-course-link" style="color:inherit;text-decoration:none">Supervisión de Obra</a></h4>
+                      <small>10 sesiones · Próximamente</small>
+                    </div>
+                    <div class="course-pct" style="color:#64748b">0%</div>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <a href="../cursos/catalogo.html">Ver todos mis cursos <span class="material-icons-round">arrow_forward</span></a>
+                </div>
+              </div>
+              <!-- Próximas actividades (máx 3, resaltar la siguiente) -->
+              <div class="card">
+                <div class="card-title">
+                  <h2><span class="material-icons-round">calendar_month</span> Próximas clases</h2>
+                </div>
+                <div id="upcomingClassesList">
+                  <div class="schedule-item highlight">
+                    <div class="sched-date">
+                      <div class="day">30</div>
+                      <div class="month">Mar</div>
+                    </div>
+                    <div class="sched-info">
+                      <h4>Sesión 4: Identificación de peligros</h4>
+                      <p><span class="material-icons-round">schedule</span> 5:00 p.m. — 6:00 p.m.</p>
+                      <span class="sched-badge live"><span class="material-icons-round" style="font-size:12px">videocam</span> En vivo</span>
+                    </div>
+                  </div>
+                  <div class="schedule-item">
+                    <div class="sched-date">
+                      <div class="day">30</div>
+                      <div class="month">Mar</div>
+                    </div>
+                    <div class="sched-info">
+                      <h4>Sesión 5: Evaluación de riesgos</h4>
+                      <p><span class="material-icons-round">schedule</span> 7:00 p.m. — 8:00 p.m.</p>
+                      <span class="sched-badge live"><span class="material-icons-round" style="font-size:12px">videocam</span> En vivo</span>
+                    </div>
+                  </div>
+                  <div class="schedule-item">
+                    <div class="sched-date">
+                      <div class="day">06</div>
+                      <div class="month">Abr</div>
+                    </div>
+                    <div class="sched-info">
+                      <h4>Sesión 6: Plan de SST en obra</h4>
+                      <p><span class="material-icons-round">schedule</span> 5:00 p.m. — 6:00 p.m.</p>
+                      <span class="sched-badge live"><span class="material-icons-round" style="font-size:12px">videocam</span> En vivo</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <a href="../sesiones/index.html">Ver todas las actividades <span class="material-icons-round">arrow_forward</span></a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Two column: Clases recientes + Avisos -->
+            <div class="two-col">
+              <!-- Clases recientes (máx 2, con Ver todas) -->
+              <div class="card">
+                <div class="card-title">
+                  <h2><span class="material-icons-round">play_circle</span> Clases recientes</h2>
+                </div>
+                <div id="recentClassesList">
+                  <div class="class-item">
+                    <div class="class-thumb"><span class="material-icons-round">ondemand_video</span></div>
+                    <div class="class-info">
+                      <h4>Sesión 3: EPP y señalización</h4>
+                      <small>Última vista hace 2 días</small>
+                    </div>
+                    <div class="class-action">
+                      <a href="../cursos/curso.html?id=sst-obras-civiles" data-course-id="sst-obras-civiles" class="btn btn-primary btn-sm dash-course-link">Continuar</a>
+                    </div>
+                  </div>
+                  <div class="class-item">
+                    <div class="class-thumb"><span class="material-icons-round">ondemand_video</span></div>
+                    <div class="class-info">
+                      <h4>Sesión 2: Marco normativo SST</h4>
+                      <small>Completada</small>
+                    </div>
+                    <div class="class-action">
+                      <a href="../cursos/curso.html?id=sst-obras-civiles" data-course-id="sst-obras-civiles" class="btn btn-outline btn-sm dash-course-link">Revisar</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer">
+                  <a href="../sesiones/index.html">Ver todas las clases <span class="material-icons-round">arrow_forward</span></a>
+                </div>
+              </div>
+              <!-- Avisos importantes (máx 3) -->
+              <div class="card">
+                <div class="card-title">
+                  <h2><span class="material-icons-round">notifications</span> Avisos</h2>
+                </div>
+                <div id="noticesList">
+                  <div class="notif-item">
+                    <div class="notif-dot blue"></div>
+                    <div class="notif-info">
+                      <h4>Nueva clase disponible</h4>
+                      <p>La Sesión 3 "EPP y señalización" ya está disponible en diferido.</p>
+                    </div>
+                  </div>
+                  <div class="notif-item">
+                    <div class="notif-dot orange"></div>
+                    <div class="notif-info">
+                      <h4>Recordatorio: clase en vivo</h4>
+                      <p>Próxima sesión: 9 de abril, 5:00 p.m.</p>
+                    </div>
+                  </div>
+                  <div class="notif-item">
+                    <div class="notif-dot green"></div>
+                    <div class="notif-info">
+                      <h4>Pago confirmado</h4>
+                      <p>Curso "SST en Obras Civiles" verificado.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- /panel-dashboard -->
+            </div>
+          </div>
+
+          </div><!-- /panel-dashboard -->
+
+          <!-- ═══ PANEL: Mi Perfil ═══ -->
+          <div class="dash-panel" id="panel-profile">
+            <div class="card" style="margin-bottom:20px">
+              <div class="profile-header">
+                <div class="profile-avatar-lg" id="profileAvatarLg">—</div>
+                <div class="profile-header-info">
+                  <h2 id="profileFullName">Estudiante</h2>
+                  <p id="profileEmail">—</p>
+                </div>
+              </div>
+              <div class="profile-grid">
+                <div class="profile-field">
+                  <label>Tipo de documento</label>
+                  <span id="profileDocType" class="empty">Sin registrar</span>
+                </div>
+                <div class="profile-field">
+                  <label>N° de documento</label>
+                  <span id="profileDocNumber" class="empty">Sin registrar</span>
+                </div>
+                <div class="profile-field">
+                  <label>Teléfono</label>
+                  <span id="profilePhone" class="empty">Sin registrar</span>
+                </div>
+                <div class="profile-field">
+                  <label>Dirección</label>
+                  <span id="profileAddress" class="empty">Sin registrar</span>
+                </div>
+                <div class="profile-field">
+                  <label>Método de registro</label>
+                  <span id="profileMethod" class="empty">—</span>
+                </div>
+                <div class="profile-field">
+                  <label>Fecha de registro</label>
+                  <span id="profileDate" class="empty">—</span>
+                </div>
+              </div>
+              <div style="margin-top:20px;text-align:right">
+                <button class="btn-save" onclick="showDashPanel('settings');document.querySelectorAll('.sidebar-nav a').forEach(function(a){a.classList.remove('active')});document.querySelectorAll('.sidebar-nav a')[5].classList.add('active')">
+                  <span class="material-icons-round" style="font-size:18px">edit</span> Editar perfil
+                </button>
+              </div>
+            </div>
+
+            <!-- Academic info -->
+            <div class="card">
+              <div class="card-title">
+                <h2><span class="material-icons-round">school</span> Información académica</h2>
+              </div>
+              <div class="profile-grid">
+                <div class="profile-field">
+                  <label>Cursos inscritos</label>
+                  <span id="profileCursos">1</span>
+                </div>
+                <div class="profile-field">
+                  <label>Progreso general</label>
+                  <span id="profileProgreso">45%</span>
+                </div>
+                <div class="profile-field">
+                  <label>Certificados obtenidos</label>
+                  <span id="profileCerts">0</span>
+                </div>
+                <div class="profile-field">
+                  <label>Estado</label>
+                  <span style="color:#16a34a;font-weight:700">Activo</span>
+                </div>
+              </div>
+            </div>
+          </div><!-- /panel-profile -->
+
+          <!-- ═══ PANEL: Configuración ═══ -->
+          <div class="dash-panel" id="panel-settings">
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-title" style="margin-bottom:16px">
+                <h2><span class="material-icons-round">settings</span> Configuración</h2>
+              </div>
+
+              <div id="settingsAlert" class="fq-alert"></div>
+
+              <!-- Personal Data -->
+              <div class="settings-section">
+                <h3><span class="material-icons-round">person</span> Datos personales</h3>
+                <form id="settingsForm" onsubmit="return false">
+                  <div class="settings-form-grid">
+                    <div class="form-field">
+                      <label for="setName">Nombre completo</label>
+                      <input type="text" id="setName" required />
+                    </div>
+                    <div class="form-field">
+                      <label for="setPhone">Teléfono</label>
+                      <input type="tel" id="setPhone" maxlength="9" placeholder="Ej: 987654321" />
+                      <span class="field-hint">9 dígitos numéricos</span>
+                    </div>
+                    <div class="form-field">
+                      <label for="setDocType">Tipo de documento</label>
+                      <select id="setDocType" onchange="updateSettingsDocRules()">
+                        <option value="">Seleccionar...</option>
+                        <option value="DNI">DNI</option>
+                        <option value="CE">Carnet de Extranjería</option>
+                        <option value="Pasaporte">Pasaporte</option>
+                        <option value="RUC">RUC</option>
+                      </select>
+                    </div>
+                    <div class="form-field">
+                      <label for="setDocNumber">N° de documento</label>
+                      <input type="text" id="setDocNumber" oninput="filterSettingsDocInput()" />
+                      <span class="field-hint" id="setDocHint">Selecciona un tipo de documento</span>
+                      <span class="field-error" id="setDocError"></span>
+                    </div>
+                    <div class="form-field" style="grid-column:1/-1">
+                      <label for="setAddress">Dirección (opcional)</label>
+                      <input type="text" id="setAddress" />
+                    </div>
+                  </div>
+                  <div class="settings-actions">
+                    <button type="button" class="btn-save" id="btnSaveSettings" onclick="saveSettings()">
+                      <span class="material-icons-round" style="font-size:18px">save</span> Guardar cambios
+                    </button>
+                    <button type="button" class="btn-outline" onclick="showDashPanel('profile');document.querySelectorAll('.sidebar-nav a').forEach(function(a){a.classList.remove('active')});document.querySelectorAll('.sidebar-nav a')[1].classList.add('active')">
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Security -->
+            <div class="card">
+              <div class="settings-section" style="margin-bottom:0">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+                  <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#1565c0,#1e88e5);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <span class="material-icons-round" style="font-size:22px;color:#fff">shield</span>
+                  </div>
+                  <div>
+                    <h3 style="font-size:17px;font-weight:800;color:#0f172a;margin:0">Seguridad de la cuenta</h3>
+                    <p style="font-size:12px;color:#64748b;margin:0">Gestiona tu contraseña y protege tu cuenta</p>
+                  </div>
+                </div>
+
+                <div id="pwChangeAlert" class="fq-alert" style="margin-top:16px"></div>
+
+                <div id="pwChangeSection" style="margin-top:20px;margin-bottom:20px">
+                  <p style="font-size:13px;color:#475569;margin-bottom:16px;display:flex;align-items:center;gap:6px">
+                    <span class="material-icons-round" style="font-size:16px;color:#1565c0">edit</span>
+                    <strong>Cambio directo de contraseña</strong>
+                  </p>
+                  <div class="settings-form-grid" style="grid-template-columns:1fr">
+                    <div class="form-field">
+                      <label for="pwCurrent">Contraseña actual</label>
+                      <div class="pw-field-wrap">
+                        <input type="password" id="pwCurrent" placeholder="Ingresa tu contraseña actual" autocomplete="current-password" />
+                        <button type="button" class="pw-toggle" onclick="togglePwField('pwCurrent',this)"><span class="material-icons-round" style="font-size:20px">visibility_off</span></button>
+                      </div>
+                    </div>
+                    <div class="form-field">
+                      <label for="pwNew">Nueva contraseña</label>
+                      <div class="pw-field-wrap">
+                        <input type="password" id="pwNew" placeholder="Mínimo 8 caracteres" oninput="checkNewPwStrength()" autocomplete="new-password" />
+                        <button type="button" class="pw-toggle" onclick="togglePwField('pwNew',this)"><span class="material-icons-round" style="font-size:20px">visibility_off</span></button>
+                      </div>
+                      <div class="pw-strength-bar-wrap"><div class="pw-strength-fill" id="pwStrengthFill"></div></div>
+                      <div class="pw-requirements" id="pwRequirements">
+                        <span id="reqLen">✗ Mínimo 8 caracteres</span>
+                        <span id="reqUpper">✗ Una letra mayúscula</span>
+                        <span id="reqNum">✗ Un número</span>
+                        <span id="reqSpecial">✗ Un carácter especial</span>
+                      </div>
+                    </div>
+                    <div class="form-field">
+                      <label for="pwConfirm">Confirmar nueva contraseña</label>
+                      <div class="pw-field-wrap">
+                        <input type="password" id="pwConfirm" placeholder="Repite la nueva contraseña" oninput="checkPwMatch()" autocomplete="new-password" />
+                        <button type="button" class="pw-toggle" onclick="togglePwField('pwConfirm',this)"><span class="material-icons-round" style="font-size:20px">visibility_off</span></button>
+                      </div>
+                      <span class="field-hint" id="pwMatchHint"></span>
+                    </div>
+                  </div>
+                  <div class="pw-security-note">
+                    <span class="material-icons-round">verified_user</span>
+                    <span>Tu contraseña se cambia de forma segura a través de Firebase Authentication. Nunca almacenamos contraseñas en texto plano.</span>
+                  </div>
+                  <div class="settings-actions" style="margin-top:18px">
+                    <button type="button" class="btn-save" id="btnChangePass" onclick="changePassword()">
+                      <span class="material-icons-round" style="font-size:18px">vpn_key</span> Actualizar contraseña
+                    </button>
+                  </div>
+                </div>
+
+                <div class="pw-divider">o recupera tu contraseña por correo</div>
+
+                <div class="pw-email-option" onclick="resetPassword()" style="cursor:pointer" role="button" tabindex="0">
+                  <div class="pw-email-icon">
+                    <span class="material-icons-round">forward_to_inbox</span>
+                  </div>
+                  <div class="pw-email-info">
+                    <strong>Enviar enlace seguro por correo</strong>
+                    <span id="resetEmailPreview">Recibirás un enlace de restablecimiento en tu correo registrado.</span>
+                  </div>
+                  <span class="material-icons-round" style="color:#94a3b8;font-size:20px">chevron_right</span>
+                </div>
+                <input type="hidden" id="btnResetPass" />
+              </div>
+            </div>
+          </div><!-- /panel-settings -->
+
+          <!-- Footer -->
+        </div><!-- /dash-main -->
+        <div class="dash-footer">
+          © 2026 FQ INGENIEROS · <a href="../index.html" style="color:#1565c0;text-decoration:none">Inicio</a> · <a href="../empresa/about.html" style="color:#1565c0;text-decoration:none">Empresa</a>
+        </div>
+
+        </div><!-- /dash-main -->
+      </div><!-- /dash-grid -->
+    </div>
+  </main>
+
+  <!-- ── Modal: Completar Perfil ── -->
+  <div id="profileModal" style="display:none;position:fixed;inset:0;z-index:100;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px">
+    <div style="background:#fff;border-radius:18px;width:100%;max-width:520px;padding:36px;box-shadow:0 8px 32px rgba(15,23,42,.12);max-height:90vh;overflow-y:auto">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#1565c0,#1e88e5);display:inline-grid;place-items:center;margin-bottom:10px">
+          <span class="material-icons-round" style="font-size:28px;color:#fff">person_add</span>
+        </div>
+        <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin-bottom:4px">Completa tu perfil</h2>
+        <p style="font-size:14px;color:#64748b">Necesitamos algunos datos adicionales para tu cuenta.</p>
+      </div>
+      <form id="profileForm">
+        <div style="margin-bottom:14px">
+          <label style="display:block;margin-bottom:4px;font-size:13px;font-weight:600;color:#334155">Nombre completo</label>
+          <input type="text" id="profName" required style="width:100%;padding:10px 13px;background:#f7f9fc;border:1.5px solid #dce3ed;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box" />
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          <div>
+            <label style="display:block;margin-bottom:4px;font-size:13px;font-weight:600;color:#334155">Tipo de documento</label>
+            <select id="profDocType" required onchange="updateProfDocRules()" style="width:100%;padding:10px 13px;background:#f7f9fc;border:1.5px solid #dce3ed;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box">
+              <option value="">Seleccionar...</option>
+              <option value="DNI">DNI</option>
+              <option value="CE">Carnet de Extranjería</option>
+              <option value="Pasaporte">Pasaporte</option>
+              <option value="RUC">RUC</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;margin-bottom:4px;font-size:13px;font-weight:600;color:#334155">N° de documento</label>
+            <input type="text" id="profDocNumber" required oninput="filterProfDocInput()" style="width:100%;padding:10px 13px;background:#f7f9fc;border:1.5px solid #dce3ed;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box;transition:border-color .2s" />
+            <p id="profDocHint" style="margin:4px 0 0;font-size:12px;color:#64748b">Selecciona un tipo de documento.</p>
+            <p id="profDocError" style="margin:4px 0 0;font-size:12px;color:#dc2626;display:none"></p>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <label style="display:block;margin-bottom:4px;font-size:13px;font-weight:600;color:#334155">Teléfono (9 dígitos)</label>
+          <input type="tel" id="profPhone" required pattern="\d{9}" maxlength="9" placeholder="Ej: 987654321" style="width:100%;padding:10px 13px;background:#f7f9fc;border:1.5px solid #dce3ed;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box" />
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="display:block;margin-bottom:4px;font-size:13px;font-weight:600;color:#334155">Dirección (opcional)</label>
+          <input type="text" id="profAddress" style="width:100%;padding:10px 13px;background:#f7f9fc;border:1.5px solid #dce3ed;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box" />
+        </div>
+        <button type="submit" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border-radius:10px;font-size:15px;font-weight:600;border:none;cursor:pointer;background:#1565c0;color:#fff;font-family:inherit">
+          <span class="material-icons-round" style="font-size:18px">save</span> Guardar y continuar
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="../assets/js/notifications.js"></script>
+
+  <script>
+    /* ── Panel navigation ── */
+    function showDashPanel(name, linkEl) {
+      document.querySelectorAll('.dash-panel').forEach(function(p) { p.classList.remove('active'); });
+      var panel = document.getElementById('panel-' + name);
+      if (panel) panel.classList.add('active');
+      if (linkEl) {
+        document.querySelectorAll('.sidebar-nav a').forEach(function(a) { a.classList.remove('active'); });
+        linkEl.classList.add('active');
+      }
+      window.location.hash = name === 'dashboard' ? '' : name;
+      if (name === 'profile') populateProfile();
+      if (name === 'settings') populateSettings();
+    }
+
+    /* ── Route from URL hash ── */
+    function routeFromHash() {
+      var hash = window.location.hash.replace('#', '');
+      var validPanels = ['profile', 'settings'];
+      if (validPanels.indexOf(hash) !== -1) {
+        var allLinks = document.querySelectorAll('.sidebar-nav a');
+        var target = null;
+        allLinks.forEach(function(a) {
+          if (hash === 'profile' && a.textContent.trim() === 'Mi perfil') target = a;
+          if (hash === 'settings' && a.textContent.trim() === 'Configuración') target = a;
+        });
+        showDashPanel(hash, target);
+      }
+    }
+
+    window.addEventListener('hashchange', routeFromHash);
+
+    /* ── Cached profile data ── */
+    var cachedProfile = null;
+    var currentUserObj = null;
+
+    function populateProfile() {
+      if (!cachedProfile) return;
+      var p = cachedProfile;
+      var name = p.name || 'Estudiante';
+      var parts = name.trim().split(/\s+/);
+      var initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0].substring(0,2).toUpperCase();
+      document.getElementById('profileAvatarLg').textContent = initials;
+      document.getElementById('profileFullName').textContent = name;
+      document.getElementById('profileEmail').textContent = p.email || '';
+      setProfileField('profileDocType', p.docType);
+      setProfileField('profileDocNumber', p.docNumber);
+      setProfileField('profilePhone', p.phone);
+      setProfileField('profileAddress', p.address);
+      var methodMap = { manual: 'Registro manual', google: 'Google', apple: 'Apple', phone: 'Teléfono' };
+      setProfileField('profileMethod', methodMap[p.method] || p.method);
+      setProfileField('profileDate', p.date);
+      document.getElementById('profileCerts').textContent = document.getElementById('statCerts').textContent || '0';
+    }
+
+    function setProfileField(id, val) {
+      var el = document.getElementById(id);
+      if (val && val.trim && val.trim() !== '') {
+        el.textContent = val;
+        el.className = '';
+      } else {
+        el.textContent = 'Sin registrar';
+        el.className = 'empty';
+      }
+    }
+
+    function populateSettings() {
+      if (!cachedProfile) return;
+      var p = cachedProfile;
+      document.getElementById('setName').value = p.name || '';
+      document.getElementById('setPhone').value = p.phone || '';
+      document.getElementById('setDocType').value = p.docType || '';
+      document.getElementById('setDocNumber').value = p.docNumber || '';
+      document.getElementById('setAddress').value = p.address || '';
+      updateSettingsDocRules();
+      hideSettingsAlert();
+      hidePwAlert();
+      var emailPreview = document.getElementById('resetEmailPreview');
+      if (emailPreview && currentUserObj && currentUserObj.email) {
+        emailPreview.textContent = 'Se enviará un enlace seguro a ' + currentUserObj.email;
+      }
+    }
+
+    /* ── Settings: doc validation (reuses same rules) ── */
+    var settingsDocRules = {
+      DNI:       { max: 8,  min: 8,  regex: /^[0-9]{8}$/, filter: /[^0-9]/g, hint: '8 dígitos numéricos.', placeholder: 'Ej: 12345678',  error: 'El DNI debe tener exactamente 8 dígitos.' },
+      RUC:       { max: 11, min: 11, regex: /^[0-9]{11}$/, filter: /[^0-9]/g, hint: '11 dígitos numéricos.', placeholder: 'Ej: 20123456789', error: 'El RUC debe tener exactamente 11 dígitos.' },
+      CE:        { max: 9,  min: 9,  regex: /^[A-Za-z0-9]{9}$/, filter: /[^A-Za-z0-9]/g, hint: '9 caracteres alfanuméricos.', placeholder: 'Ej: A12345678', error: 'El carnet debe tener exactamente 9 caracteres.' },
+      Pasaporte: { max: 12, min: 6,  regex: /^[A-Za-z0-9]{6,12}$/, filter: /[^A-Za-z0-9]/g, hint: 'Entre 6 y 12 caracteres alfanuméricos.', placeholder: 'Ej: AB1234567', error: 'El pasaporte debe tener entre 6 y 12 caracteres alfanuméricos.' }
+    };
+
+    function updateSettingsDocRules() {
+      var type = document.getElementById('setDocType').value;
+      var input = document.getElementById('setDocNumber');
+      var hint = document.getElementById('setDocHint');
+      var errEl = document.getElementById('setDocError');
+      var rule = settingsDocRules[type];
+      errEl.style.display = 'none';
+      input.style.borderColor = '#dce3ed';
+      if (rule) {
+        input.maxLength = rule.max;
+        input.placeholder = rule.placeholder;
+        hint.textContent = rule.hint;
+      } else {
+        input.removeAttribute('maxLength');
+        input.placeholder = '';
+        hint.textContent = 'Selecciona un tipo de documento';
+      }
+    }
+
+    function filterSettingsDocInput() {
+      var type = document.getElementById('setDocType').value;
+      var input = document.getElementById('setDocNumber');
+      var errEl = document.getElementById('setDocError');
+      var rule = settingsDocRules[type];
+      if (!rule) return;
+      input.value = input.value.replace(rule.filter, '');
+      var val = input.value;
+      if (val.length > 0 && !rule.regex.test(val)) {
+        errEl.textContent = rule.error;
+        errEl.style.display = 'block';
+        input.style.borderColor = '#dc2626';
+      } else {
+        errEl.style.display = 'none';
+        input.style.borderColor = val.length >= rule.min ? '#16a34a' : '#dce3ed';
+      }
+    }
+
+    function validateSettingsDoc() {
+      var type = document.getElementById('setDocType').value;
+      var val = document.getElementById('setDocNumber').value.trim();
+      if (!type && !val) return true;
+      var rule = settingsDocRules[type];
+      if (!rule) return 'Selecciona un tipo de documento.';
+      if (!rule.regex.test(val)) return rule.error;
+      return true;
+    }
+
+    var _settingsAlertTimer = null;
+    function showSettingsAlert(msg, type) {
+      FQNotify.alert('settingsAlert', msg, type, {
+        title: type === 'success' ? '¡Cambios guardados!' : type === 'error' ? 'Error al guardar' : 'Información',
+        autoHide: type === 'success' ? 5000 : 0
+      });
+      if (type === 'success') FQNotify.toast(msg, 'success', { title: 'Perfil actualizado' });
+    }
+
+    function hideSettingsAlert() {
+      FQNotify.hideAlert('settingsAlert');
+    }
+
+    function saveSettings() {
+      if (!currentUserObj) return;
+      var name = document.getElementById('setName').value.trim();
+      if (!name) { showSettingsAlert('El nombre es obligatorio.', 'error'); return; }
+      var phone = document.getElementById('setPhone').value.trim();
+      if (phone && !/^\d{9}$/.test(phone)) { showSettingsAlert('El teléfono debe tener 9 dígitos.', 'error'); return; }
+      var docCheck = validateSettingsDoc();
+      if (docCheck !== true) { showSettingsAlert(docCheck, 'error'); return; }
+
+      var btn = document.getElementById('btnSaveSettings');
+      FQNotify.btnLoading(btn, 'Guardando...');
+
+      var updates = {
+        name: name,
+        phone: phone,
+        docType: document.getElementById('setDocType').value,
+        docNumber: document.getElementById('setDocNumber').value.trim(),
+        address: document.getElementById('setAddress').value.trim()
+      };
+
+      db.collection('users').doc(currentUserObj.uid).update(updates).then(function() {
+        Object.assign(cachedProfile, updates);
+        document.getElementById('sidebarName').textContent = name;
+        var parts = name.trim().split(/\s+/);
+        var initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0].substring(0,2).toUpperCase();
+        document.getElementById('sidebarAvatar').textContent = initials;
+        showSettingsAlert('Datos actualizados correctamente.', 'success');
+        FQNotify.btnDone(btn, '¡Guardado!');
+      }).catch(function(err) {
+        showSettingsAlert('Error al guardar: ' + err.message, 'error');
+        FQNotify.btnReset(btn);
+      });
+    }
+
+    /* ── Password fields helpers ── */
+    function togglePwField(id, btn) {
+      var input = document.getElementById(id);
+      var icon = btn.querySelector('.material-icons-round');
+      if (input.type === 'password') { input.type = 'text'; icon.textContent = 'visibility'; }
+      else { input.type = 'password'; icon.textContent = 'visibility_off'; }
+    }
+
+    function checkNewPwStrength() {
+      var pw = document.getElementById('pwNew').value;
+      var bar = document.getElementById('pwStrengthFill');
+      var hasLen = pw.length >= 8;
+      var hasUpper = /[A-Z]/.test(pw);
+      var hasNum = /[0-9]/.test(pw);
+      var hasSpecial = /[^A-Za-z0-9]/.test(pw);
+      document.getElementById('reqLen').className = hasLen ? 'met' : '';
+      document.getElementById('reqLen').textContent = (hasLen ? '✓' : '✗') + ' Mínimo 8 caracteres';
+      document.getElementById('reqUpper').className = hasUpper ? 'met' : '';
+      document.getElementById('reqUpper').textContent = (hasUpper ? '✓' : '✗') + ' Una letra mayúscula';
+      document.getElementById('reqNum').className = hasNum ? 'met' : '';
+      document.getElementById('reqNum').textContent = (hasNum ? '✓' : '✗') + ' Un número';
+      document.getElementById('reqSpecial').className = hasSpecial ? 'met' : '';
+      document.getElementById('reqSpecial').textContent = (hasSpecial ? '✓' : '✗') + ' Un carácter especial';
+      var score = (hasLen ? 1 : 0) + (hasUpper ? 1 : 0) + (hasNum ? 1 : 0) + (hasSpecial ? 1 : 0);
+      var colors = ['#dc2626','#f59e0b','#1e88e5','#16a34a'];
+      var widths = ['25%','50%','75%','100%'];
+      bar.style.width = score ? widths[score - 1] : '0';
+      bar.style.background = score ? colors[score - 1] : '#dce3ed';
+      checkPwMatch();
+    }
+
+    function checkPwMatch() {
+      var pw = document.getElementById('pwNew').value;
+      var confirm = document.getElementById('pwConfirm').value;
+      var hint = document.getElementById('pwMatchHint');
+      if (!confirm) { hint.textContent = ''; hint.style.color = '#64748b'; return; }
+      if (pw === confirm) { hint.textContent = '✓ Las contraseñas coinciden'; hint.style.color = '#16a34a'; }
+      else { hint.textContent = '✗ Las contraseñas no coinciden'; hint.style.color = '#dc2626'; }
+    }
+
+    /* ── Toast notification system (delegated to FQNotify) ── */
+    function showToast(title, msg, type) { FQNotify.toast(msg, type, { title: title }); }
+    function dismissToast(el) { FQNotify.dismiss(el); }
+    function ensureToastContainer() { return document.getElementById('fqToastContainer'); }
+
+    /* ── Enhanced inline alert ── */
+    function showPwAlert(msg, type) {
+      FQNotify.alert('pwChangeAlert', msg, type, {
+        title: type === 'success' ? '¡Operación exitosa!' : type === 'error' ? 'Algo salió mal' : 'Información'
+      });
+    }
+
+    function hidePwAlert() {
+      FQNotify.hideAlert('pwChangeAlert');
+    }
+
+    function clearPwFields() {
+      document.getElementById('pwCurrent').value = '';
+      document.getElementById('pwNew').value = '';
+      document.getElementById('pwConfirm').value = '';
+      document.getElementById('pwStrengthFill').style.width = '0';
+      document.getElementById('pwMatchHint').textContent = '';
+      ['reqLen','reqUpper','reqNum','reqSpecial'].forEach(function(id) {
+        var el = document.getElementById(id);
+        el.className = '';
+      });
+      document.getElementById('reqLen').textContent = '✗ Mínimo 8 caracteres';
+      document.getElementById('reqUpper').textContent = '✗ Una letra mayúscula';
+      document.getElementById('reqNum').textContent = '✗ Un número';
+      document.getElementById('reqSpecial').textContent = '✗ Un carácter especial';
+    }
+
+    async function changePassword() {
+      hidePwAlert();
+      if (!currentUserObj || !currentUserObj.email) { showPwAlert('No se pudo identificar tu sesión. Intenta cerrar sesión e ingresar de nuevo.', 'error'); return; }
+
+      var current = document.getElementById('pwCurrent').value;
+      var newPw = document.getElementById('pwNew').value;
+      var confirmPw = document.getElementById('pwConfirm').value;
+
+      if (!current) { showPwAlert('Ingresa tu contraseña actual para verificar tu identidad.', 'error'); document.getElementById('pwCurrent').focus(); return; }
+      if (!newPw) { showPwAlert('Ingresa la nueva contraseña que deseas usar.', 'error'); document.getElementById('pwNew').focus(); return; }
+      if (newPw.length < 8) { showPwAlert('La nueva contraseña debe tener al menos 8 caracteres.', 'error'); document.getElementById('pwNew').focus(); return; }
+      if (!/[A-Z]/.test(newPw)) { showPwAlert('Incluye al menos una letra mayúscula para mayor seguridad.', 'error'); document.getElementById('pwNew').focus(); return; }
+      if (!/[0-9]/.test(newPw)) { showPwAlert('Incluye al menos un número para mayor seguridad.', 'error'); document.getElementById('pwNew').focus(); return; }
+      if (!/[^A-Za-z0-9]/.test(newPw)) { showPwAlert('Incluye al menos un carácter especial (ej: @, #, $) para mayor seguridad.', 'error'); document.getElementById('pwNew').focus(); return; }
+      if (newPw !== confirmPw) { showPwAlert('Las contraseñas no coinciden. Verifica e intenta de nuevo.', 'error'); document.getElementById('pwConfirm').focus(); return; }
+      if (current === newPw) { showPwAlert('La nueva contraseña debe ser diferente a la actual.', 'error'); document.getElementById('pwNew').focus(); return; }
+
+      var btn = document.getElementById('btnChangePass');
+      FQNotify.btnLoading(btn, 'Verificando identidad...');
+
+      try {
+        var credential = firebase.auth.EmailAuthProvider.credential(currentUserObj.email, current);
+        await currentUserObj.reauthenticateWithCredential(credential);
+        btn.innerHTML = '<span class="material-icons-round" style="font-size:18px">sync</span> Actualizando...';
+        await currentUserObj.updatePassword(newPw);
+        clearPwFields();
+        showPwAlert('Tu contraseña ha sido actualizada correctamente. Ya puedes usarla en tu próximo inicio de sesión.', 'success');
+        FQNotify.toast('Tu nueva contraseña está activa. Recuérdala bien.', 'success', { title: 'Contraseña actualizada' });
+      } catch (err) {
+        switch (err.code) {
+          case 'auth/wrong-password':
+          case 'auth/invalid-credential':
+            showPwAlert('La contraseña actual que ingresaste no es correcta. Verifica e intenta de nuevo.', 'error');
+            document.getElementById('pwCurrent').focus();
+            break;
+          case 'auth/too-many-requests':
+            showPwAlert('Has realizado demasiados intentos. Por seguridad, espera unos minutos antes de intentar de nuevo.', 'error');
+            break;
+          case 'auth/requires-recent-login':
+            showPwAlert('Tu sesión ha expirado por seguridad. Cierra sesión, ingresa de nuevo e intenta otra vez.', 'error');
+            break;
+          default:
+            showPwAlert('No se pudo cambiar la contraseña: ' + err.message, 'error');
+        }
+      } finally {
+        FQNotify.btnReset(btn);
+      }
+    }
+
+    function resetPassword() {
+      if (!currentUserObj || !currentUserObj.email) {
+        showPwAlert('No se encontró un correo asociado a tu cuenta.', 'error');
+        return;
+      }
+      var email = currentUserObj.email;
+      var actionCodeSettings = {
+        url: window.location.origin + '/auth/login.html',
+        handleCodeInApp: false
+      };
+      showPwAlert('Enviando enlace seguro a <strong>' + email.replace(/</g, '&lt;') + '</strong>...', 'info');
+      auth.sendPasswordResetEmail(email, actionCodeSettings).then(function() {
+        showPwAlert('Te hemos enviado un enlace seguro a <strong>' + email.replace(/</g, '&lt;') + '</strong>. Revisa tu bandeja de entrada (y la carpeta de spam). El enlace expira en 1 hora.', 'success');
+        FQNotify.toast('Revisa ' + email + ' para restablecer tu contraseña.', 'info', { title: 'Correo enviado' });
+      }).catch(function(err) {
+        switch (err.code) {
+          case 'auth/too-many-requests':
+            showPwAlert('Has solicitado demasiados correos. Espera unos minutos antes de intentar de nuevo.', 'error');
+            break;
+          default:
+            showPwAlert('No se pudo enviar el correo: ' + err.message, 'error');
+        }
+      });
+    }
+
+    /* ── Validación de documento (solo completar perfil) ── */
+    var profDocRules = {
+      DNI:       { max: 8,  min: 8,  regex: /^[0-9]{8}$/, filter: /[^0-9]/g, hint: '8 dígitos numéricos.', placeholder: 'Ej: 12345678',  error: 'El DNI debe tener exactamente 8 dígitos.' },
+      RUC:       { max: 11, min: 11, regex: /^[0-9]{11}$/, filter: /[^0-9]/g, hint: '11 dígitos numéricos.', placeholder: 'Ej: 20123456789', error: 'El RUC debe tener exactamente 11 dígitos.' },
+      CE:        { max: 9,  min: 9,  regex: /^[A-Za-z0-9]{9}$/, filter: /[^A-Za-z0-9]/g, hint: '9 caracteres alfanuméricos.', placeholder: 'Ej: A12345678', error: 'El carnet debe tener exactamente 9 caracteres.' },
+      Pasaporte: { max: 12, min: 6,  regex: /^[A-Za-z0-9]{6,12}$/, filter: /[^A-Za-z0-9]/g, hint: 'Entre 6 y 12 caracteres alfanuméricos.', placeholder: 'Ej: AB1234567', error: 'El pasaporte debe tener entre 6 y 12 caracteres alfanuméricos.' }
+    };
+
+    function updateProfDocRules() {
+      var type = document.getElementById('profDocType').value;
+      var input = document.getElementById('profDocNumber');
+      var hint = document.getElementById('profDocHint');
+      var errEl = document.getElementById('profDocError');
+      var rule = profDocRules[type];
+      input.value = '';
+      errEl.style.display = 'none';
+      input.style.borderColor = '#dce3ed';
+      if (rule) {
+        input.maxLength = rule.max;
+        input.placeholder = rule.placeholder;
+        hint.textContent = rule.hint;
+      } else {
+        input.removeAttribute('maxLength');
+        input.placeholder = 'Ej: 12345678';
+        hint.textContent = 'Selecciona un tipo de documento.';
+      }
+    }
+
+    function filterProfDocInput() {
+      var type = document.getElementById('profDocType').value;
+      var input = document.getElementById('profDocNumber');
+      var errEl = document.getElementById('profDocError');
+      var rule = profDocRules[type];
+      if (!rule) return;
+      input.value = input.value.replace(rule.filter, '');
+      var val = input.value;
+      if (val.length > 0 && !rule.regex.test(val)) {
+        errEl.textContent = rule.error;
+        errEl.style.display = 'block';
+        input.style.borderColor = '#dc2626';
+      } else {
+        errEl.style.display = 'none';
+        input.style.borderColor = val.length >= rule.min ? '#16a34a' : '#dce3ed';
+      }
+    }
+
+    function validateProfDoc() {
+      var type = document.getElementById('profDocType').value;
+      var val = document.getElementById('profDocNumber').value.trim();
+      var rule = profDocRules[type];
+      if (!rule) return 'Selecciona un tipo de documento.';
+      if (!rule.regex.test(val)) return rule.error;
+      return true;
+    }
+
+    auth.onAuthStateChanged(function(user) {
+      if (!user) {
+        document.getElementById('noSession').style.display = '';
+        document.getElementById('dashMain').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('noSession').style.display = 'none';
+      document.getElementById('dashMain').style.display = '';
+
+      // ══════════════════════════════════════════════════════
+      // BLOQUE BIENVENIDA DINÁMICO
+      // ══════════════════════════════════════════════════════
+      (async function() {
+        // Nombre del usuario
+        let displayName = user.displayName || '';
+        let firestoreName = '';
+        try {
+          const userDoc = await db.collection('users').doc(user.uid).get();
+          if (userDoc.exists && userDoc.data().name) firestoreName = userDoc.data().name;
+        } catch(e) {}
+        const name = firestoreName || displayName || 'Estudiante';
+        document.getElementById('welcomeName').textContent = name.split(' ')[0];
+        document.getElementById('welcomeMsg').innerHTML = '¡Bienvenido, <span id="welcomeName">' + name.split(' ')[0] + '</span>!';
+
+        // Fecha actual
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        let dateStr = now.toLocaleDateString('es-PE', options);
+        dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+        document.getElementById('currentDate').textContent = dateStr;
+
+        // Cursos inscritos y clases totales
+        let totalCourses = 0;
+        let totalClasses = 0;
+        let totalProgress = 0;
+        let certCount = 0;
+        try {
+          const enrollSnap = await db.collection('enrollments').where('userId', '==', user.uid).get();
+          totalCourses = enrollSnap.size;
+          let progressSum = 0;
+          let progressCount = 0;
+          let courseFetches = [];
+          enrollSnap.forEach(doc => {
+            const data = doc.data();
+            // Progreso por curso
+            let progreso = 0;
+            if (data.completedLive === true || data.completedRecording === true) {
+              progreso = 100;
+            } else if (typeof data.recordingWatchedPct === 'number') {
+              progreso = Math.round(data.recordingWatchedPct);
+            }
+            progressSum += progreso;
+            progressCount++;
+            // Para contar sesiones
+            courseFetches.push(db.collection('courses').doc(data.courseId).get());
+          });
+          // Calcular progreso promedio
+          totalProgress = progressCount ? Math.round(progressSum / progressCount) : 0;
+          // Contar sesiones totales
+          const courseDocs = await Promise.all(courseFetches);
+          courseDocs.forEach(doc => {
+            if (doc.exists && Array.isArray(doc.data().sessions)) {
+              totalClasses += doc.data().sessions.length;
+            }
+          });
+        } catch(e) {}
+        document.getElementById('totalCourses').textContent = totalCourses;
+        document.getElementById('totalClasses').textContent = totalClasses;
+        document.getElementById('totalProgress').textContent = totalProgress + '%';
+
+        // Certificados obtenidos
+        try {
+          const certSnap = await db.collection('certificates').where('email', '==', user.email).get();
+          certCount = certSnap.size;
+        } catch(e) {}
+        document.getElementById('totalCertificates').textContent = certCount;
+      })();
+
+      // Renderizar dinámicamente los cursos inscritos
+      db.collection('enrollments').where('userId', '==', user.uid).get().then(async function(snapshot) {
+                console.log('[FQ][DEBUG] user.uid:', user.uid);
+                console.log('[FQ][DEBUG] enrollments snapshot.size:', snapshot.size);
+                snapshot.forEach(function(doc) {
+                  console.log('[FQ][DEBUG] enrollment doc:', doc.id, doc.data());
+                });
+        const coursesList = document.getElementById('coursesList');
+        coursesList.innerHTML = '';
+        let courseIds = [];
+        let courseFetches = [];
+        snapshot.forEach(function(doc) {
+          const data = doc.data();
+          courseIds.push(data.courseId);
+          courseFetches.push(db.collection('courses').doc(data.courseId).get());
+        });
+        const courseDocs = await Promise.all(courseFetches);
+        courseDocs.forEach(function(courseDoc, idx) {
+          if (!courseDoc.exists) return;
+          const course = courseDoc.data();
+          const enrollment = snapshot.docs[idx].data();
+          // Lógica de generación automática de certificado
+          if (enrollment.examPassed && !enrollment.certificateUnlocked) {
+            db.collection('certificates').add({
+              userId: user.uid,
+              userEmail: user.email,
+              courseId: enrollment.courseId,
+              courseName: enrollment.courseName || course.name || '',
+              createdAt: new Date()
+            });
+            // Marcar como generado
+            db.collection('enrollments').doc(enrollment.id).update({
+              certificateUnlocked: true
+            });
+          }
+          const progreso = enrollment.completedLive === true || enrollment.completedRecording === true ? 100 : (typeof enrollment.recordingWatchedPct === 'number' ? Math.round(enrollment.recordingWatchedPct) : 0);
+          const icon = course.icon || 'school';
+          const colorClass = ['ci-blue','ci-dark','ci-teal','ci-orange'][idx%4];
+          const html = `
+            <div class="course-item">
+              <div class="course-icon ${colorClass}"><span class="material-icons-round">${icon}</span></div>
+              <div class="course-info">
+                <h4><a href="../cursos/curso.html?id=${courseDoc.id}" data-course-id="${courseDoc.id}" class="dash-course-link" style="color:inherit;text-decoration:none">${course.name || 'Curso'}</a></h4>
+                <small>${course.sessions || 0} sesiones · ${course.meta || ''}</small>
+              </div>
+              <div class="course-pct" style="color:${progreso === 0 ? '#64748b' : '#1565c0'}">${progreso}%</div>
+            </div>
+          `;
+          coursesList.insertAdjacentHTML('beforeend', html);
+        });
+        if (courseIds.length === 0) {
+          coursesList.innerHTML = '<div style="color:#64748b;text-align:center;padding:18px 0">No tienes cursos inscritos aún.</div>';
+        }
+      });
+
+      // Renderizar próximas clases (máx 3, resaltando la más próxima)
+      db.collection('enrollments').where('userId', '==', user.uid).get().then(async function(snapshot) {
+        const upcomingClassesList = document.getElementById('upcomingClassesList');
+        upcomingClassesList.innerHTML = '';
+        let allSchedules = [];
+        let now = new Date();
+        let courseFetches = [];
+        snapshot.forEach(function(doc) {
+          const data = doc.data();
+          courseFetches.push(db.collection('courses').doc(data.courseId).get());
+        });
+        const courseDocs = await Promise.all(courseFetches);
+        courseDocs.forEach(function(courseDoc, idx) {
+          if (!courseDoc.exists) return;
+          const course = courseDoc.data();
+          if (Array.isArray(course.schedules)) {
+            course.schedules.forEach(function(sched) {
+              allSchedules.push({
+                ...sched,
+                courseId: courseDoc.id,
+                courseName: course.name || 'Curso',
+                courseIcon: course.icon || 'school',
+              });
+            });
+          }
+        });
+        // Filtrar próximas (fecha >= hoy)
+        allSchedules = allSchedules.filter(s => {
+          const schedDate = new Date(s.date + 'T' + (s.timeStart || '00:00'));
+          return schedDate >= now;
+        });
+        allSchedules.sort((a,b) => new Date(a.date + 'T' + (a.timeStart||'00:00')) - new Date(b.date + 'T' + (b.timeStart||'00:00')));
+        allSchedules.slice(0,3).forEach(function(sched, idx) {
+          const schedDate = new Date(sched.date + 'T' + (sched.timeStart || '00:00'));
+          const day = schedDate.getDate().toString().padStart(2,'0');
+          const month = schedDate.toLocaleString('es-PE', { month: 'short' });
+          const highlight = idx === 0 ? 'highlight' : '';
+          const html = `
+            <div class="schedule-item ${highlight}">
+              <div class="sched-date">
+                <div class="day">${day}</div>
+                <div class="month">${month.charAt(0).toUpperCase() + month.slice(1)}</div>
+              </div>
+              <div class="sched-info">
+                <h4>${sched.title || 'Sesión'}</h4>
+                <p><span class="material-icons-round">schedule</span> ${sched.timeStart || ''} — ${sched.timeEnd || ''}</p>
+                <span class="sched-badge live"><span class="material-icons-round" style="font-size:12px">videocam</span> En vivo</span>
+              </div>
+            </div>
+          `;
+          upcomingClassesList.insertAdjacentHTML('beforeend', html);
+        });
+        if (allSchedules.length === 0) {
+          upcomingClassesList.innerHTML = '<div style="color:#64748b;text-align:center;padding:18px 0">No hay próximas clases.</div>';
+        }
+      });
+
+      // Renderizar clases recientes (máx 2)
+      db.collection('enrollments').where('userId', '==', user.uid).get().then(async function(snapshot) {
+        const recentClassesList = document.getElementById('recentClassesList');
+        recentClassesList.innerHTML = '';
+        let recent = [];
+        let courseFetches = [];
+        snapshot.forEach(function(doc) {
+          const data = doc.data();
+          courseFetches.push(db.collection('courses').doc(data.courseId).get());
+        });
+        const courseDocs = await Promise.all(courseFetches);
+        courseDocs.forEach(function(courseDoc, idx) {
+          if (!courseDoc.exists) return;
+          const course = courseDoc.data();
+          if (Array.isArray(course.sessions)) {
+            course.sessions.forEach(function(sess) {
+              if (sess.lastViewedBy && sess.lastViewedBy[user.uid]) {
+                recent.push({
+                  ...sess,
+                  courseId: courseDoc.id,
+                  courseName: course.name || 'Curso',
+                  courseIcon: course.icon || 'ondemand_video',
+                  lastViewed: sess.lastViewedBy[user.uid]
+                });
+              }
+            });
+          }
+        });
+        // Ordenar por fecha de última vista descendente
+        recent.sort((a,b) => b.lastViewed - a.lastViewed);
+        recent.slice(0,2).forEach(function(sess) {
+          const lastViewed = new Date(sess.lastViewed);
+          const now = new Date();
+          const diffDays = Math.floor((now - lastViewed) / (1000*60*60*24));
+          let lastViewedStr = diffDays === 0 ? 'Hoy' : diffDays === 1 ? 'Ayer' : `Hace ${diffDays} días`;
+          const html = `
+            <div class="class-item">
+              <div class="class-thumb"><span class="material-icons-round">${sess.icon || 'ondemand_video'}</span></div>
+              <div class="class-info">
+                <h4>${sess.title || 'Sesión'}</h4>
+                <small>Última vista: ${lastViewedStr}</small>
+              </div>
+              <div class="class-action">
+                <a href="../cursos/curso.html?id=${sess.courseId}" data-course-id="${sess.courseId}" class="btn btn-primary btn-sm dash-course-link">Continuar</a>
+              </div>
+            </div>
+          `;
+          recentClassesList.insertAdjacentHTML('beforeend', html);
+        });
+        if (recent.length === 0) {
+          recentClassesList.innerHTML = '<div style="color:#64748b;text-align:center;padding:18px 0">No hay clases recientes.</div>';
+        }
+      });
+
+      // Renderizar avisos (máx 3)
+      db.collection('notices').where('userId', 'in', [user.uid, null]).orderBy('createdAt', 'desc').limit(3).get().then(function(snapshot) {
+        const noticesList = document.getElementById('noticesList');
+        noticesList.innerHTML = '';
+        snapshot.forEach(function(doc) {
+          const data = doc.data();
+          const color = data.type === 'info' ? 'blue' : data.type === 'warning' ? 'orange' : 'green';
+          const html = `
+            <div class="notif-item">
+              <div class="notif-dot ${color}"></div>
+              <div class="notif-info">
+                <h4>${data.title || 'Aviso'}</h4>
+                <p>${data.body || ''}</p>
+              </div>
+            </div>
+          `;
+          noticesList.insertAdjacentHTML('beforeend', html);
+        });
+        if (snapshot.size === 0) {
+          noticesList.innerHTML = '<div style="color:#64748b;text-align:center;padding:18px 0">No hay avisos importantes.</div>';
+        }
+      });
+
+      // Obtener perfil
+      db.collection('users').doc(user.uid).get().then(function(doc) {
+        var profile = doc.exists ? doc.data() : { name: user.displayName || 'Estudiante', email: user.email || '' };
+        cachedProfile = profile;
+        currentUserObj = user;
+        // ...modal y datos de perfil (igual que antes)...
+        var name = profile.name || 'Estudiante';
+        var parts = name.trim().split(/\s+/);
+        var initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : parts[0].substring(0,2).toUpperCase();
+        var firstName = parts[0];
+        document.getElementById('sidebarAvatar').textContent = initials;
+        document.getElementById('sidebarName').textContent = name;
+        document.getElementById('sidebarEmail').textContent = profile.email || user.email || '';
+        var h = new Date().getHours();
+        var greeting = h < 12 ? 'Buenos días' : h < 18 ? 'Buenas tardes' : 'Buenas noches';
+        document.getElementById('welcomeMsg').textContent = '¡' + greeting + ', ' + firstName + '!';
+        var now = new Date();
+        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        var dateStr = now.toLocaleDateString('es-PE', options);
+        dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+        document.getElementById('welcomeDate').innerHTML = '<span class="material-icons-round">calendar_today</span> ' + dateStr;
+        routeFromHash();
+
+        // ══════════════════════════════════════════════════════
+        // NUEVO: Progreso real y constancia
+        // ══════════════════════════════════════════════════════
+        // 1. Obtener cursos inscritos
+        db.collection('enrollments').where('userId', '==', user.uid).get().then(function(snapshot) {
+          var totalCursos = 0, totalProgreso = 0, totalCerts = 0;
+          var cursoEnProgreso = null, maxProgreso = 0;
+          snapshot.forEach(function(doc) {
+            var data = doc.data();
+            totalCursos++;
+            var progreso = 0;
+            // Si completó en vivo o grabación completa
+            if (data.completedLive === true || data.completedRecording === true) {
+              progreso = 100;
+            } else if (typeof data.recordingWatchedPct === 'number') {
+              progreso = Math.round(data.recordingWatchedPct);
+            }
+            totalProgreso += progreso;
+            if (progreso === 100) totalCerts++;
+            // Para mostrar el curso con mayor avance en el hero
+            if (progreso > maxProgreso) {
+              maxProgreso = progreso;
+              cursoEnProgreso = {
+                id: data.courseId,
+                name: data.courseName || 'Curso',
+                meta: data.courseMeta || '',
+                progreso: progreso
+              };
+            }
+          });
+          document.getElementById('statProgreso').textContent = totalCursos ? Math.round(totalProgreso/totalCursos) + '%' : '0%';
+          // Actualizar stats
+
+// Cursos
+const statCursosEl = document.getElementById('statCursos');
+if (statCursosEl) {
+  statCursosEl.textContent = totalCursos;
+} else {
+  console.error('[FQ] No existe #statCursos');
+}
+
+// Progreso
+const statProgresoEl = document.getElementById('statProgreso');
+if (statProgresoEl) {
+  statProgresoEl.textContent = totalCursos ? Math.round(totalProgreso/totalCursos) + '%' : '0%';
+}
+// Perfil - cursos
+const profileCursosEl = document.getElementById('profileCursos');
+if (profileCursosEl) {
+  profileCursosEl.textContent = totalCursos;
+}
+
+// Perfil - progreso
+const profileProgresoEl = document.getElementById('profileProgreso');
+if (profileProgresoEl) {
+  profileProgresoEl.textContent = totalCursos ? Math.round(totalProgreso/totalCursos) + '%' : '0%';
+}
+
+// Perfil - certificados
+const profileCertsEl = document.getElementById('profileCerts');
+if (profileCertsEl) {
+  profileCertsEl.textContent = totalCerts;
+}
+// Certificados - dashboard principal
+const statCertsEl = document.getElementById('statCerts');
+if (statCertsEl) {
+  statCertsEl.textContent = totalCerts;
+}
+          document.getElementById('profileCursos').textContent = totalCursos;
+          document.getElementById('profileProgreso').textContent = totalCursos ? Math.round(totalProgreso/totalCursos) + '%' : '0%';
+          document.getElementById('profileCerts').textContent = totalCerts;
+          // Hero: curso en progreso
+          if (cursoEnProgreso) {
+            var hero = document.querySelector('.hero-course');
+            if (hero) {
+              hero.querySelector('h3 a').textContent = cursoEnProgreso.name;
+              hero.querySelector('h3 a').href = '../cursos/curso.html?id=' + cursoEnProgreso.id;
+              hero.querySelector('.hero-course-meta').textContent = cursoEnProgreso.meta;
+              hero.querySelector('.progress-fill').style.width = cursoEnProgreso.progreso + '%';
+              hero.querySelector('.hero-course-pct').textContent = cursoEnProgreso.progreso + '%';
+            }
+          }
+          // Constancia: mostrar solo si hay algún curso al 100%
+          var constanciaCards = document.querySelectorAll('.credential-card');
+          constanciaCards.forEach(function(card) {
+            if (maxProgreso === 100) {
+              card.classList.add('available');
+              card.classList.remove('locked');
+              var btn = card.querySelector('#btnConstancia');
+              if (btn) btn.style.display = '';
+            } else {
+              card.classList.remove('available');
+              card.classList.add('locked');
+              var btn = card.querySelector('#btnConstancia');
+              if (btn) btn.style.display = 'none';
+            }
+          });
+        });
+        // ══════════════════════════════════════════════════════
+      });
+
+      /* Certificates count from Firestore */
+      db.collection('certificates').where('userEmail', '==', user.email).get().then(function(snapshot) 
+      {
+        document.getElementById('statCerts').textContent = snapshot.size;
+      }).catch(function() {
+        const statCertsEl = document.getElementById('statCerts');
+if (statCertsEl) {
+  statCertsEl.textContent = '0';
+} else {
+  console.error('[FQ] No existe #statCerts');
+}
+      });
+
+      /* Logout from sidebar */
+      document.getElementById('sidebarLogout').addEventListener('click', function () {
+        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+          auth.signOut().then(function() {
+            window.location.href = '../index.html';
+          });
+        }
+      });
+
+      /* ── Enrollment-aware course link routing ── */
+      updateDashCourseLinks(user);
+    });
+
+    /* ══════════════════════════════════════════════
+       Update dashboard course links based on enrollment
+       ══════════════════════════════════════════════ */
+    function updateDashCourseLinks(user) {
+      var links = document.querySelectorAll('.dash-course-link[data-course-id]');
+      if (!links.length || !user) return;
+
+      /* Collect unique course IDs */
+      var courseIds = [];
+      links.forEach(function(el) {
+        var cid = el.getAttribute('data-course-id');
+        if (courseIds.indexOf(cid) === -1) courseIds.push(cid);
+      });
+
+      /* 1️⃣ Instant: update from localStorage */
+      courseIds.forEach(function(cid) {
+        var cacheKey = 'enrollment_' + user.uid + '_' + cid;
+        try {
+          var cached = localStorage.getItem(cacheKey);
+          if (cached) {
+            var data = JSON.parse(cached);
+            if (data.enrolled || data.schedule) {
+              setLinksForCourse(cid, true);
+            }
+          }
+        } catch (_) {}
+      });
+
+      /* 2️⃣ Background: validate with Firestore */
+      courseIds.forEach(function(cid) {
+        db.collection('enrollments').doc(user.uid + '_' + cid).get()
+          .then(function(doc) {
+            if (doc.exists && doc.data().status === 'active') {
+              setLinksForCourse(cid, true);
+            } else {
+              setLinksForCourse(cid, false);
+            }
+          })
+          .catch(function() {});
+      });
+    }
+
+    function setLinksForCourse(courseId, isEnrolled) {
+      var links = document.querySelectorAll('.dash-course-link[data-course-id="' + courseId + '"]');
+      links.forEach(function(el) {
+        if (isEnrolled) {
+          el.href = '../sesiones/index.html?course=' + courseId;
+        } else {
+          el.href = '../cursos/curso.html?id=' + courseId;
+        }
+      });
+    }
+  </script>
+  <script src="../assets/js/auth-ui.js"></script>
+</body>
+</html>
