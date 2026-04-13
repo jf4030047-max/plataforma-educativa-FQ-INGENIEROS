@@ -529,15 +529,19 @@
         }
       } else if (state === 'live') {
         html += '<p class="session-label">¡La sesión está en curso!</p>';
-        html += '<a href="#" class="btn btn-success btn-lg btn-full btn-live" id="btnJoinSession" onclick="markAttended(event)"><span class="material-icons-round">videocam</span> Unirme ahora</a>';
+        if (course.zoomLink) {
+          html += '<a href="' + course.zoomLink + '" target="_blank" class="btn btn-success btn-lg btn-full btn-live" id="btnJoinSession" onclick="markAttended(event)"><span class="material-icons-round">videocam</span> Unirme a Zoom</a>';
+        } else {
+          html += '<a href="#" class="btn btn-success btn-lg btn-full btn-live" id="btnJoinSession" onclick="markAttended(event)"><span class="material-icons-round">videocam</span> Unirme ahora</a>';
+        }
         if (attended) {
           html += '<p class="session-countdown" style="color:#065f46"><span class="material-icons-round">check_circle</span> Ya registraste tu asistencia</p>';
         }
       } else {
         html += '<p class="session-label">La sesión aún no comienza</p>';
         // Solo mostrar botón "Ver grabación" si hay grabación disponible
-        if (enrollment.recordingAvailable) {
-          html += '<a href="#" class="btn btn-primary btn-lg btn-full" id="btnWatchRecording" onclick="markWatched(event)"><span class="material-icons-round">play_circle</span> Ver grabación</a>';
+        if (course.recordingUrl || enrollment.recordingAvailable) {
+          html += '<a href="' + (course.recordingUrl || '#') + '" target="_blank" class="btn btn-primary btn-lg btn-full" id="btnWatchRecording" onclick="' + (course.recordingUrl ? 'markWatched(event)' : 'return false') + '"><span class="material-icons-round">play_circle</span> Ver grabación</a>';
           if (watched) {
             html += '<p class="session-countdown" style="color:#1565c0"><span class="material-icons-round">check_circle</span> Grabación vista</p>';
           }

@@ -300,37 +300,9 @@
         <!-- ═══ CURSOS ═══ -->
         <div class="panel" id="panel-courses">
           <div class="panel-header">
-            <h3>Cursos disponibles</h3>
+            <h3>Gestión de Cursos</h3>
           </div>
-          <div class="course-list">
-            <div class="course-item">
-              <h4>Seguridad y Salud en el Trabajo en Obras Civiles</h4>
-              <p>Identificación de riesgos, medidas preventivas, inspección de campo y protocolos de seguridad.</p>
-              <div class="course-meta">
-                <span><span class="material-icons-round">schedule</span> 1 hora</span>
-                <span><span class="material-icons-round">people</span> <span id="course1Count">0</span> inscritos</span>
-                <span><span class="material-icons-round">sell</span> Gratis</span>
-              </div>
-            </div>
-            <div class="course-item">
-              <h4>Metrados y Presupuestos</h4>
-              <p>Costeo técnico, análisis de partidas unitarias y elaboración de valorizaciones de obra.</p>
-              <div class="course-meta">
-                <span><span class="material-icons-round">schedule</span> 12 horas</span>
-                <span><span class="material-icons-round">people</span> 0 inscritos</span>
-                <span><span class="material-icons-round">sell</span> S/ 50</span>
-              </div>
-            </div>
-            <div class="course-item">
-              <h4>Supervisión de Obra</h4>
-              <p>Dirección técnica, control de calidad, cuaderno de obra y buenas prácticas de supervisión.</p>
-              <div class="course-meta">
-                <span><span class="material-icons-round">schedule</span> 16 horas</span>
-                <span><span class="material-icons-round">people</span> 0 inscritos</span>
-                <span><span class="material-icons-round">sell</span> S/ 80</span>
-              </div>
-            </div>
-          </div>
+          <div class="course-list" id="coursesList"></div>
         </div>
 
         <!-- ═══ PAGOS ═══ -->
@@ -568,6 +540,9 @@
         renderCerts();
         renderDashboard();
       });
+
+      // Courses (local management)
+      renderCourses();
     }
 
     // ═══ RENDER DASHBOARD ═══
@@ -734,7 +709,69 @@
       }
     }
 
+    // ═══ RENDER COURSES (Management) ═══
+    function renderCourses() {
+      const coursesList = document.getElementById('coursesList');
+      
+      // Cursos disponibles (puedes obtenerlos de Firestore si lo deseas)
+      const courses = [
+        { id: 'sst-obras-civiles', name: 'Seguridad y Salud en el Trabajo en Obras Civiles', icon: 'health_and_safety' },
+        { id: 'metrados-presupuestos', name: 'Metrados y Presupuestos', icon: 'calculate' },
+        { id: 'supervision-obra', name: 'Supervisión de Obra', icon: 'engineering' }
+      ];
+
+      let html = '';
+      courses.forEach(function(course) {
+        const stored = localStorage.getItem('course_' + course.id) || '{}';
+        const data = JSON.parse(stored);
+        
+        html += '<div class="course-item" style="background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px">';
+        html += '<div style="display:flex;align-items:center;gap:10px">';
+        html += '<span class="material-icons-round" style="color:#1565c0">' + course.icon + '</span>';
+        html += '<h4 style="font-size:16px;font-weight:700;color:#0f172a">' + course.name + '</h4>';
+        html += '</div>';
+        
+        // Input Zoom Link
+        html += '<div>';
+        html += '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Link de Zoom</label>';
+        html += '<input type="url" id="zoom_' + course.id + '" value="' + (data.zoomLink || '') + '" placeholder="https://zoom.us/j/..." style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />';
+        html += '</div>';
+        
+        // Input Recording URL
+        html += '<div>';
+        html += '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">URL de Grabación</label>';
+        html += '<input type="url" id="recording_' + course.id + '" value="' + (data.recordingUrl || '') + '" placeholder="https://example.com/video.mp4" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />';
+        html += '</div>';
+        
+        // Buttons
+        html += '<div style="display:flex;gap:8px">';
+        html += '<button class="btn-sm btn-blue" style="flex:1" onclick="saveCourseData(\'' + course.id + '\')">Guardar</button>';
+        html += '<button class="btn-sm btn-outline-sm" style="flex:1" onclick="clearCourseData(\'' + course.id + '\')">Limpiar</button>';
+        html += '</div>';
+        html += '</div>';
+      });
+      
+      coursesList.innerHTML = html;
+    }
+
+    function saveCourseData(courseId) {
+      const zoomLink = document.getElementById('zoom_' + courseId).value;
+      const recordingUrl = document.getElementById('recording_' + courseId).value;
+      
+      const data = { zoomLink, recordingUrl };
+      localStorage.setItem('course_' + courseId, JSON.stringify(data));
+      FQNotify.toast('Datos del curso guardados correctamente.', 'success');
+    }
+
+    function clearCourseData(courseId) {
+      if (!confirm('¿Estás seguro de limpiar los datos de este curso?')) return;
+      localStorage.removeItem('course_' + courseId);
+      renderCourses();
+      FQNotify.toast('Datos del curso limpiados.', 'info');
+    }
+
     // ═══ SETTINGS ═══
+
     async function saveAdminCreds() {
       const pw = document.getElementById('adminPw').value;
       if (!pw || pw.length < 6) { FQNotify.toast('La contraseña debe tener al menos 6 caracteres.', 'warning'); return; }

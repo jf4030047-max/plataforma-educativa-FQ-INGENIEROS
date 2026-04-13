@@ -238,6 +238,8 @@
         duration: '1 hora', sessions: 1, enrolled: 120, modality: 'En vivo',
         icon: 'health_and_safety',
         tags: ['Seguridad', 'Obras Civiles', 'Normativa'],
+        zoomLink: '', // Link de Zoom para la sesión en vivo
+        recordingUrl: '', // URL de la grabación cuando esté disponible
         schedules: [
           { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Jueves 23 de abril' },
           { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Jueves 23 de abril' }
@@ -357,6 +359,18 @@
        ══════════════════════════════════════════════ */
     var courseId = new URLSearchParams(window.location.search).get('id');
     var course = courseId ? COURSES[courseId] : null;
+
+    // Cargar datos de Zoom y grabación desde localStorage
+    if (course) {
+      try {
+        const stored = localStorage.getItem('course_' + courseId);
+        if (stored) {
+          const data = JSON.parse(stored);
+          course.zoomLink = data.zoomLink || course.zoomLink || '';
+          course.recordingUrl = data.recordingUrl || course.recordingUrl || '';
+        }
+      } catch (_) {}
+    }
 
     if (!course) {
       document.getElementById('courseMain').innerHTML =
