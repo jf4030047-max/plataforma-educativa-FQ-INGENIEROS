@@ -591,12 +591,15 @@
 
     // ═══ RENDER DASHBOARD ═══
     function renderDashboard() {
-      document.getElementById('statUsers').textContent = usersData.length;
-      document.getElementById('statPayments').textContent = paymentsData.length;
-      document.getElementById('statCerts').textContent = certsData.length;
-      document.getElementById('userCount').textContent = usersData.length;
-      document.getElementById('payCount').textContent = paymentsData.length;
-      document.getElementById('course1Count').textContent = usersData.length;
+      const statUsers = document.getElementById('statUsers');
+      const statPayments = document.getElementById('statPayments');
+      const statCerts = document.getElementById('statCerts');
+      const statCursos = document.getElementById('statCursos');
+
+      if (statUsers) statUsers.textContent = usersData.length;
+      if (statPayments) statPayments.textContent = paymentsData.length;
+      if (statCerts) statCerts.textContent = certsData.length;
+      if (statCursos) statCursos.textContent = coursesData ? coursesData.length : 0;
 
       // Origin badge
       const badge = document.getElementById('originBadge');
