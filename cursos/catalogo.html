@@ -93,77 +93,8 @@
         <button class="filter-btn">Gratuitos</button>
       </div>
 
-      <div class="courses-grid">
-
-        <!-- CURSO 1: SST en Obras Civiles -->
-        <article class="course-card">
-          <div class="cc-header">
-            <span class="cc-badge new">Nuevo</span>
-            <span class="cc-price">Gratis</span>
-          </div>
-          <div class="cc-body">
-            <h3><a href="#" style="color:inherit;text-decoration:none">Seguridad y Salud en el Trabajo en Obras Civiles</a></h3>
-            <p>Conoce los fundamentos de la Seguridad y Salud en el Trabajo aplicados a obras civiles, incluyendo marco legal peruano, identificación de peligros y riesgos, investigación de incidentes y elaboración de análisis de riesgos según normativa vigente.</p>
-            <div class="cc-tags">
-              <span class="cc-tag">Seguridad</span>
-              <span class="cc-tag">Obras Civiles</span>
-              <span class="cc-tag">Normativa</span>
-            </div>
-            <div class="cc-meta">
-              <span><span class="material-icons-round">schedule</span> 1 hora</span>
-              <span><span class="material-icons-round">event_seat</span> Cupos disponibles</span>
-              <span><span class="material-icons-round">videocam</span> En vivo + Grabado</span>
-            </div>
-            <div class="course-action" data-course="sst-obras-civiles"></div>
-          </div>
-        </article>
-
-        <!-- CURSO 2: Metrados y Presupuestos -->
-        <article class="course-card">
-          <div class="cc-header">
-            <span class="cc-badge top">Top</span>
-            <span class="cc-price">S/ 50</span>
-          </div>
-          <div class="cc-body">
-            <h3><a href="curso.html?id=metrados-presupuestos" style="color:inherit;text-decoration:none">Metrados y Presupuestos</a></h3>
-            <p>Aprende a realizar metrados, análisis de partidas unitarias y elaboración de valorizaciones de obra según normativa vigente. Domina el costeo técnico y la gestión de presupuestos para proyectos de infraestructura.</p>
-            <div class="cc-tags">
-              <span class="cc-tag">Costos</span>
-              <span class="cc-tag">Presupuestos</span>
-              <span class="cc-tag">Valorizaciones</span>
-            </div>
-            <div class="cc-meta">
-              <span><span class="material-icons-round">schedule</span> 12 horas</span>
-              <span><span class="material-icons-round">people</span> 85 inscritos</span>
-              <span><span class="material-icons-round">videocam</span> En vivo</span>
-            </div>
-            <div class="course-action" data-course="metrados-presupuestos"></div>
-          </div>
-        </article>
-
-        <!-- CURSO 3: Supervisión de Obra -->
-        <article class="course-card">
-          <div class="cc-header">
-            <span class="cc-badge pro">Pro</span>
-            <span class="cc-price">S/ 80</span>
-          </div>
-          <div class="cc-body">
-            <h3><a href="curso.html?id=supervision-obra" style="color:inherit;text-decoration:none">Supervisión de Obra</a></h3>
-            <p>Desarrolla competencias en dirección técnica, control de calidad, gestión de cuaderno de obra y aplicación de buenas prácticas de supervisión. Enfocado en proyectos civiles y normativas actuales.</p>
-            <div class="cc-tags">
-              <span class="cc-tag">Supervisión</span>
-              <span class="cc-tag">Control de Calidad</span>
-              <span class="cc-tag">Dirección</span>
-            </div>
-            <div class="cc-meta">
-              <span><span class="material-icons-round">schedule</span> 16 horas</span>
-              <span><span class="material-icons-round">people</span> 64 inscritos</span>
-              <span><span class="material-icons-round">videocam</span> En vivo + Grabado</span>
-            </div>
-            <div class="course-action" data-course="supervision-obra"></div>
-          </div>
-        </article>
-
+      <div class="courses-grid" id="coursesGrid">
+        <!-- Dinamically loaded from Firestore -->
       </div>
     </div>
   </main>
@@ -181,101 +112,173 @@
   <script src="../assets/js/firebase-config.js"></script>
   <script src="../assets/js/auth-ui.js"></script>
 
-<!-- Script reutilizable de lógica dinámica de catálogo (idéntico a index.html, solo para cards del catálogo) -->
+<!-- Script for loading courses from Firestore -->
 <script>
-window.addEventListener('DOMContentLoaded', function() {
+  /* Load courses from Firestore and render them */
+  var allCourses = {};
   var courseStates = {
     'sst-obras-civiles': 'disponible',
     'metrados-presupuestos': 'proximamente',
     'supervision-obra': 'proximamente'
   };
 
-  document.querySelectorAll('.course-action[data-course]').forEach(function(container) {
-    var courseId = container.getAttribute('data-course');
-    var state = courseStates[courseId] || 'disponible';
-    container.innerHTML = '';
-    if (state === 'disponible') {
-      var btn = document.createElement('a');
-      btn.href = '#';
-      btn.className = 'btn btn-primary btn-block btn-sm course-link';
-      btn.setAttribute('data-course', courseId);
-      btn.textContent = 'Inscribirme';
-      btn.onclick = function(e) {
-        e.preventDefault();
-        // Navegación robusta: siempre ir a la descripción del curso correcto
-        var base = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
-        window.location.href = base + 'curso.html?id=' + courseId;
-        return false;
-      };
-      container.appendChild(btn);
-    } else if (state === 'proximamente') {
-      var badge = document.createElement('span');
-      badge.className = 'cbadge';
-      badge.style.background = '#fef3c7';
-      badge.style.color = '#92400e';
-      badge.style.fontSize = '13px';
-      badge.style.padding = '5px 14px';
-      badge.style.display = 'block';
-      badge.style.textAlign = 'center';
-      badge.style.marginBottom = '8px';
-      badge.style.borderRadius = '18px';
-      badge.innerHTML = '<span class="material-icons-round" style="font-size:16px;vertical-align:middle;">upcoming</span> Próximamente';
-      container.appendChild(badge);
-    }
-  });
+  function renderCourses() {
+    var grid = document.getElementById('coursesGrid');
+    if (!grid) return;
 
-  if (typeof auth !== 'undefined' && typeof db !== 'undefined') {
-    auth.onAuthStateChanged(function(user) {
-      if (!user) return;
-      document.querySelectorAll('.course-action[data-course]').forEach(function(container) {
-        var courseId = container.getAttribute('data-course');
-        var cacheKey = 'enrollment_' + user.uid + '_' + courseId;
-        function setEnrolledUI() {
-          container.innerHTML = '';
-          var btn = document.createElement('a');
-          btn.href = '../sesiones/index.html?course=' + courseId;
-          btn.className = 'btn btn-success btn-block btn-sm';
-          btn.innerHTML = '<span class="material-icons-round">play_circle</span> Ir al curso';
-          container.appendChild(btn);
-          btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = '../sesiones/index.html?course=' + courseId;
-          });
-        }
-        try {
-          var cached = localStorage.getItem(cacheKey);
-          if (cached) {
-            var data = JSON.parse(cached);
-            if (data.enrolled) setEnrolledUI();
-          }
-        } catch (_) {}
-        db.collection('enrollments').doc(user.uid + '_' + courseId).get()
-          .then(function(doc) {
-            if (doc.exists && doc.data().status === 'active') {
-              setEnrolledUI();
-              try {
-                localStorage.setItem(cacheKey, JSON.stringify({
-                  enrolled: true,
-                  schedule: doc.data().schedule || null,
-                  ts: Date.now()
-                }));
-              } catch (_) {}
-            }
-          });
-      });
+    grid.innerHTML = '';
+
+    Object.values(allCourses).forEach(function(course) {
+      var state = courseStates[course.id] || 'disponible';
+      
+      // Determine badge
+      var badgeHtml = '';
+      if (course.badge === 'new') {
+        badgeHtml = '<span class="cc-badge new">Nuevo</span>';
+      } else if (course.badge === 'top') {
+        badgeHtml = '<span class="cc-badge top">Top</span>';
+      } else if (course.badge === 'pro') {
+        badgeHtml = '<span class="cc-badge pro">Pro</span>';
+      }
+
+      // Render tags
+      var tagsHtml = '';
+      if (course.tags && course.tags.length > 0) {
+        course.tags.forEach(function(tag) {
+          tagsHtml += '<span class="cc-tag">' + tag + '</span>';
+        });
+      }
+
+      // Render meta
+      var metaHtml = '<div class="cc-meta">';
+      if (course.duration) metaHtml += '<span><span class="material-icons-round">schedule</span> ' + course.duration + '</span>';
+      if (course.enrolled) metaHtml += '<span><span class="material-icons-round">people</span> ' + course.enrolled + ' inscritos</span>';
+      if (course.modality) metaHtml += '<span><span class="material-icons-round">videocam</span> ' + course.modality + '</span>';
+      metaHtml += '</div>';
+
+      var priceLabel = course.price === 0 ? 'Gratis' : ('S/ ' + course.price);
+
+      var html = 
+        '<article class="course-card">' +
+        '<div class="cc-header">' +
+        badgeHtml +
+        '<span class="cc-price">' + priceLabel + '</span>' +
+        '</div>' +
+        '<div class="cc-body">' +
+        '<h3><a href="curso.html?id=' + course.id + '" style="color:inherit;text-decoration:none">' + course.name + '</a></h3>' +
+        '<p>' + course.desc + '</p>' +
+        '<div class="cc-tags">' + tagsHtml + '</div>' +
+        metaHtml +
+        '<div class="course-action" data-course="' + course.id + '"></div>' +
+        '</div>' +
+        '</article>';
+
+      grid.innerHTML += html;
     });
+
+    // Now attach event handlers
+    attachEventHandlers();
   }
 
-  // Ocultar info detallada en cursos Próximamente
-  document.querySelectorAll('.course-action[data-course]').forEach(function(container) {
-    var courseId = container.getAttribute('data-course');
-    var state = courseStates[courseId] || 'disponible';
-    var meta = container.parentElement.querySelector('.cc-meta');
-    if (meta) {
-      meta.style.display = (state === 'proximamente') ? 'none' : '';
+  function attachEventHandlers() {
+    var courseStates = {
+      'sst-obras-civiles': 'disponible',
+      'metrados-presupuestos': 'proximamente',
+      'supervision-obra': 'proximamente'
+    };
+
+    document.querySelectorAll('.course-action[data-course]').forEach(function(container) {
+      var courseId = container.getAttribute('data-course');
+      var state = courseStates[courseId] || 'disponible';
+      container.innerHTML = '';
+      
+      if (state === 'disponible') {
+        var btn = document.createElement('a');
+        btn.href = '#';
+        btn.className = 'btn btn-primary';
+        btn.style.width = '100%';
+        btn.setAttribute('data-course', courseId);
+        btn.textContent = 'Inscribirme';
+        btn.onclick = function(e) {
+          e.preventDefault();
+          window.location.href = 'curso.html?id=' + courseId;
+          return false;
+        };
+        container.appendChild(btn);
+      } else if (state === 'proximamente') {
+        var badge = document.createElement('span');
+        badge.className = 'cbadge';
+        badge.style.background = '#fef3c7';
+        badge.style.color = '#92400e';
+        badge.style.fontSize = '13px';
+        badge.style.padding = '5px 14px';
+        badge.style.display = 'block';
+        badge.style.textAlign = 'center';
+        badge.style.marginBottom = '8px';
+        badge.style.borderRadius = '18px';
+        badge.innerHTML = '<span class="material-icons-round" style="font-size:16px;vertical-align:middle;">upcoming</span> Próximamente';
+        container.appendChild(badge);
+      }
+    });
+
+    if (typeof auth !== 'undefined' && typeof db !== 'undefined') {
+      auth.onAuthStateChanged(function(user) {
+        if (!user) return;
+        document.querySelectorAll('.course-action[data-course]').forEach(function(container) {
+          var courseId = container.getAttribute('data-course');
+          var cacheKey = 'enrollment_' + user.uid + '_' + courseId;
+          function setEnrolledUI() {
+            container.innerHTML = '';
+            var btn = document.createElement('a');
+            btn.href = '../sesiones/index.html?course=' + courseId;
+            btn.className = 'btn btn-success';
+            btn.style.width = '100%';
+            btn.innerHTML = '<span class="material-icons-round">play_circle</span> Ir al curso';
+            container.appendChild(btn);
+            btn.addEventListener('click', function(e) {
+              e.preventDefault();
+              window.location.href = '../sesiones/index.html?course=' + courseId;
+            });
+          }
+          try {
+            var cached = localStorage.getItem(cacheKey);
+            if (cached) {
+              var data = JSON.parse(cached);
+              if (data.enrolled) setEnrolledUI();
+            }
+          } catch (_) {}
+          db.collection('enrollments').doc(user.uid + '_' + courseId).get()
+            .then(function(doc) {
+              if (doc.exists && doc.data().status === 'active') {
+                setEnrolledUI();
+                try {
+                  localStorage.setItem(cacheKey, JSON.stringify({
+                    enrolled: true,
+                    schedule: doc.data().schedule || null,
+                    ts: Date.now()
+                  }));
+                } catch (_) {}
+              }
+            });
+        });
+      });
+    }
+  }
+
+  // Load courses from Firestore
+  window.addEventListener('DOMContentLoaded', function() {
+    if (typeof db !== 'undefined') {
+      db.collection('courses').get().then(function(snapshot) {
+        snapshot.forEach(function(doc) {
+          allCourses[doc.id] = doc.data();
+        });
+        renderCourses();
+      }).catch(function(error) {
+        console.error('Error loading courses:', error);
+        document.getElementById('coursesGrid').innerHTML = '<p style="text-align:center;padding:40px;color:#64748b;">Error al cargar los cursos. Por favor, intenta más tarde.</p>';
+      });
     }
   });
-});
 </script>
 </body>
 </html>
