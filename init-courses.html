@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inicializar Cursos | FQ INGENIEROS Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f7f9fc; padding: 40px 20px; min-height: 100vh; }
+    .container { max-width: 600px; margin: 0 auto; }
+    .card { background: #fff; border: 1px solid #dce3ed; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    h1 { font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 12px; }
+    p { color: #64748b; line-height: 1.6; margin-bottom: 20px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .2s; }
+    .btn-primary { background: #1565c0; color: #fff; }
+    .btn-primary:hover { background: #1e88e5; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+    .status { margin-top: 24px; padding: 16px; border-radius: 8px; font-size: 13px; display: none; }
+    .status.info { background: #dbeafe; color: #1565c0; border: 1px solid #bfdbfe; }
+    .status.success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .status.error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .status.loading { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    .courses-list { margin-top: 24px; }
+    .course-item { padding: 12px; background: #f8fafc; border-radius: 6px; margin-bottom: 8px; font-size: 13px; color: #475569; }
+    .course-item strong { color: #0f172a; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>🎓 Inicializar Cursos</h1>
+      <p>Este script agregará los 3 cursos iniciales a la colección "courses" en Firestore.</p>
+      
+      <div class="courses-list">
+        <div class="course-item"><strong>1. Seguridad y Salud en el Trabajo en Obras Civiles</strong> (Gratis)</div>
+        <div class="course-item"><strong>2. Metrados y Presupuestos</strong> (S/ 50)</div>
+        <div class="course-item"><strong>3. Supervisión de Obra</strong> (S/ 80)</div>
+      </div>
+
+      <button class="btn btn-primary" id="initBtn" onclick="initializeCourses()">
+        <span>▶️</span> Inicializar Cursos
+      </button>
+
+      <div class="status" id="status"></div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <script src="assets/js/firebase-config.js"></script>
+
+  <script>
+    const INITIAL_COURSES = [
+      {
+        id: 'sst-obras-civiles',
+        name: 'Seguridad y Salud en el Trabajo en Obras Civiles',
+        price: 0,
+        priceLabel: 'Gratis',
+        desc: 'Conoce los fundamentos de la Seguridad y Salud en el Trabajo aplicados a obras civiles, incluyendo marco legal peruano, identificación de peligros y riesgos, investigación de incidentes y elaboración de análisis de riesgos según normativa vigente.',
+        duration: '1 hora',
+        sessions: 1,
+        enrolled: 0,
+        modality: 'En vivo + Grabado',
+        icon: 'health_and_safety',
+        badge: 'new',
+        badgeLabel: 'Nuevo',
+        tags: ['Seguridad', 'Obras Civiles', 'Normativa'],
+        schedules: [
+          { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Jueves 23 de abril' },
+          { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Jueves 23 de abril' }
+        ],
+        temario: [
+          { titulo: 'Introducción a la SST', temas: [
+            'Reseña histórica de la Seguridad y Salud en el Trabajo',
+            'Historia de la SST en el Perú',
+            'Términos y definiciones'
+          ]},
+          { titulo: 'Marco Legal en el Perú', temas: [
+            'Ley N° 29783 y su reglamento D.S. 005-2012-TR',
+            'Leyes de SST',
+            'Resoluciones Ministeriales',
+            'Aplicación en diferentes sectores',
+            'Organismos competentes en el Perú',
+            'Modificatorias',
+            'Principios de la ley'
+          ]},
+          { titulo: 'Peligros y Riesgos', temas: [
+            'Peligros',
+            'Riesgos',
+            'Consecuencias',
+            'Jerarquía de control'
+          ]},
+          { titulo: 'Incidentes y Accidentes', temas: [
+            'Tipos',
+            'Causas',
+            'Reportes'
+          ]},
+          { titulo: 'Análisis de Riesgos', temas: [
+            'Conceptos básicos',
+            'Proceso de análisis',
+            'Elaboración',
+            'Registros'
+          ]}
+        ],
+        includes: [
+          { icon: 'videocam', text: '1 sesión en vivo (1 hora)' },
+          { icon: 'play_circle', text: 'Acceso a la grabación después de la capacitación' },
+          { icon: 'description', text: 'Material de apoyo (si aplica)' },
+          { icon: 'verified', text: 'Constancia de participación digital (gratuita)' },
+          { icon: 'workspace_premium', text: 'Certificado opcional (previo examen y pago de S/ 20)' },
+          { icon: 'forum', text: 'Grupo de coordinación opcional (WhatsApp)' }
+        ],
+        zoomLink: '',
+        recordingUrl: '',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 'metrados-presupuestos',
+        name: 'Metrados y Presupuestos',
+        price: 50,
+        priceLabel: 'S/ 50',
+        desc: 'Aprende a realizar metrados, análisis de partidas unitarias y elaboración de valorizaciones de obra según normativa vigente. Domina el costeo técnico y la gestión de presupuestos para proyectos de infraestructura.',
+        duration: '12 horas',
+        sessions: 8,
+        enrolled: 0,
+        modality: 'En vivo',
+        icon: 'calculate',
+        badge: 'top',
+        badgeLabel: 'Top',
+        tags: ['Costos', 'Presupuestos', 'Valorizaciones'],
+        schedules: [
+          { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Lunes y miércoles' },
+          { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Martes y jueves' }
+        ],
+        temario: [
+          'Fundamentos de costos en construcción',
+          'Análisis de precios unitarios',
+          'Metrado de partidas principales',
+          'Presupuesto base y fórmulas polinómicas',
+          'Valorizaciones mensuales',
+          'Reajuste de precios',
+          'Software S10 — Introducción práctica',
+          'Caso práctico integral'
+        ],
+        includes: [
+          { icon: 'videocam', text: '8 sesiones en vivo' },
+          { icon: 'play_circle', text: 'Acceso a grabaciones' },
+          { icon: 'description', text: 'Plantillas Excel' },
+          { icon: 'workspace_premium', text: 'Certificado digital' },
+          { icon: 'forum', text: 'Grupo de WhatsApp' },
+          { icon: 'quiz', text: 'Examen de certificación' }
+        ],
+        zoomLink: '',
+        recordingUrl: '',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 'supervision-obra',
+        name: 'Supervisión de Obra',
+        price: 80,
+        priceLabel: 'S/ 80',
+        desc: 'Desarrolla competencias en dirección técnica, control de calidad, gestión de cuaderno de obra y aplicación de buenas prácticas de supervisión. Enfocado en proyectos civiles y normativas actuales.',
+        duration: '16 horas',
+        sessions: 10,
+        enrolled: 0,
+        modality: 'En vivo + Grabado',
+        icon: 'engineering',
+        badge: 'pro',
+        badgeLabel: 'Pro',
+        tags: ['Supervisión', 'Control de Calidad', 'Dirección'],
+        schedules: [
+          { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Lunes y miércoles' },
+          { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Martes y jueves' }
+        ],
+        temario: [
+          'Rol del supervisor de obra',
+          'Marco legal y contractual',
+          'Control de calidad de materiales',
+          'Cuaderno de obra digital',
+          'Control de avance físico y financiero',
+          'Recepción de obra y liquidación',
+          'Gestión de adicionales y deductivos',
+          'Resolución de controversias',
+          'Supervisión en proyectos públicos (OSCE)',
+          'Caso práctico integral'
+        ],
+        includes: [
+          { icon: 'videocam', text: '10 sesiones en vivo' },
+          { icon: 'play_circle', text: 'Grabaciones disponibles' },
+          { icon: 'description', text: 'Material y normativa' },
+          { icon: 'workspace_premium', text: 'Certificado digital' },
+          { icon: 'forum', text: 'Grupo de WhatsApp' },
+          { icon: 'quiz', text: 'Examen de certificación' }
+        ],
+        zoomLink: '',
+        recordingUrl: '',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ];
+
+    function showStatus(message, type = 'info') {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`;
+      statusEl.style.display = 'block';
+    }
+
+    async function initializeCourses() {
+      const btn = document.getElementById('initBtn');
+      btn.disabled = true;
+
+      try {
+        showStatus('Verificando autenticación...', 'loading');
+        
+        // Check if user is authenticated
+        const user = auth.currentUser;
+        if (!user) {
+          showStatus('❌ Error: No estás autenticado. Por favor, inicia sesión en el admin panel primero.', 'error');
+          btn.disabled = false;
+          return;
+        }
+
+        showStatus('Inicializando cursos en Firestore...', 'loading');
+
+        let createdCount = 0;
+        for (const course of INITIAL_COURSES) {
+          try {
+            // Check if course already exists
+            const docSnapshot = await db.collection('courses').doc(course.id).get();
+            
+            if (!docSnapshot.exists) {
+              await db.collection('courses').doc(course.id).set({
+                ...course,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+              });
+              createdCount++;
+            }
+          } catch (err) {
+            console.error(`Error adding course ${course.id}:`, err);
+          }
+        }
+
+        showStatus(`✅ Éxito: Se inicializaron ${createdCount} curso(s) en Firestore. Puedes cerrar esta ventana.`, 'success');
+      } catch (error) {
+        console.error('Error:', error);
+        showStatus(`❌ Error: ${error.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // Auto-initialize on load if in admin perspective
+    window.addEventListener('load', function() {
+      if (auth.currentUser) {
+        console.log('Usuario autenticado:', auth.currentUser.email);
+      }
+    });
+  </script>
+</body>
+</html>
