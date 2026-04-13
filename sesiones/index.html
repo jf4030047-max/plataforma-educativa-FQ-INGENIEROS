@@ -535,9 +535,14 @@
         }
       } else {
         html += '<p class="session-label">La sesión ya finalizó</p>';
-        html += '<a href="#" class="btn btn-primary btn-lg btn-full" id="btnWatchRecording" onclick="markWatched(event)"><span class="material-icons-round">play_circle</span> Ver grabación</a>';
-        if (watched) {
-          html += '<p class="session-countdown" style="color:#1565c0"><span class="material-icons-round">check_circle</span> Grabación vista</p>';
+        // Solo mostrar botón "Ver grabación" si hay grabación disponible
+        if (enrollment.recordingAvailable) {
+          html += '<a href="#" class="btn btn-primary btn-lg btn-full" id="btnWatchRecording" onclick="markWatched(event)"><span class="material-icons-round">play_circle</span> Ver grabación</a>';
+          if (watched) {
+            html += '<p class="session-countdown" style="color:#1565c0"><span class="material-icons-round">check_circle</span> Grabación vista</p>';
+          }
+        } else {
+          html += '<p class="session-label" style="margin-top:12px;color:#64748b;font-size:14px"><span class="material-icons-round" style="vertical-align:middle;margin-right:6px">schedule</span> La grabación estará disponible próximamente</p>';
         }
       }
 
