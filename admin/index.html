@@ -283,7 +283,7 @@
         <!-- ═══ USUARIOS ═══ -->
         <div class="panel" id="panel-users">
           <div class="panel-header">
-            <h3>Todos los usuarios</h3>
+            <h3>Todos los usuarios <span id="usersTotal" style="color:#64748b;font-weight:400;font-size:16px">(0)</span></h3>
             <div class="search-box">
               <span class="material-icons-round">search</span>
               <input type="text" placeholder="Buscar por nombre o correo..." id="searchUsers" oninput="renderUsers()" />
@@ -595,11 +595,15 @@
       const statPayments = document.getElementById('statPayments');
       const statCerts = document.getElementById('statCerts');
       const statCursos = document.getElementById('statCursos');
+      const userCount = document.getElementById('userCount');
+      const payCount = document.getElementById('payCount');
 
       if (statUsers) statUsers.textContent = usersData.length;
       if (statPayments) statPayments.textContent = paymentsData.length;
       if (statCerts) statCerts.textContent = certsData.length;
       if (statCursos) statCursos.textContent = coursesData ? coursesData.length : 0;
+      if (userCount) userCount.textContent = usersData.length;
+      if (payCount) payCount.textContent = paymentsData.length;
 
       // Origin badge
       const badge = document.getElementById('originBadge');
@@ -636,6 +640,12 @@
         const text = ((u.name || '') + ' ' + u.email).toLowerCase();
         return text.includes(query);
       });
+
+      // Actualizar contador total
+      const usersTotal = document.getElementById('usersTotal');
+      if (usersTotal) {
+        usersTotal.textContent = '(' + usersData.length + ')';
+      }
 
       const tbody = document.getElementById('usersTable');
       if (users.length === 0) {
