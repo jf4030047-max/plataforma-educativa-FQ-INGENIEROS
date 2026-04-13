@@ -675,9 +675,12 @@
       document.getElementById('scheduleSection').style.display = 'none';
       document.getElementById('enrolledState').style.display = '';
 
-      if (scheduleData && scheduleData.label) {
+      // Solo mostrar el horario si hay grabación disponible (simulación: solo si course.hasRecording es true)
+      if (course.hasRecording && scheduleData && scheduleData.label) {
         document.getElementById('enrolledSchedule').innerHTML =
           '<span class="material-icons-round">schedule</span> Horario: ' + scheduleData.label + ' (' + scheduleData.detail + ')';
+      } else {
+        document.getElementById('enrolledSchedule').innerHTML = '';
       }
       document.getElementById('btnIrCurso').href = '../sesiones/index.html?course=' + course.id;
     }
