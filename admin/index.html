@@ -300,9 +300,50 @@
         <!-- ═══ CURSOS ═══ -->
         <div class="panel" id="panel-courses">
           <div class="panel-header">
-            <h3>Gestión de Cursos</h3>
+            <h3>Administración de Cursos</h3>
+            <button class="btn btn-primary" onclick="showCourseForm()" style="padding:8px 16px;font-size:13px">
+              <span class="material-icons-round" style="font-size:18px">add</span> Nuevo curso
+            </button>
           </div>
-          <div class="course-list" id="coursesList"></div>
+
+          <!-- Form para crear/editar curso -->
+          <div id="courseFormWrap" style="display:none;background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:22px;margin-bottom:20px">
+            <h4 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:16px">Formulario de Curso</h4>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Nombre del curso</label>
+                <input type="text" id="courseName" placeholder="Ej: Seguridad en Obras Civiles" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Precio (S/)</label>
+                <input type="number" id="coursePrice" placeholder="0" min="0" step="0.01" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+              </div>
+              <div style="grid-column:1/-1">
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Descripción</label>
+                <textarea id="courseDesc" placeholder="Descripción del curso..." style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit;min-height:80px"></textarea>
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Duración</label>
+                <input type="text" id="courseDuration" placeholder="Ej: 1 hora" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Número de sesiones</label>
+                <input type="number" id="courseSessions" placeholder="1" min="1" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+              </div>
+              <div style="grid-column:1/-1;display:flex;gap:10px">
+                <button class="btn-sm btn-blue" onclick="saveCourse()" style="flex:1">Guardar Curso</button>
+                <button class="btn-sm btn-outline-sm" onclick="closeCourseForm()" style="flex:1">Cancelar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla de cursos -->
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Nombre</th><th>Precio</th><th>Duración</th><th>Sesiones</th><th>Acciones</th></tr></thead>
+              <tbody id="coursesTable"></tbody>
+            </table>
+          </div>
         </div>
 
         <!-- ═══ PAGOS ═══ -->
@@ -541,7 +582,10 @@
         renderDashboard();
       });
 
-      // Courses (local management)
+      // Courses listener
+      initCoursesListener();
+
+      // Courses (local management for Zoom/Recording)
       renderCourses();
     }
 
@@ -709,25 +753,120 @@
       }
     }
 
-    // ═══ RENDER COURSES (Management) ═══
-    function renderCourses() {
-      const coursesList = document.getElementById('coursesList');
-      
-      // Cursos disponibles (puedes obtenerlos de Firestore si lo deseas)
-      const courses = [
-        { id: 'sst-obras-civiles', name: 'Seguridad y Salud en el Trabajo en Obras Civiles', icon: 'health_and_safety' },
-        { id: 'metrados-presupuestos', name: 'Metrados y Presupuestos', icon: 'calculate' },
-        { id: 'supervision-obra', name: 'Supervisión de Obra', icon: 'engineering' }
-      ];
+    // ═══ RENDER COURSES (Admin CRUD) ═══
+    let coursesData = [];
+    let editingCourseId = null;
 
+    function initCoursesListener() {
+      db.collection('courses').onSnapshot(function(snapshot) {
+        coursesData = [];
+        snapshot.forEach(function(doc) {
+          coursesData.push({ id: doc.id, ...doc.data() });
+        });
+        renderCoursesTable();
+      });
+    }
+
+    function renderCoursesTable() {
+      const tbody = document.getElementById('coursesTable');
+      if (coursesData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:32px">No hay cursos creados aún.</td></tr>';
+      } else {
+        tbody.innerHTML = coursesData.map(c => `
+          <tr>
+            <td>${c.name || '—'}</td>
+            <td>S/ ${c.price || 0}</td>
+            <td>${c.duration || '—'}</td>
+            <td>${c.sessions || 0}</td>
+            <td>
+              <button class="action-btn" onclick="editCourse('${c.id}')"><span class="material-icons-round" style="font-size:16px">edit</span> Editar</button>
+              <button class="action-btn danger" onclick="deleteCourse('${c.id}')"><span class="material-icons-round" style="font-size:16px">delete</span></button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    function showCourseForm() {
+      editingCourseId = null;
+      document.getElementById('courseName').value = '';
+      document.getElementById('coursePrice').value = '';
+      document.getElementById('courseDesc').value = '';
+      document.getElementById('courseDuration').value = '';
+      document.getElementById('courseSessions').value = '1';
+      document.getElementById('courseFormWrap').style.display = '';
+    }
+
+    function closeCourseForm() {
+      document.getElementById('courseFormWrap').style.display = 'none';
+      editingCourseId = null;
+    }
+
+    function editCourse(id) {
+      const course = coursesData.find(c => c.id === id);
+      if (!course) return;
+      editingCourseId = id;
+      document.getElementById('courseName').value = course.name || '';
+      document.getElementById('coursePrice').value = course.price || 0;
+      document.getElementById('courseDesc').value = course.desc || '';
+      document.getElementById('courseDuration').value = course.duration || '';
+      document.getElementById('courseSessions').value = course.sessions || 1;
+      document.getElementById('courseFormWrap').style.display = '';
+      document.getElementById('courseFormWrap').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function saveCourse() {
+      const name = document.getElementById('courseName').value.trim();
+      const price = parseFloat(document.getElementById('coursePrice').value) || 0;
+      const desc = document.getElementById('courseDesc').value.trim();
+      const duration = document.getElementById('courseDuration').value.trim();
+      const sessions = parseInt(document.getElementById('courseSessions').value) || 1;
+
+      if (!name) { FQNotify.toast('El nombre del curso es requerido.', 'warning'); return; }
+      if (!desc) { FQNotify.toast('La descripción del curso es requerida.', 'warning'); return; }
+
+      const courseData = { name, price, desc, duration, sessions, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+
+      if (editingCourseId) {
+        // Actualizar
+        db.collection('courses').doc(editingCourseId).update(courseData)
+          .then(() => {
+            FQNotify.toast('Curso actualizado correctamente.', 'success');
+            closeCourseForm();
+          })
+          .catch(err => FQNotify.toast('Error: ' + err.message, 'error'));
+      } else {
+        // Crear
+        courseData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        db.collection('courses').add(courseData)
+          .then(() => {
+            FQNotify.toast('Curso creado correctamente.', 'success');
+            closeCourseForm();
+          })
+          .catch(err => FQNotify.toast('Error: ' + err.message, 'error'));
+      }
+    }
+
+    function deleteCourse(id) {
+      if (!confirm('¿Estás seguro de que deseas eliminar este curso?')) return;
+      db.collection('courses').doc(id).delete()
+        .then(() => {
+          FQNotify.toast('Curso eliminado correctamente.', 'success');
+        })
+        .catch(err => FQNotify.toast('Error: ' + err.message, 'error'));
+    }
+
+    function renderCourses() {
+      // Esta función se mantiene para compatibilidad pero ahora maneja Zoom/Grabación
+      const coursesList = document.getElementById('coursesList') || document.createElement('div');
+      
       let html = '';
-      courses.forEach(function(course) {
+      coursesData.forEach(function(course) {
         const stored = localStorage.getItem('course_' + course.id) || '{}';
         const data = JSON.parse(stored);
         
         html += '<div class="course-item" style="background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px">';
         html += '<div style="display:flex;align-items:center;gap:10px">';
-        html += '<span class="material-icons-round" style="color:#1565c0">' + course.icon + '</span>';
         html += '<h4 style="font-size:16px;font-weight:700;color:#0f172a">' + course.name + '</h4>';
         html += '</div>';
         
@@ -751,7 +890,7 @@
         html += '</div>';
       });
       
-      coursesList.innerHTML = html;
+      if (coursesList.id) coursesList.innerHTML = html;
     }
 
     function saveCourseData(courseId) {
@@ -760,7 +899,7 @@
       
       const data = { zoomLink, recordingUrl };
       localStorage.setItem('course_' + courseId, JSON.stringify(data));
-      FQNotify.toast('Datos del curso guardados correctamente.', 'success');
+      FQNotify.toast('Datos de Zoom/Grabación guardados correctamente.', 'success');
     }
 
     function clearCourseData(courseId) {

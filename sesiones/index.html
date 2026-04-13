@@ -220,80 +220,42 @@
 
   <script>
     /* ══════════════════════════════════════════════
-       Course data (mirrors cursos/curso.html)
+       Course data - loaded from Firestore
        ══════════════════════════════════════════════ */
-    var COURSES = {
-      'sst-obras-civiles': {
-        name: 'Seguridad y Salud en el Trabajo en Obras Civiles',
-        icon: 'health_and_safety',
-        duration: '1 hora',
-        sessions: 1,
-        modality: 'En vivo',
-        /* Session datetime per schedule (Peru = UTC-5) */
-        sessionDate: '2026-03-30',
-        scheduleTime: {
-          h1: { start: '17:00', end: '18:00' },
-          h2: { start: '19:00', end: '20:00' }
-        },
-        temario: [
-          'Introducción a la SST',
-          'Marco Legal en el Perú',
-          'Peligros y Riesgos',
-          'Incidentes y Accidentes',
-          'Análisis de Riesgos'
-        ]
-      },
-      'metrados-presupuestos': {
-        name: 'Metrados y Presupuestos',
-        icon: 'calculate',
-        duration: '12 horas',
-        sessions: 8,
-        modality: 'En vivo',
-        sessionDate: null,
-        scheduleTime: {},
-        temario: [
-          'Fundamentos de costos en construcción',
-          'Análisis de precios unitarios',
-          'Metrado de partidas principales',
-          'Presupuesto base y fórmulas polinómicas',
-          'Valorizaciones mensuales',
-          'Reajuste de precios',
-          'Software S10 — Introducción práctica',
-          'Caso práctico integral'
-        ]
-      },
-      'supervision-obra': {
-        name: 'Supervisión de Obra',
-        icon: 'engineering',
-        duration: '16 horas',
-        sessions: 10,
-        modality: 'En vivo + Grabado',
-        sessionDate: null,
-        scheduleTime: {},
-        temario: [
-          'Rol del supervisor de obra',
-          'Marco legal y contractual',
-          'Control de calidad de materiales',
-          'Cuaderno de obra digital',
-          'Control de avance físico y financiero',
-          'Recepción de obra y liquidación',
-          'Gestión de adicionales y deductivos',
-          'Resolución de controversias',
-          'Supervisión en proyectos públicos (OSCE)',
-          'Caso práctico integral'
-        ]
-      }
-    };
+    var COURSES = {};
+    var SCHEDULES = {};
 
     var courseId = new URLSearchParams(window.location.search).get('course');
 
-    /* Available schedules for SST (mirrors cursos/curso.html) */
-    var SCHEDULES = {
-      'sst-obras-civiles': [
-        { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Jueves 23 de abril' },
-        { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Jueves 23 de abril' }
-      ]
-    };
+    // Load courses from Firestore
+    function loadCoursesFromFirestore() {
+      return db.collection('courses').get().then(function(snapshot) {
+        snapshot.forEach(function(doc) {
+          const data = doc.data();
+          COURSES[doc.id] = {
+            id: doc.id,
+            name: data.name || '',
+            icon: data.icon || 'menu_book',
+            duration: data.duration || '',
+            sessions: data.sessions || 1,
+            modality: data.modality || 'En vivo',
+            price: data.price || 0,
+            desc: data.desc || '',
+            sessionDate: data.sessionDate || null,
+            scheduleTime: data.scheduleTime || {},
+            zoomLink: data.zoomLink || '',
+            recordingUrl: data.recordingUrl || '',
+            temario: data.temario || [],
+            schedules: data.schedules || []
+          };
+          
+          // Store schedules in SCHEDULES map for backward compatibility
+          if (data.schedules && data.schedules.length > 0) {
+            SCHEDULES[doc.id] = data.schedules;
+          }
+        });
+      });
+    }
 
     /* ══════════════════════════════════════════════
        Helpers
@@ -368,39 +330,41 @@
         return;
       }
 
-      if (!courseId || !COURSES[courseId]) {
-        contentEl.innerHTML =
-          '<div class="state-box">' +
-          '<span class="material-icons-round">search_off</span>' +
-          '<h2>Curso no encontrado</h2>' +
-          '<p>El curso solicitado no existe o el enlace es incorrecto.</p>' +
-          '<a href="../dashboard/index.html" class="btn btn-primary">Ir al dashboard</a>' +
-          '</div>';
-        return;
-      }
-
-      var cacheKey = 'session_enrollment_' + user.uid + '_' + courseId;
-
-      /* 1️⃣ Instant: render from localStorage first */
-      try {
-        var cached = localStorage.getItem(cacheKey);
-        if (cached) {
-          var cachedData = JSON.parse(cached);
-          if (cachedData.status === 'active') {
-            renderPanel(COURSES[courseId], cachedData);
-          }
+      // Load courses from Firestore then check enrollment
+      loadCoursesFromFirestore().then(function() {
+        if (!courseId || !COURSES[courseId]) {
+          contentEl.innerHTML =
+            '<div class="state-box">' +
+            '<span class="material-icons-round">search_off</span>' +
+            '<h2>Curso no encontrado</h2>' +
+            '<p>El curso solicitado no existe o el enlace es incorrecto.</p>' +
+            '<a href="../dashboard/index.html" class="btn btn-primary">Ir al dashboard</a>' +
+            '</div>';
+          return;
         }
-      } catch (_) {}
 
-      /* 2️⃣ Background: validate with Firestore */
-      db.collection('enrollments').doc(user.uid + '_' + courseId).get()
-        .then(function(doc) {
-          if (!doc.exists || doc.data().status !== 'active') {
-            try { localStorage.removeItem(cacheKey); } catch (_) {}
-            contentEl.innerHTML =
-              '<div class="state-box">' +
-              '<span class="material-icons-round">block</span>' +
-              '<h2>No estás matriculado</h2>' +
+        var cacheKey = 'session_enrollment_' + user.uid + '_' + courseId;
+
+        /* 1️⃣ Instant: render from localStorage first */
+        try {
+          var cached = localStorage.getItem(cacheKey);
+          if (cached) {
+            var cachedData = JSON.parse(cached);
+            if (cachedData.status === 'active') {
+              renderPanel(COURSES[courseId], cachedData);
+            }
+          }
+        } catch (_) {}
+
+        /* 2️⃣ Background: validate with Firestore */
+        db.collection('enrollments').doc(user.uid + '_' + courseId).get()
+          .then(function(doc) {
+            if (!doc.exists || doc.data().status !== 'active') {
+              try { localStorage.removeItem(cacheKey); } catch (_) {}
+              contentEl.innerHTML =
+                '<div class="state-box">' +
+                '<span class="material-icons-round">block</span>' +
+                '<h2>No estás matriculado</h2>' +
               '<p>Necesitas matricularte para acceder al contenido de este curso.</p>' +
               '<a href="../cursos/curso.html?id=' + courseId + '" class="btn btn-primary">Ver curso e inscribirme</a>' +
               '</div>';
@@ -423,6 +387,7 @@
             '<p>No pudimos verificar tu matrícula. Intenta recargar la página.</p>' +
             '</div>';
         });
+      });
     });
 
     /* ══════════════════════════════════════════════

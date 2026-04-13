@@ -226,164 +226,77 @@
 
   <script>
     /* ══════════════════════════════════════════════
-       Course data registry (static — can migrate to Firestore later)
+       Course data - Loaded from Firestore
        ══════════════════════════════════════════════ */
-    var COURSES = {
-      'sst-obras-civiles': {
-        id: 'sst-obras-civiles',
-        name: 'Seguridad y Salud en el Trabajo en Obras Civiles',
-        badge: 'new', badgeLabel: 'Nuevo',
-        price: 0, priceLabel: 'Gratis',
-        desc: 'Conoce los fundamentos de la Seguridad y Salud en el Trabajo aplicados a obras civiles, incluyendo marco legal peruano, identificación de peligros y riesgos, investigación de incidentes y elaboración de análisis de riesgos según normativa vigente.',
-        duration: '1 hora', sessions: 1, enrolled: 120, modality: 'En vivo',
-        icon: 'health_and_safety',
-        tags: ['Seguridad', 'Obras Civiles', 'Normativa'],
-        zoomLink: '', // Link de Zoom para la sesión en vivo
-        recordingUrl: '', // URL de la grabación cuando esté disponible
-        schedules: [
-          { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Jueves 23 de abril' },
-          { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Jueves 23 de abril' }
-        ],
-        temario: [
-          { titulo: 'Introducción a la SST', temas: [
-            'Reseña histórica de la Seguridad y Salud en el Trabajo',
-            'Historia de la SST en el Perú',
-            'Términos y definiciones'
-          ]},
-          { titulo: 'Marco Legal en el Perú', temas: [
-            'Ley N° 29783 y su reglamento D.S. 005-2012-TR',
-            'Leyes de SST',
-            'Resoluciones Ministeriales',
-            'Aplicación en diferentes sectores',
-            'Organismos competentes en el Perú',
-            'Modificatorias',
-            'Principios de la ley'
-          ]},
-          { titulo: 'Peligros y Riesgos', temas: [
-            'Peligros',
-            'Riesgos',
-            'Consecuencias',
-            'Jerarquía de control'
-          ]},
-          { titulo: 'Incidentes y Accidentes', temas: [
-            'Tipos',
-            'Causas',
-            'Reportes'
-          ]},
-          { titulo: 'Análisis de Riesgos', temas: [
-            'Conceptos básicos',
-            'Proceso de análisis',
-            'Elaboración',
-            'Registros'
-          ]}
-        ],
-        includes: [
-          { icon: 'videocam', text: '1 sesión en vivo (1 hora)' },
-          { icon: 'play_circle', text: 'Acceso a la grabación después de la capacitación' },
-          { icon: 'description', text: 'Material de apoyo (si aplica)' },
-          { icon: 'verified', text: 'Constancia de participación digital (gratuita)' },
-          { icon: 'workspace_premium', text: 'Certificado opcional (previo examen y pago de S/ 20)' },
-          { icon: 'forum', text: 'Grupo de coordinación opcional (WhatsApp)' }
-        ]
-      },
-      'metrados-presupuestos': {
-        id: 'metrados-presupuestos',
-        name: 'Metrados y Presupuestos',
-        badge: 'top', badgeLabel: 'Top',
-        price: 50, priceLabel: 'S/ 50',
-        desc: 'Aprende a realizar metrados, análisis de partidas unitarias y elaboración de valorizaciones de obra según normativa vigente. Domina el costeo técnico y la gestión de presupuestos para proyectos de infraestructura.',
-        duration: '12 horas', sessions: 8, enrolled: 85, modality: 'En vivo',
-        icon: 'calculate',
-        tags: ['Costos', 'Presupuestos', 'Valorizaciones'],
-        schedules: [
-          { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Lunes y miércoles' },
-          { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Martes y jueves' }
-        ],
-        temario: [
-          'Fundamentos de costos en construcción',
-          'Análisis de precios unitarios',
-          'Metrado de partidas principales',
-          'Presupuesto base y fórmulas polinómicas',
-          'Valorizaciones mensuales',
-          'Reajuste de precios',
-          'Software S10 — Introducción práctica',
-          'Caso práctico integral'
-        ],
-        includes: [
-          { icon: 'videocam', text: '8 sesiones en vivo' },
-          { icon: 'play_circle', text: 'Acceso a grabaciones' },
-          { icon: 'description', text: 'Plantillas Excel' },
-          { icon: 'workspace_premium', text: 'Certificado digital' },
-          { icon: 'forum', text: 'Grupo de WhatsApp' },
-          { icon: 'quiz', text: 'Examen de certificación' }
-        ]
-      },
-      'supervision-obra': {
-        id: 'supervision-obra',
-        name: 'Supervisión de Obra',
-        badge: 'pro', badgeLabel: 'Pro',
-        price: 80, priceLabel: 'S/ 80',
-        desc: 'Desarrolla competencias en dirección técnica, control de calidad, gestión de cuaderno de obra y aplicación de buenas prácticas de supervisión. Enfocado en proyectos civiles y normativas actuales.',
-        duration: '16 horas', sessions: 10, enrolled: 64, modality: 'En vivo + Grabado',
-        icon: 'engineering',
-        tags: ['Supervisión', 'Control de Calidad', 'Dirección'],
-        schedules: [
-          { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Lunes y miércoles' },
-          { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Martes y jueves' }
-        ],
-        temario: [
-          'Rol del supervisor de obra',
-          'Marco legal y contractual',
-          'Control de calidad de materiales',
-          'Cuaderno de obra digital',
-          'Control de avance físico y financiero',
-          'Recepción de obra y liquidación',
-          'Gestión de adicionales y deductivos',
-          'Resolución de controversias',
-          'Supervisión en proyectos públicos (OSCE)',
-          'Caso práctico integral'
-        ],
-        includes: [
-          { icon: 'videocam', text: '10 sesiones en vivo' },
-          { icon: 'play_circle', text: 'Grabaciones disponibles' },
-          { icon: 'description', text: 'Material y normativa' },
-          { icon: 'workspace_premium', text: 'Certificado digital' },
-          { icon: 'forum', text: 'Grupo de WhatsApp' },
-          { icon: 'quiz', text: 'Examen de certificación' }
-        ]
-      }
-    };
-
-    /* ══════════════════════════════════════════════
-       Page init
-       ══════════════════════════════════════════════ */
+    var COURSES = {}; // Se llena dinámicamente desde Firestore
     var courseId = new URLSearchParams(window.location.search).get('id');
-    var course = courseId ? COURSES[courseId] : null;
+    var course = null;
 
-    // Cargar datos de Zoom y grabación desde localStorage
-    if (course) {
-      try {
-        const stored = localStorage.getItem('course_' + courseId);
-        if (stored) {
-          const data = JSON.parse(stored);
-          course.zoomLink = data.zoomLink || course.zoomLink || '';
-          course.recordingUrl = data.recordingUrl || course.recordingUrl || '';
-        }
-      } catch (_) {}
+    // Cargar cursos desde Firestore
+    function loadCoursesFromFirestore() {
+      return db.collection('courses').get().then(function(snapshot) {
+        snapshot.forEach(function(doc) {
+          const data = doc.data();
+          COURSES[doc.id] = {
+            id: doc.id,
+            name: data.name || '',
+            price: data.price || 0,
+            priceLabel: 'S/ ' + (data.price || 'Gratis'),
+            desc: data.desc || '',
+            duration: data.duration || '',
+            sessions: data.sessions || 1,
+            enrolled: data.enrolled || 0,
+            modality: data.modality || 'En vivo',
+            icon: data.icon || 'menu_book',
+            tags: data.tags || [],
+            badge: data.badge || 'pro',
+            badgeLabel: data.badgeLabel || 'Curso',
+            zoomLink: data.zoomLink || '',
+            recordingUrl: data.recordingUrl || '',
+            schedules: data.schedules || [],
+            temario: data.temario || [],
+            includes: data.includes || []
+          };
+        });
+
+        // Ahora inicializar la pagina
+        initCoursePage();
+      });
     }
 
-    if (!course) {
-      document.getElementById('courseMain').innerHTML =
-        '<div style="text-align:center;padding:60px 20px">' +
-        '<span class="material-icons-round" style="font-size:56px;color:#dce3ed">search_off</span>' +
-        '<h2 style="font-size:20px;color:#0f172a;margin:12px 0 6px">Curso no encontrado</h2>' +
-        '<p style="color:#64748b;font-size:14px;margin-bottom:20px">El curso que buscas no existe o fue eliminado.</p>' +
-        '<a href="catalogo.html" class="btn btn-primary" style="width:auto;display:inline-flex">Ver catálogo</a>' +
-        '</div>';
-      document.getElementById('enrollCard').style.display = 'none';
-    } else {
-      renderCourse(course);
+    function initCoursePage() {
+      course = courseId ? COURSES[courseId] : null;
+
+      // Cargar datos de Zoom y grabación desde localStorage
+      if (course) {
+        try {
+          const stored = localStorage.getItem('course_' + courseId);
+          if (stored) {
+            const data = JSON.parse(stored);
+            course.zoomLink = data.zoomLink || course.zoomLink || '';
+            course.recordingUrl = data.recordingUrl || course.recordingUrl || '';
+          }
+        } catch (_) {}
+      }
+
+      if (!course) {
+        document.getElementById('courseMain').innerHTML =
+          '<div style="text-align:center;padding:60px 20px">' +
+          '<span class="material-icons-round" style="font-size:56px;color:#dce3ed">search_off</span>' +
+          '<h2 style="font-size:20px;color:#0f172a;margin:12px 0 6px">Curso no encontrado</h2>' +
+          '<p style="color:#64748b;font-size:14px;margin-bottom:20px">El curso que buscas no existe o fue eliminado.</p>' +
+          '<a href="catalogo.html" class="btn btn-primary" style="width:auto;display:inline-flex">Ver catálogo</a>' +
+          '</div>';
+        document.getElementById('enrollCard').style.display = 'none';
+      } else {
+        renderCourse(course);
+      }
     }
+
+    // Cargar cursos al iniciar
+    loadCoursesFromFirestore();
+
+    /* ═══════════════════════════════════════════════ */
 
     function renderCourse(c) {
       document.title = c.name + ' | FQ INGENIEROS';
