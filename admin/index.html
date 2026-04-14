@@ -330,10 +330,27 @@
                 <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Número de sesiones</label>
                 <input type="number" id="courseSessions" placeholder="1" min="1" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
               </div>
-              <div style="grid-column:1/-1;display:flex;gap:10px">
-                <button class="btn-sm btn-blue" onclick="saveCourse()" style="flex:1">Guardar Curso</button>
-                <button class="btn-sm btn-outline-sm" onclick="closeCourseForm()" style="flex:1">Cancelar</button>
+            </div>
+
+            <!-- ═══ TEMARIO EDITOR ═══ -->
+            <div style="margin-top:18px;border-top:1px solid #e2e8f0;padding-top:18px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <label style="font-size:13px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:6px">
+                  <span class="material-icons-round" style="font-size:18px;color:#1565c0">menu_book</span> Temario del curso
+                </label>
+                <button type="button" class="btn-sm btn-outline-sm" onclick="addTemarioModule()" style="padding:5px 12px;font-size:12px">
+                  <span class="material-icons-round" style="font-size:15px">add</span> Agregar módulo
+                </button>
               </div>
+              <div id="temarioEditor" style="display:flex;flex-direction:column;gap:12px">
+                <!-- Modules rendered dynamically -->
+              </div>
+              <p id="temarioEmpty" style="text-align:center;color:#94a3b8;font-size:13px;padding:16px 0;display:none">Sin módulos — haz clic en "Agregar módulo" para empezar.</p>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:18px">
+              <button class="btn-sm btn-blue" onclick="saveCourse()" style="flex:1">Guardar Curso</button>
+              <button class="btn-sm btn-outline-sm" onclick="closeCourseForm()" style="flex:1">Cancelar</button>
             </div>
           </div>
 
@@ -807,6 +824,103 @@
       }
     }
 
+    // ═══ TEMARIO EDITOR HELPERS ═══
+    var temarioModules = [];
+
+    function renderTemarioEditor() {
+      var container = document.getElementById('temarioEditor');
+      var emptyMsg = document.getElementById('temarioEmpty');
+      if (temarioModules.length === 0) {
+        container.innerHTML = '';
+        emptyMsg.style.display = '';
+        return;
+      }
+      emptyMsg.style.display = 'none';
+      container.innerHTML = temarioModules.map(function(mod, i) {
+        var temasHtml = mod.temas.map(function(t, j) {
+          return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">' +
+            '<span style="color:#94a3b8;font-size:12px">' + (j + 1) + '.</span>' +
+            '<input type="text" value="' + escapeAttr(t) + '" onchange="updateTema(' + i + ',' + j + ',this.value)" ' +
+            'placeholder="Tema..." style="flex:1;padding:6px 10px;border:1px solid #dce3ed;border-radius:6px;font-size:12px;font-family:inherit" />' +
+            '<button type="button" onclick="removeTema(' + i + ',' + j + ')" style="background:none;border:none;cursor:pointer;color:#ef4444;padding:2px" title="Eliminar tema">' +
+            '<span class="material-icons-round" style="font-size:16px">close</span></button>' +
+            '</div>';
+        }).join('');
+
+        return '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px">' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">' +
+          '<span style="background:#1565c0;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px">M' + (i + 1) + '</span>' +
+          '<input type="text" value="' + escapeAttr(mod.titulo) + '" onchange="updateModuleTitle(' + i + ',this.value)" ' +
+          'placeholder="Título del módulo" style="flex:1;padding:6px 10px;border:1px solid #dce3ed;border-radius:6px;font-size:13px;font-weight:600;font-family:inherit" />' +
+          '<button type="button" onclick="removeModule(' + i + ')" style="background:none;border:none;cursor:pointer;color:#ef4444" title="Eliminar módulo">' +
+          '<span class="material-icons-round" style="font-size:18px">delete_outline</span></button>' +
+          '</div>' +
+          '<div style="padding-left:8px">' + temasHtml + '</div>' +
+          '<button type="button" onclick="addTema(' + i + ')" style="margin-top:6px;background:none;border:1px dashed #cbd5e1;border-radius:6px;padding:5px 12px;font-size:12px;color:#64748b;cursor:pointer;width:100%;font-family:inherit">' +
+          '<span class="material-icons-round" style="font-size:14px;vertical-align:middle">add</span> Agregar tema</button>' +
+          '</div>';
+      }).join('');
+    }
+
+    function escapeAttr(str) {
+      return String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function addTemarioModule() {
+      temarioModules.push({ titulo: '', temas: [''] });
+      renderTemarioEditor();
+    }
+
+    function removeModule(i) {
+      temarioModules.splice(i, 1);
+      renderTemarioEditor();
+    }
+
+    function updateModuleTitle(i, val) {
+      temarioModules[i].titulo = val;
+    }
+
+    function addTema(i) {
+      temarioModules[i].temas.push('');
+      renderTemarioEditor();
+    }
+
+    function removeTema(i, j) {
+      temarioModules[i].temas.splice(j, 1);
+      renderTemarioEditor();
+    }
+
+    function updateTema(i, j, val) {
+      temarioModules[i].temas[j] = val;
+    }
+
+    function getTemarioData() {
+      return temarioModules
+        .filter(function(m) { return m.titulo.trim() || m.temas.some(function(t) { return t.trim(); }); })
+        .map(function(m) {
+          return {
+            titulo: m.titulo.trim(),
+            temas: m.temas.filter(function(t) { return t.trim(); })
+          };
+        });
+    }
+
+    function loadTemarioFromCourse(course) {
+      temarioModules = [];
+      if (course.temario && course.temario.length > 0) {
+        if (typeof course.temario[0] === 'string') {
+          // Flat list → convert to single module
+          temarioModules = [{ titulo: 'Contenido del curso', temas: course.temario.slice() }];
+        } else {
+          // Structured modules
+          temarioModules = course.temario.map(function(m) {
+            return { titulo: m.titulo || '', temas: (m.temas || []).slice() };
+          });
+        }
+      }
+      renderTemarioEditor();
+    }
+
     function showCourseForm() {
       editingCourseId = null;
       document.getElementById('courseName').value = '';
@@ -814,6 +928,8 @@
       document.getElementById('courseDesc').value = '';
       document.getElementById('courseDuration').value = '';
       document.getElementById('courseSessions').value = '1';
+      temarioModules = [];
+      renderTemarioEditor();
       document.getElementById('courseFormWrap').style.display = '';
     }
 
@@ -831,6 +947,7 @@
       document.getElementById('courseDesc').value = course.desc || '';
       document.getElementById('courseDuration').value = course.duration || '';
       document.getElementById('courseSessions').value = course.sessions || 1;
+      loadTemarioFromCourse(course);
       document.getElementById('courseFormWrap').style.display = '';
       document.getElementById('courseFormWrap').scrollIntoView({ behavior: 'smooth' });
     }
@@ -845,7 +962,8 @@
       if (!name) { FQNotify.toast('El nombre del curso es requerido.', 'warning'); return; }
       if (!desc) { FQNotify.toast('La descripción del curso es requerida.', 'warning'); return; }
 
-      const courseData = { name, price, desc, duration, sessions, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+      const temario = getTemarioData();
+      const courseData = { name, price, desc, duration, sessions, temario, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
 
       if (editingCourseId) {
         // Actualizar

@@ -233,12 +233,127 @@
     var course = null;
 
     // Cargar cursos desde Firestore
+    var FALLBACK_DATA = {
+      'sst-obras-civiles': {
+        temario: [
+          { titulo: 'Introducción a la SST', temas: [
+            'Reseña histórica de la Seguridad y Salud en el Trabajo',
+            'Historia de la SST en el Perú',
+            'Términos y definiciones'
+          ]},
+          { titulo: 'Marco Legal en el Perú', temas: [
+            'Ley N° 29783 y su reglamento D.S. 005-2012-TR',
+            'Leyes de SST',
+            'Resoluciones Ministeriales',
+            'Aplicación en diferentes sectores',
+            'Organismos competentes en el Perú',
+            'Modificatorias',
+            'Principios de la ley'
+          ]},
+          { titulo: 'Peligros y Riesgos', temas: [
+            'Peligros',
+            'Riesgos',
+            'Consecuencias',
+            'Jerarquía de control'
+          ]},
+          { titulo: 'Incidentes y Accidentes', temas: [
+            'Tipos',
+            'Causas',
+            'Reportes'
+          ]},
+          { titulo: 'Análisis de Riesgos', temas: [
+            'Conceptos básicos',
+            'Proceso de análisis',
+            'Elaboración',
+            'Registros'
+          ]}
+        ],
+        includes: [
+          { icon: 'videocam', text: '1 sesión en vivo (1 hora)' },
+          { icon: 'play_circle', text: 'Acceso a la grabación después de la capacitación' },
+          { icon: 'description', text: 'Material de apoyo (si aplica)' },
+          { icon: 'verified', text: 'Constancia de participación digital (gratuita)' },
+          { icon: 'workspace_premium', text: 'Certificado opcional (previo examen y pago de S/ 20)' },
+          { icon: 'forum', text: 'Grupo de coordinación opcional (WhatsApp)' }
+        ],
+        schedules: [
+          { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Jueves 23 de abril' },
+          { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Jueves 23 de abril' }
+        ],
+        icon: 'health_and_safety',
+        badge: 'new',
+        badgeLabel: 'Nuevo',
+        modality: 'En vivo + Grabado',
+        tags: ['Seguridad', 'Obras Civiles', 'Normativa']
+      },
+      'metrados-presupuestos': {
+        temario: [
+          'Fundamentos de costos en construcción',
+          'Análisis de precios unitarios',
+          'Metrado de partidas principales',
+          'Presupuesto base y fórmulas polinómicas',
+          'Valorizaciones mensuales',
+          'Reajuste de precios',
+          'Software S10 — Introducción práctica',
+          'Caso práctico integral'
+        ],
+        includes: [
+          { icon: 'videocam', text: '8 sesiones en vivo' },
+          { icon: 'play_circle', text: 'Acceso a grabaciones' },
+          { icon: 'description', text: 'Plantillas Excel' },
+          { icon: 'workspace_premium', text: 'Certificado digital' },
+          { icon: 'forum', text: 'Grupo de WhatsApp' },
+          { icon: 'quiz', text: 'Examen de certificación' }
+        ],
+        schedules: [
+          { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Lunes y miércoles' },
+          { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Martes y jueves' }
+        ],
+        icon: 'calculate',
+        badge: 'top',
+        badgeLabel: 'Top',
+        modality: 'En vivo',
+        tags: ['Costos', 'Presupuestos', 'Valorizaciones']
+      },
+      'supervision-obra': {
+        temario: [
+          'Rol del supervisor de obra',
+          'Marco legal y contractual',
+          'Control de calidad de materiales',
+          'Cuaderno de obra digital',
+          'Control de avance físico y financiero',
+          'Recepción de obra y liquidación',
+          'Gestión de adicionales y deductivos',
+          'Resolución de controversias',
+          'Supervisión en proyectos públicos (OSCE)',
+          'Caso práctico integral'
+        ],
+        includes: [
+          { icon: 'videocam', text: '10 sesiones en vivo' },
+          { icon: 'play_circle', text: 'Grabaciones disponibles' },
+          { icon: 'description', text: 'Material y normativa' },
+          { icon: 'workspace_premium', text: 'Certificado digital' },
+          { icon: 'forum', text: 'Grupo de WhatsApp' },
+          { icon: 'quiz', text: 'Examen de certificación' }
+        ],
+        schedules: [
+          { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Lunes y miércoles' },
+          { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Martes y jueves' }
+        ],
+        icon: 'engineering',
+        badge: 'pro',
+        badgeLabel: 'Pro',
+        modality: 'En vivo + Grabado',
+        tags: ['Supervisión', 'Control de Calidad', 'Dirección']
+      }
+    };
+
     function loadCoursesFromFirestore() {
       return db.collection('courses').get().then(function(snapshot) {
         console.log('Firestore: ' + snapshot.size + ' cursos cargados');
         snapshot.forEach(function(doc) {
           const data = doc.data();
-          console.log('Curso: ' + doc.id, 'temario:', data.temario ? data.temario.length + ' items' : 'NO TIENE');
+          const fb = FALLBACK_DATA[doc.id] || {};
           COURSES[doc.id] = {
             id: doc.id,
             name: data.name || '',
@@ -248,30 +363,53 @@
             duration: data.duration || '',
             sessions: data.sessions || 1,
             enrolled: data.enrolled || 0,
-            modality: data.modality || 'En vivo',
-            icon: data.icon || 'menu_book',
-            tags: data.tags || [],
-            badge: data.badge || 'pro',
-            badgeLabel: data.badgeLabel || 'Curso',
+            modality: data.modality || fb.modality || 'En vivo',
+            icon: data.icon || fb.icon || 'menu_book',
+            tags: (data.tags && data.tags.length > 0) ? data.tags : (fb.tags || []),
+            badge: data.badge || fb.badge || 'pro',
+            badgeLabel: data.badgeLabel || fb.badgeLabel || 'Curso',
             zoomLink: data.zoomLink || '',
             recordingUrl: data.recordingUrl || '',
-            schedules: data.schedules || [],
-            temario: data.temario || [],
-            includes: data.includes || []
+            schedules: (data.schedules && data.schedules.length > 0) ? data.schedules : (fb.schedules || []),
+            temario: (data.temario && data.temario.length > 0) ? data.temario : (fb.temario || []),
+            includes: (data.includes && data.includes.length > 0) ? data.includes : (fb.includes || [])
           };
         });
 
-        // Ahora inicializar la pagina
+        // Si no hay cursos en Firestore, usar fallback completo
+        if (snapshot.size === 0) {
+          Object.keys(FALLBACK_DATA).forEach(function(id) {
+            var fb = FALLBACK_DATA[id];
+            COURSES[id] = {
+              id: id,
+              name: id.replace(/-/g, ' '),
+              price: 0, priceLabel: 'Gratis',
+              desc: '', duration: '', sessions: 1, enrolled: 0,
+              modality: fb.modality, icon: fb.icon,
+              tags: fb.tags, badge: fb.badge, badgeLabel: fb.badgeLabel,
+              zoomLink: '', recordingUrl: '',
+              schedules: fb.schedules, temario: fb.temario, includes: fb.includes
+            };
+          });
+        }
+
         initCoursePage();
       }).catch(function(error) {
         console.error('Error cargando cursos de Firestore:', error);
-        document.getElementById('courseMain').innerHTML =
-          '<div style="text-align:center;padding:60px 20px">' +
-          '<span class="material-icons-round" style="font-size:56px;color:#dce3ed">error_outline</span>' +
-          '<h2 style="font-size:20px;color:#0f172a;margin:12px 0 6px">Error al cargar el curso</h2>' +
-          '<p style="color:#64748b;font-size:14px;margin-bottom:20px">' + error.message + '</p>' +
-          '<a href="catalogo.html" class="btn btn-primary" style="width:auto;display:inline-flex">Ver catálogo</a>' +
-          '</div>';
+        // Si falla Firestore, usar datos de respaldo
+        Object.keys(FALLBACK_DATA).forEach(function(id) {
+          var fb = FALLBACK_DATA[id];
+          COURSES[id] = {
+            id: id, name: id.replace(/-/g, ' '),
+            price: 0, priceLabel: 'Gratis',
+            desc: '', duration: '', sessions: 1, enrolled: 0,
+            modality: fb.modality, icon: fb.icon,
+            tags: fb.tags, badge: fb.badge, badgeLabel: fb.badgeLabel,
+            zoomLink: '', recordingUrl: '',
+            schedules: fb.schedules, temario: fb.temario, includes: fb.includes
+          };
+        });
+        initCoursePage();
       });
     }
 
