@@ -322,30 +322,37 @@
 
       // Temario
       var temHtml = '';
-      var isAccordion = c.temario.length > 0 && typeof c.temario[0] === 'object';
-      if (isAccordion) {
-        c.temario.forEach(function(mod, i) {
-          var isOpen = i === 0 ? ' open' : '';
-          temHtml += '<div class="temario-module' + isOpen + '">';
-          temHtml += '<button class="temario-header" type="button">';
-          temHtml += '<span class="temario-num">' + (i + 1) + '</span>';
-          temHtml += '<span class="temario-title">' + mod.titulo + '</span>';
-          temHtml += '<span class="material-icons-round temario-toggle">expand_more</span>';
-          temHtml += '</button>';
-          temHtml += '<div class="temario-body"><ul class="temario-topics">';
-          mod.temas.forEach(function(t) {
-            temHtml += '<li>' + t + '</li>';
+      if (c.temario && c.temario.length > 0) {
+        var isAccordion = typeof c.temario[0] === 'object' && c.temario[0].titulo;
+        if (isAccordion) {
+          c.temario.forEach(function(mod, i) {
+            var isOpen = i === 0 ? ' open' : '';
+            temHtml += '<div class="temario-module' + isOpen + '">';
+            temHtml += '<button class="temario-header" type="button">';
+            temHtml += '<span class="temario-num">' + (i + 1) + '</span>';
+            temHtml += '<span class="temario-title">' + mod.titulo + '</span>';
+            temHtml += '<span class="material-icons-round temario-toggle">expand_more</span>';
+            temHtml += '</button>';
+            temHtml += '<div class="temario-body"><ul class="temario-topics">';
+            if (mod.temas && mod.temas.length > 0) {
+              mod.temas.forEach(function(t) {
+                temHtml += '<li>' + t + '</li>';
+              });
+            }
+            temHtml += '</ul></div></div>';
           });
-          temHtml += '</ul></div></div>';
-        });
+        } else {
+          c.temario.forEach(function(t, i) {
+            var tema = typeof t === 'string' ? t : (t.titulo || t.name || '');
+            temHtml += '<div class="temario-module">';
+            temHtml += '<div class="temario-header" style="cursor:default">';
+            temHtml += '<span class="temario-num">' + (i + 1) + '</span>';
+            temHtml += '<span class="temario-title">' + tema + '</span>';
+            temHtml += '</div></div>';
+          });
+        }
       } else {
-        c.temario.forEach(function(t, i) {
-          temHtml += '<div class="temario-module">';
-          temHtml += '<div class="temario-header" style="cursor:default">';
-          temHtml += '<span class="temario-num">' + (i + 1) + '</span>';
-          temHtml += '<span class="temario-title">' + t + '</span>';
-          temHtml += '</div></div>';
-        });
+        temHtml = '<p style="color:#64748b;font-size:14px;padding:12px 0">Temario no disponible aún.</p>';
       }
       document.getElementById('temarioList').innerHTML = temHtml;
 
