@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel del Profesor | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link href="../assets/css/notifications.css" rel="stylesheet" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
+
+    /* Layout */
+    .layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+
+    /* Sidebar */
+    .sidebar{background:#0f172a;color:#e2e8f0;padding:0;display:flex;flex-direction:column}
+    .sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 22px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .sidebar-brand img{width:36px;height:36px;border-radius:8px;object-fit:cover}
+    .sidebar-brand strong{font-size:13px;color:#fff}
+    .sidebar-brand span{font-size:10px;color:#f59e0b;letter-spacing:1px;text-transform:uppercase;display:block;font-weight:600}
+    .sidebar-nav{flex:1;padding:16px 12px}
+    .nav-label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding:12px 10px 6px;margin-top:8px}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s;cursor:pointer;margin-bottom:2px}
+    .nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+    .nav-item.active{background:#d97706;color:#fff}
+    .nav-item .material-icons-round{font-size:20px}
+    .nav-item .badge-count{margin-left:auto;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;min-width:20px;text-align:center}
+    .sidebar-footer{padding:16px 22px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:#64748b}
+    .sidebar-footer a{color:#f59e0b;text-decoration:none}
+
+    /* Main */
+    .main{padding:0;overflow-y:auto;max-height:100vh}
+    .top-bar{background:#fff;border-bottom:1px solid #dce3ed;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:10}
+    .top-bar h2{font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px}
+    .top-bar-actions{display:flex;align-items:center;gap:14px}
+    .prof-badge{background:#fffbeb;color:#d97706;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
+    .btn-logout{background:none;border:1.5px solid #dce3ed;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;color:#334155;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;font-family:inherit}
+    .btn-logout:hover{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+
+    .content{padding:28px 32px}
+
+    /* Stats */
+    .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:32px}
+    .stat-card{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:22px;display:flex;align-items:center;gap:16px;transition:box-shadow .2s}
+    .stat-card:hover{box-shadow:0 4px 16px rgba(15,23,42,.08)}
+    .stat-icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center}
+    .stat-icon .material-icons-round{font-size:24px;color:#fff}
+    .stat-icon.amber{background:linear-gradient(135deg,#d97706,#f59e0b)}
+    .stat-icon.blue{background:linear-gradient(135deg,#1565c0,#1e88e5)}
+    .stat-icon.green{background:linear-gradient(135deg,#16a34a,#22c55e)}
+    .stat-info strong{display:block;font-size:28px;font-weight:800;color:#0f172a}
+    .stat-info span{font-size:13px;color:#64748b}
+
+    /* Panels */
+    .panel{display:none}
+    .panel.active{display:block}
+    .panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+    .panel-header h3{font-size:20px;font-weight:700;color:#0f172a}
+
+    /* Table */
+    .table-wrap{background:#fff;border:1px solid #dce3ed;border-radius:14px;overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    thead{background:#f7f9fc}
+    th{text-align:left;padding:12px 16px;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #dce3ed}
+    td{padding:12px 16px;font-size:14px;color:#334155;border-bottom:1px solid #eef2f7}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#f7f9fc}
+    .user-cell{display:flex;align-items:center;gap:10px}
+    .user-avatar{width:34px;height:34px;border-radius:50%;background:#d97706;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:700;flex-shrink:0}
+    .user-name{font-weight:600;color:#0f172a}
+    .user-email{font-size:12px;color:#64748b}
+    .status-badge{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+    .status-badge.passed{background:#f0fdf4;color:#16a34a}
+    .status-badge.failed{background:#fef2f2;color:#dc2626}
+    .status-badge.pending{background:#fffbeb;color:#d97706}
+
+    /* Cards */
+    .course-card{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:22px;margin-bottom:18px}
+    .course-card h4{font-size:17px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+    .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+    /* Buttons */
+    .btn-sm{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .2s;font-family:inherit}
+    .btn-amber{background:#d97706;color:#fff}
+    .btn-amber:hover{background:#b45309}
+    .btn-blue{background:#1565c0;color:#fff}
+    .btn-blue:hover{background:#1e88e5}
+    .btn-outline-sm{background:transparent;border:1.5px solid #dce3ed;color:#334155}
+    .btn-outline-sm:hover{background:#eff6ff;border-color:#1565c0;color:#1565c0}
+    .action-btn{background:none;border:1px solid #dce3ed;border-radius:8px;padding:5px 8px;cursor:pointer;color:#64748b;transition:all .2s;display:inline-flex;align-items:center;gap:4px;font-size:12px;font-family:inherit}
+    .action-btn:hover{background:#eff6ff;border-color:#1565c0;color:#1565c0}
+
+    .search-box{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #dce3ed;border-radius:10px;padding:8px 14px;width:280px;transition:border-color .2s}
+    .search-box:focus-within{border-color:#d97706}
+    .search-box input{border:none;outline:none;font-size:14px;font-family:inherit;width:100%;color:#0f172a;background:transparent}
+    .search-box .material-icons-round{font-size:20px;color:#64748b}
+
+    .empty-state{text-align:center;padding:48px 20px;color:#64748b}
+    .empty-state .material-icons-round{font-size:48px;color:#dce3ed;margin-bottom:12px}
+
+    /* Material section */
+    .material-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border:1px solid #dce3ed;border-radius:10px;margin-bottom:8px}
+    .material-item .material-icons-round{font-size:22px;color:#d97706}
+    .material-item .mat-info{flex:1}
+    .material-item .mat-name{font-weight:600;font-size:14px;color:#0f172a}
+    .material-item .mat-url{font-size:12px;color:#64748b;word-break:break-all}
+
+    /* Login Gate */
+    .login-gate{position:fixed;inset:0;z-index:200;background:#f7f9fc;display:flex;align-items:center;justify-content:center;padding:20px}
+    .login-card{background:#fff;border-radius:18px;width:100%;max-width:420px;padding:40px;box-shadow:0 8px 32px rgba(15,23,42,.10);text-align:center}
+    .login-card h2{font-size:22px;font-weight:800;color:#0f172a;margin:16px 0 6px}
+    .login-card p{font-size:14px;color:#64748b;margin-bottom:24px;line-height:1.5}
+    .code-input{width:200px;padding:14px 20px;border:2px solid #dce3ed;border-radius:12px;font-size:24px;font-weight:700;text-align:center;letter-spacing:8px;font-family:inherit;transition:border-color .2s}
+    .code-input:focus{outline:none;border-color:#d97706}
+    .login-error{color:#dc2626;font-size:13px;margin-top:10px;display:none}
+
+    @media(max-width:900px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{display:none}
+      .stats-grid{grid-template-columns:1fr}
+      .card-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:600px){
+      .content{padding:20px 16px}
+      .top-bar{padding:0 16px}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ LOGIN GATE ═══ -->
+  <div id="loginGate" class="login-gate">
+    <div class="login-card">
+      <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#d97706,#f59e0b);display:inline-grid;place-items:center;margin-bottom:4px">
+        <span class="material-icons-round" style="font-size:30px;color:#fff">school</span>
+      </div>
+      <h2>Panel del Profesor</h2>
+      <p>Ingresa tu código de acceso para continuar.</p>
+      <div>
+        <input type="password" id="accessCode" class="code-input" maxlength="6" placeholder="······" onkeydown="if(event.key==='Enter')verifyCode()" autofocus />
+        <p id="loginError" class="login-error">Código incorrecto. Intenta de nuevo.</p>
+      </div>
+      <div style="margin-top:20px">
+        <button class="btn-sm btn-amber" onclick="verifyCode()" style="padding:12px 32px;font-size:15px">
+          <span class="material-icons-round" style="font-size:18px">lock_open</span> Ingresar
+        </button>
+      </div>
+      <div style="margin-top:16px">
+        <a href="../index.html" style="font-size:13px;color:#64748b;text-decoration:none;display:inline-flex;align-items:center;gap:4px">
+          <span class="material-icons-round" style="font-size:16px">arrow_back</span> Volver al inicio
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN LAYOUT ═══ -->
+  <div class="layout" id="profLayout" style="display:none">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="../assets/img/logo-fq.png" alt="FQ" />
+        <div><strong>FQ INGENIEROS</strong><span>Panel Profesor</span></div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-label">Principal</div>
+        <a class="nav-item active" onclick="showPanel('dashboard',this)">
+          <span class="material-icons-round">dashboard</span> Dashboard
+        </a>
+        <a class="nav-item" onclick="showPanel('alumnos',this)">
+          <span class="material-icons-round">people</span> Alumnos
+          <span class="badge-count" id="alumnosCount">0</span>
+        </a>
+
+        <div class="nav-label">Mis Cursos</div>
+        <a class="nav-item" onclick="showPanel('zoom',this)">
+          <span class="material-icons-round">videocam</span> Zoom / Grabación
+        </a>
+        <a class="nav-item" onclick="showPanel('temario',this)">
+          <span class="material-icons-round">menu_book</span> Temario
+        </a>
+
+        <div class="nav-label">Evaluación</div>
+        <a class="nav-item" onclick="showPanel('examenes',this)">
+          <span class="material-icons-round">quiz</span> Exámenes
+        </a>
+        <a class="nav-item" onclick="showPanel('material',this)">
+          <span class="material-icons-round">attach_file</span> Material de Apoyo
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="../index.html">← Volver al sitio</a>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+      <header class="top-bar">
+        <h2><span class="material-icons-round">school</span> Panel del Profesor</h2>
+        <div class="top-bar-actions">
+          <span class="prof-badge"><span class="material-icons-round" style="font-size:16px">verified_user</span> Profesor</span>
+          <button class="btn-logout" onclick="logoutProf()"><span class="material-icons-round" style="font-size:16px">logout</span> Salir</button>
+        </div>
+      </header>
+
+      <div class="content">
+
+        <!-- ═══ DASHBOARD ═══ -->
+        <div class="panel active" id="panel-dashboard">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon amber"><span class="material-icons-round">people</span></div>
+              <div class="stat-info"><strong id="statAlumnos">0</strong><span>Alumnos inscritos</span></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon blue"><span class="material-icons-round">menu_book</span></div>
+              <div class="stat-info"><strong id="statCursos">0</strong><span>Cursos asignados</span></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green"><span class="material-icons-round">quiz</span></div>
+              <div class="stat-info"><strong id="statExamenes">0</strong><span>Exámenes rendidos</span></div>
+            </div>
+          </div>
+
+          <div class="panel-header">
+            <h3>Resumen de cursos</h3>
+          </div>
+          <div id="dashCourses"></div>
+        </div>
+
+        <!-- ═══ ALUMNOS ═══ -->
+        <div class="panel" id="panel-alumnos">
+          <div class="panel-header">
+            <h3>Alumnos inscritos <span id="alumnosTotal" style="color:#64748b;font-weight:400;font-size:16px">(0)</span></h3>
+            <div class="search-box">
+              <span class="material-icons-round">search</span>
+              <input type="text" placeholder="Buscar alumno..." id="searchAlumnos" oninput="renderAlumnos()" />
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Alumno</th><th>Curso</th><th>Fecha inscripción</th></tr></thead>
+              <tbody id="alumnosTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ═══ ZOOM / GRABACIÓN ═══ -->
+        <div class="panel" id="panel-zoom">
+          <div class="panel-header">
+            <h3>Gestión de Zoom y Grabaciones</h3>
+          </div>
+          <div id="zoomCards"></div>
+        </div>
+
+        <!-- ═══ TEMARIO ═══ -->
+        <div class="panel" id="panel-temario">
+          <div class="panel-header">
+            <h3>Temario de cursos</h3>
+          </div>
+          <div id="temarioCards"></div>
+        </div>
+
+        <!-- ═══ EXÁMENES ═══ -->
+        <div class="panel" id="panel-examenes">
+          <div class="panel-header">
+            <h3>Resultados de exámenes</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Alumno</th><th>Curso</th><th>Nota</th><th>Estado</th><th>Fecha</th></tr></thead>
+              <tbody id="examsTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ═══ MATERIAL DE APOYO ═══ -->
+        <div class="panel" id="panel-material">
+          <div class="panel-header">
+            <h3>Material de apoyo</h3>
+            <button class="btn-sm btn-amber" onclick="showAddMaterial()">
+              <span class="material-icons-round" style="font-size:16px">add</span> Agregar material
+            </button>
+          </div>
+          <!-- Form agregar material -->
+          <div id="materialFormWrap" style="display:none;background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:22px;margin-bottom:20px">
+            <h4 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:16px">Nuevo material</h4>
+            <div class="card-grid">
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Curso</label>
+                <select id="materialCourse" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit">
+                </select>
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Nombre del archivo/recurso</label>
+                <input type="text" id="materialName" placeholder="Ej: Diapositivas Módulo 1" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+              </div>
+              <div style="grid-column:1/-1">
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">URL del recurso (Google Drive, Dropbox, etc.)</label>
+                <input type="url" id="materialUrl" placeholder="https://drive.google.com/..." style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+              </div>
+              <div style="grid-column:1/-1;display:flex;gap:10px">
+                <button class="btn-sm btn-amber" onclick="saveMaterial()" style="flex:1">Guardar</button>
+                <button class="btn-sm btn-outline-sm" onclick="closeMaterialForm()" style="flex:1">Cancelar</button>
+              </div>
+            </div>
+          </div>
+          <div id="materialList"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+
+  <script>
+    // ═══ CONFIG ═══
+    var PROF_CODE_HASH = '121416';
+    var coursesData = [];
+    var usersData = [];
+    var examsData = [];
+    var materialsData = [];
+
+    // ═══ LOGIN GATE ═══
+    function verifyCode() {
+      var code = document.getElementById('accessCode').value.trim();
+      if (code === PROF_CODE_HASH) {
+        sessionStorage.setItem('prof_auth', 'true');
+        document.getElementById('loginGate').style.display = 'none';
+        document.getElementById('profLayout').style.display = 'grid';
+        initProfPanel();
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+        document.getElementById('accessCode').value = '';
+        document.getElementById('accessCode').focus();
+      }
+    }
+
+    // Check session
+    if (sessionStorage.getItem('prof_auth') === 'true') {
+      document.getElementById('loginGate').style.display = 'none';
+      document.getElementById('profLayout').style.display = 'grid';
+      // Wait for Firebase to load
+      window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(initProfPanel, 300);
+      });
+    }
+
+    function logoutProf() {
+      sessionStorage.removeItem('prof_auth');
+      window.location.reload();
+    }
+
+    // ═══ NAVIGATION ═══
+    function showPanel(name, el) {
+      document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+      document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+      document.getElementById('panel-' + name).classList.add('active');
+      if (el) el.classList.add('active');
+    }
+
+    // ═══ INIT: FIRESTORE LISTENERS ═══
+    var listenersActive = false;
+    function initProfPanel() {
+      if (listenersActive) return;
+      listenersActive = true;
+
+      // Courses listener
+      db.collection('courses').onSnapshot(function(snapshot) {
+        coursesData = [];
+        snapshot.forEach(function(doc) {
+          coursesData.push({ id: doc.id, ...doc.data() });
+        });
+        renderDashboard();
+        renderZoomCards();
+        renderTemarioCards();
+        renderMaterialCourseSelect();
+        renderMaterials();
+      });
+
+      // Users listener
+      db.collection('users').onSnapshot(function(snapshot) {
+        usersData = [];
+        snapshot.forEach(function(doc) {
+          usersData.push({ id: doc.id, ...doc.data() });
+        });
+        renderDashboard();
+        renderAlumnos();
+      });
+
+      // Exams listener
+      db.collection('exams').onSnapshot(function(snapshot) {
+        examsData = [];
+        snapshot.forEach(function(doc) {
+          examsData.push({ id: doc.id, ...doc.data() });
+        });
+        renderDashboard();
+        renderExams();
+      });
+
+      // Materials listener
+      db.collection('materials').onSnapshot(function(snapshot) {
+        materialsData = [];
+        snapshot.forEach(function(doc) {
+          materialsData.push({ id: doc.id, ...doc.data() });
+        });
+        renderMaterials();
+      });
+    }
+
+    // ═══ HELPERS ═══
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function getInitials(name) {
+      return (name || '?').split(' ').map(function(w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
+    }
+
+    function getCourseName(id) {
+      var c = coursesData.find(function(x) { return x.id === id; });
+      return c ? c.name : id;
+    }
+
+    function formatDate(ts) {
+      if (!ts) return '—';
+      var d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    // ═══ DASHBOARD ═══
+    function renderDashboard() {
+      var el = document.getElementById('statAlumnos');
+      if (el) el.textContent = usersData.length;
+
+      var el2 = document.getElementById('statCursos');
+      if (el2) el2.textContent = coursesData.length;
+
+      var el3 = document.getElementById('statExamenes');
+      if (el3) el3.textContent = examsData.length;
+
+      var el4 = document.getElementById('alumnosCount');
+      if (el4) el4.textContent = usersData.length;
+
+      // Courses summary
+      var html = '';
+      coursesData.forEach(function(c) {
+        var enrolled = usersData.filter(function(u) {
+          return u.enrolledCourses && u.enrolledCourses.indexOf(c.id) !== -1;
+        }).length;
+        var zoomStatus = c.zoomLink ? '<span style="color:#16a34a;font-size:12px;display:flex;align-items:center;gap:3px"><span class="material-icons-round" style="font-size:14px">check_circle</span> Zoom activo</span>' : '<span style="color:#94a3b8;font-size:12px">Sin Zoom</span>';
+        var recStatus = c.recordingUrl ? '<span style="color:#d97706;font-size:12px;display:flex;align-items:center;gap:3px"><span class="material-icons-round" style="font-size:14px">play_circle</span> Grabación</span>' : '';
+
+        html += '<div class="course-card">';
+        html += '<h4><span class="material-icons-round" style="color:#d97706">' + (c.icon || 'menu_book') + '</span> ' + escapeHtml(c.name || c.id) + '</h4>';
+        html += '<div style="display:flex;gap:24px;font-size:13px;color:#64748b">';
+        html += '<span><strong>' + enrolled + '</strong> alumnos</span>';
+        html += '<span><strong>' + (c.sessions || 0) + '</strong> sesiones</span>';
+        html += '<span>' + escapeHtml(c.duration || '—') + '</span>';
+        html += '</div>';
+        html += '<div style="display:flex;gap:16px;margin-top:8px">' + zoomStatus + recStatus + '</div>';
+        html += '</div>';
+      });
+
+      if (coursesData.length === 0) {
+        html = '<div class="empty-state"><span class="material-icons-round">menu_book</span><p>No hay cursos disponibles aún.</p></div>';
+      }
+
+      var dashEl = document.getElementById('dashCourses');
+      if (dashEl) dashEl.innerHTML = html;
+    }
+
+    // ═══ ALUMNOS ═══
+    function renderAlumnos() {
+      var search = (document.getElementById('searchAlumnos') || {}).value || '';
+      search = search.toLowerCase();
+      var totalEl = document.getElementById('alumnosTotal');
+      if (totalEl) totalEl.textContent = '(' + usersData.length + ')';
+
+      var tbody = document.getElementById('alumnosTable');
+      if (!tbody) return;
+
+      var filtered = usersData.filter(function(u) {
+        if (!search) return true;
+        return ((u.name || '') + ' ' + (u.email || '')).toLowerCase().indexOf(search) !== -1;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#64748b;padding:32px">No se encontraron alumnos.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(function(u) {
+        var courses = (u.enrolledCourses || []).map(function(cid) { return getCourseName(cid); }).join(', ') || '—';
+        return '<tr>' +
+          '<td><div class="user-cell"><div class="user-avatar">' + getInitials(u.name || u.email) + '</div><div><div class="user-name">' + escapeHtml(u.name || 'Sin nombre') + '</div><div class="user-email">' + escapeHtml(u.email) + '</div></div></div></td>' +
+          '<td>' + escapeHtml(courses) + '</td>' +
+          '<td>' + formatDate(u.createdAt) + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    // ═══ ZOOM / GRABACIÓN ═══
+    function renderZoomCards() {
+      var container = document.getElementById('zoomCards');
+      if (!container) return;
+
+      if (coursesData.length === 0) {
+        container.innerHTML = '<div class="empty-state"><span class="material-icons-round">videocam</span><p>No hay cursos disponibles.</p></div>';
+        return;
+      }
+
+      container.innerHTML = coursesData.map(function(c) {
+        return '<div class="course-card">' +
+          '<h4><span class="material-icons-round" style="color:#d97706">' + (c.icon || 'menu_book') + '</span> ' + escapeHtml(c.name || c.id) + '</h4>' +
+          '<div class="card-grid">' +
+          '<div>' +
+          '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Link de Zoom</label>' +
+          '<input type="url" id="profZoom_' + c.id + '" value="' + escapeHtml(c.zoomLink || '') + '" placeholder="https://zoom.us/j/..." style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />' +
+          '</div>' +
+          '<div>' +
+          '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">URL de Grabación</label>' +
+          '<input type="url" id="profRec_' + c.id + '" value="' + escapeHtml(c.recordingUrl || '') + '" placeholder="https://..." style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />' +
+          '</div>' +
+          '<div style="grid-column:1/-1;display:flex;gap:8px">' +
+          '<button class="btn-sm btn-amber" style="flex:1" onclick="saveZoom(\'' + c.id + '\')"><span class="material-icons-round" style="font-size:16px">save</span> Guardar</button>' +
+          '<button class="btn-sm btn-outline-sm" style="flex:1" onclick="clearZoom(\'' + c.id + '\')"><span class="material-icons-round" style="font-size:16px">clear</span> Limpiar</button>' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    function saveZoom(courseId) {
+      var zoomLink = document.getElementById('profZoom_' + courseId).value.trim();
+      var recordingUrl = document.getElementById('profRec_' + courseId).value.trim();
+      db.collection('courses').doc(courseId).update({
+        zoomLink: zoomLink,
+        recordingUrl: recordingUrl,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function() {
+        FQNotify.toast('Zoom/Grabación guardados.', 'success');
+      }).catch(function(err) {
+        FQNotify.toast('Error: ' + err.message, 'error');
+      });
+    }
+
+    function clearZoom(courseId) {
+      if (!confirm('¿Limpiar Zoom y Grabación de este curso?')) return;
+      db.collection('courses').doc(courseId).update({ zoomLink: '', recordingUrl: '' })
+        .then(function() { FQNotify.toast('Limpiado.', 'info'); })
+        .catch(function(err) { FQNotify.toast('Error: ' + err.message, 'error'); });
+    }
+
+    // ═══ TEMARIO ═══
+    var editingTemarioCourse = null;
+    var temarioModules = [];
+
+    function renderTemarioCards() {
+      var container = document.getElementById('temarioCards');
+      if (!container) return;
+
+      // Fallback temarios
+      var FALLBACK = {
+        'sst-obras-civiles': [
+          { titulo: 'Introducción a la SST', temas: ['Reseña histórica de la SST','Historia de la SST en el Perú','Términos y definiciones'] },
+          { titulo: 'Marco Legal en el Perú', temas: ['Ley N° 29783 y su reglamento','Leyes de SST','Resoluciones Ministeriales','Aplicación en diferentes sectores','Organismos competentes','Modificatorias','Principios de la ley'] },
+          { titulo: 'Peligros y Riesgos', temas: ['Peligros','Riesgos','Consecuencias','Jerarquía de control'] },
+          { titulo: 'Incidentes y Accidentes', temas: ['Tipos','Causas','Reportes'] },
+          { titulo: 'Análisis de Riesgos', temas: ['Conceptos básicos','Proceso de análisis','Elaboración','Registros'] }
+        ]
+      };
+
+      container.innerHTML = coursesData.map(function(c) {
+        var temario = (c.temario && c.temario.length > 0) ? c.temario : (FALLBACK[c.id] || []);
+        var temarioHtml = '';
+
+        if (temario.length === 0) {
+          temarioHtml = '<p style="color:#94a3b8;font-size:13px;text-align:center;padding:16px 0">Sin temario configurado.</p>';
+        } else {
+          temarioHtml = temario.map(function(mod, i) {
+            if (typeof mod === 'string') {
+              return '<div style="padding:4px 0;font-size:13px;color:#334155">' + (i + 1) + '. ' + escapeHtml(mod) + '</div>';
+            }
+            var temasStr = (mod.temas || []).map(function(t, j) {
+              return '<div style="padding:2px 0 2px 16px;font-size:12px;color:#64748b">' + (j + 1) + '. ' + escapeHtml(t) + '</div>';
+            }).join('');
+            return '<div style="margin-bottom:10px">' +
+              '<div style="font-size:13px;font-weight:600;color:#0f172a;display:flex;align-items:center;gap:6px">' +
+              '<span style="background:#d97706;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px">M' + (i + 1) + '</span> ' +
+              escapeHtml(mod.titulo) + '</div>' +
+              temasStr + '</div>';
+          }).join('');
+        }
+
+        return '<div class="course-card">' +
+          '<h4 style="display:flex;justify-content:space-between;align-items:center"><span><span class="material-icons-round" style="color:#d97706">' + (c.icon || 'menu_book') + '</span> ' + escapeHtml(c.name || c.id) + '</span>' +
+          '<button class="btn-sm btn-outline-sm" onclick="editTemario(\'' + c.id + '\')" style="font-size:12px;padding:5px 12px"><span class="material-icons-round" style="font-size:14px">edit</span> Editar</button></h4>' +
+          '<div style="padding:8px 0">' + temarioHtml + '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    // Temario editor modal (reuses same approach as admin)
+    function editTemario(courseId) {
+      editingTemarioCourse = courseId;
+      var c = coursesData.find(function(x) { return x.id === courseId; });
+      if (!c) return;
+
+      var FALLBACK = {
+        'sst-obras-civiles': [
+          { titulo: 'Introducción a la SST', temas: ['Reseña histórica de la SST','Historia de la SST en el Perú','Términos y definiciones'] },
+          { titulo: 'Marco Legal en el Perú', temas: ['Ley N° 29783 y su reglamento','Leyes de SST','Resoluciones Ministeriales','Aplicación en diferentes sectores','Organismos competentes','Modificatorias','Principios de la ley'] },
+          { titulo: 'Peligros y Riesgos', temas: ['Peligros','Riesgos','Consecuencias','Jerarquía de control'] },
+          { titulo: 'Incidentes y Accidentes', temas: ['Tipos','Causas','Reportes'] },
+          { titulo: 'Análisis de Riesgos', temas: ['Conceptos básicos','Proceso de análisis','Elaboración','Registros'] }
+        ]
+      };
+
+      var temario = (c.temario && c.temario.length > 0) ? c.temario : (FALLBACK[c.id] || []);
+      temarioModules = temario.map(function(m) {
+        if (typeof m === 'string') return { titulo: 'Tema', temas: [m] };
+        return { titulo: m.titulo || '', temas: (m.temas || []).slice() };
+      });
+
+      // Build inline editor
+      var container = document.getElementById('temarioCards');
+      var editorHtml = '<div class="course-card" id="temarioEditorWrap" style="border-color:#d97706">' +
+        '<h4><span class="material-icons-round" style="color:#d97706">edit</span> Editando temario: ' + escapeHtml(c.name || c.id) + '</h4>' +
+        '<div style="display:flex;justify-content:flex-end;margin-bottom:10px">' +
+        '<button class="btn-sm btn-outline-sm" onclick="addTemarioMod()" style="font-size:12px;padding:5px 12px"><span class="material-icons-round" style="font-size:14px">add</span> Agregar módulo</button>' +
+        '</div>' +
+        '<div id="profTemarioEditor"></div>' +
+        '<div style="display:flex;gap:10px;margin-top:16px">' +
+        '<button class="btn-sm btn-amber" onclick="saveTemario()" style="flex:1"><span class="material-icons-round" style="font-size:16px">save</span> Guardar temario</button>' +
+        '<button class="btn-sm btn-outline-sm" onclick="renderTemarioCards()" style="flex:1">Cancelar</button>' +
+        '</div>' +
+        '</div>';
+
+      container.innerHTML = editorHtml;
+      renderProfTemarioEditor();
+    }
+
+    function renderProfTemarioEditor() {
+      var container = document.getElementById('profTemarioEditor');
+      if (!container) return;
+
+      if (temarioModules.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:13px;padding:12px">Sin módulos. Haz clic en "Agregar módulo".</p>';
+        return;
+      }
+
+      container.innerHTML = temarioModules.map(function(mod, i) {
+        var temasHtml = mod.temas.map(function(t, j) {
+          return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">' +
+            '<span style="color:#94a3b8;font-size:12px">' + (j + 1) + '.</span>' +
+            '<input type="text" value="' + escapeHtml(t) + '" onchange="profUpdateTema(' + i + ',' + j + ',this.value)" style="flex:1;padding:6px 10px;border:1px solid #dce3ed;border-radius:6px;font-size:12px;font-family:inherit" />' +
+            '<button onclick="profRemoveTema(' + i + ',' + j + ')" style="background:none;border:none;cursor:pointer;color:#ef4444;padding:2px"><span class="material-icons-round" style="font-size:16px">close</span></button>' +
+            '</div>';
+        }).join('');
+
+        return '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:10px">' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">' +
+          '<span style="background:#d97706;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px">M' + (i + 1) + '</span>' +
+          '<input type="text" value="' + escapeHtml(mod.titulo) + '" onchange="profUpdateTitle(' + i + ',this.value)" style="flex:1;padding:6px 10px;border:1px solid #dce3ed;border-radius:6px;font-size:13px;font-weight:600;font-family:inherit" />' +
+          '<button onclick="profRemoveMod(' + i + ')" style="background:none;border:none;cursor:pointer;color:#ef4444"><span class="material-icons-round" style="font-size:18px">delete_outline</span></button>' +
+          '</div>' +
+          '<div style="padding-left:8px">' + temasHtml + '</div>' +
+          '<button onclick="profAddTema(' + i + ')" style="margin-top:6px;background:none;border:1px dashed #cbd5e1;border-radius:6px;padding:5px 12px;font-size:12px;color:#64748b;cursor:pointer;width:100%;font-family:inherit"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">add</span> Agregar tema</button>' +
+          '</div>';
+      }).join('');
+    }
+
+    function addTemarioMod() { temarioModules.push({ titulo: '', temas: [''] }); renderProfTemarioEditor(); }
+    function profRemoveMod(i) { temarioModules.splice(i, 1); renderProfTemarioEditor(); }
+    function profUpdateTitle(i, val) { temarioModules[i].titulo = val; }
+    function profAddTema(i) { temarioModules[i].temas.push(''); renderProfTemarioEditor(); }
+    function profRemoveTema(i, j) { temarioModules[i].temas.splice(j, 1); renderProfTemarioEditor(); }
+    function profUpdateTema(i, j, val) { temarioModules[i].temas[j] = val; }
+
+    function saveTemario() {
+      if (!editingTemarioCourse) return;
+      var clean = temarioModules
+        .filter(function(m) { return m.titulo.trim() || m.temas.some(function(t) { return t.trim(); }); })
+        .map(function(m) {
+          return { titulo: m.titulo.trim(), temas: m.temas.filter(function(t) { return t.trim(); }) };
+        });
+
+      db.collection('courses').doc(editingTemarioCourse).update({
+        temario: clean,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function() {
+        FQNotify.toast('Temario guardado correctamente.', 'success');
+        editingTemarioCourse = null;
+      }).catch(function(err) {
+        FQNotify.toast('Error: ' + err.message, 'error');
+      });
+    }
+
+    // ═══ EXÁMENES ═══
+    function renderExams() {
+      var tbody = document.getElementById('examsTable');
+      if (!tbody) return;
+
+      if (examsData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:32px">No hay exámenes registrados.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = examsData.map(function(e) {
+        var score = e.score || 0;
+        var status = score >= 14 ? 'passed' : 'failed';
+        var label = score >= 14 ? 'Aprobado' : 'Desaprobado';
+        return '<tr>' +
+          '<td><div class="user-cell"><div class="user-avatar">' + getInitials(e.userName || e.userEmail || '?') + '</div><div><div class="user-name">' + escapeHtml(e.userName || 'Sin nombre') + '</div><div class="user-email">' + escapeHtml(e.userEmail || '') + '</div></div></div></td>' +
+          '<td>' + escapeHtml(getCourseName(e.courseId)) + '</td>' +
+          '<td><strong style="font-size:18px">' + score + '</strong>/20</td>' +
+          '<td><span class="status-badge ' + status + '">' + label + '</span></td>' +
+          '<td>' + formatDate(e.createdAt) + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    // ═══ MATERIAL DE APOYO ═══
+    function renderMaterialCourseSelect() {
+      var sel = document.getElementById('materialCourse');
+      if (!sel) return;
+      sel.innerHTML = coursesData.map(function(c) {
+        return '<option value="' + c.id + '">' + escapeHtml(c.name || c.id) + '</option>';
+      }).join('');
+    }
+
+    function showAddMaterial() {
+      document.getElementById('materialFormWrap').style.display = '';
+      document.getElementById('materialName').value = '';
+      document.getElementById('materialUrl').value = '';
+    }
+
+    function closeMaterialForm() {
+      document.getElementById('materialFormWrap').style.display = 'none';
+    }
+
+    function saveMaterial() {
+      var courseId = document.getElementById('materialCourse').value;
+      var name = document.getElementById('materialName').value.trim();
+      var url = document.getElementById('materialUrl').value.trim();
+
+      if (!name) { FQNotify.toast('El nombre es requerido.', 'warning'); return; }
+      if (!url) { FQNotify.toast('La URL es requerida.', 'warning'); return; }
+
+      db.collection('materials').add({
+        courseId: courseId,
+        name: name,
+        url: url,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function() {
+        FQNotify.toast('Material agregado correctamente.', 'success');
+        closeMaterialForm();
+      }).catch(function(err) {
+        FQNotify.toast('Error: ' + err.message, 'error');
+      });
+    }
+
+    function deleteMaterial(id) {
+      if (!confirm('¿Eliminar este material?')) return;
+      db.collection('materials').doc(id).delete()
+        .then(function() { FQNotify.toast('Material eliminado.', 'info'); })
+        .catch(function(err) { FQNotify.toast('Error: ' + err.message, 'error'); });
+    }
+
+    function renderMaterials() {
+      var container = document.getElementById('materialList');
+      if (!container) return;
+
+      if (materialsData.length === 0) {
+        container.innerHTML = '<div class="empty-state"><span class="material-icons-round">attach_file</span><p>No hay material de apoyo agregado aún.</p></div>';
+        return;
+      }
+
+      // Group by course
+      var grouped = {};
+      materialsData.forEach(function(m) {
+        var key = m.courseId || 'sin-curso';
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(m);
+      });
+
+      var html = '';
+      Object.keys(grouped).forEach(function(courseId) {
+        html += '<div class="course-card">';
+        html += '<h4><span class="material-icons-round" style="color:#d97706">folder</span> ' + escapeHtml(getCourseName(courseId)) + '</h4>';
+        grouped[courseId].forEach(function(m) {
+          html += '<div class="material-item">' +
+            '<span class="material-icons-round">description</span>' +
+            '<div class="mat-info"><div class="mat-name">' + escapeHtml(m.name) + '</div><div class="mat-url">' + escapeHtml(m.url) + '</div></div>' +
+            '<a href="' + escapeHtml(m.url) + '" target="_blank" rel="noopener" class="action-btn" style="text-decoration:none"><span class="material-icons-round" style="font-size:16px">open_in_new</span></a>' +
+            '<button class="action-btn" onclick="deleteMaterial(\'' + m.id + '\')" style="color:#ef4444"><span class="material-icons-round" style="font-size:16px">delete</span></button>' +
+            '</div>';
+        });
+        html += '</div>';
+      });
+
+      container.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
