@@ -40,6 +40,9 @@
       <button class="btn btn-primary" id="initBtn" onclick="initializeCourses()">
         <span>▶️</span> Inicializar Cursos
       </button>
+      <button class="btn btn-primary" id="forceBtn" onclick="forceUpdateCourses()" style="background:#ea580c;margin-left:8px">
+        <span>🔄</span> Forzar Actualización Completa
+      </button>
 
       <div class="status" id="status"></div>
     </div>
@@ -282,6 +285,42 @@
         console.log('Usuario autenticado:', auth.currentUser.email);
       }
     });
+
+    async function forceUpdateCourses() {
+      const btn = document.getElementById('forceBtn');
+      btn.disabled = true;
+
+      try {
+        const user = auth.currentUser;
+        if (!user) {
+          showStatus('❌ Error: No estás autenticado. Inicia sesión primero.', 'error');
+          btn.disabled = false;
+          return;
+        }
+
+        showStatus('Forzando actualización de todos los cursos...', 'loading');
+
+        let count = 0;
+        for (const course of INITIAL_COURSES) {
+          try {
+            await db.collection('courses').doc(course.id).set({
+              ...course,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            count++;
+          } catch (err) {
+            console.error('Error updating ' + course.id + ':', err);
+          }
+        }
+
+        showStatus('✅ ' + count + ' curso(s) actualizados con TODOS los datos (temario, includes, schedules, etc.).', 'success');
+      } catch (error) {
+        showStatus('❌ Error: ' + error.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
   </script>
 </body>
 </html>
