@@ -116,8 +116,9 @@
 <script>
   /* Load courses from Firestore and render them */
   var allCourses = {};
+  // Todos los cursos son 'disponible' por defecto
+  // Si quieres marcar uno como 'proximamente', agrégalo aquí:
   var courseStates = {
-    'sst-obras-civiles': 'disponible',
     'metrados-presupuestos': 'proximamente',
     'supervision-obra': 'proximamente'
   };
@@ -181,12 +182,6 @@
   }
 
   function attachEventHandlers() {
-    var courseStates = {
-      'sst-obras-civiles': 'disponible',
-      'metrados-presupuestos': 'proximamente',
-      'supervision-obra': 'proximamente'
-    };
-
     document.querySelectorAll('.course-action[data-course]').forEach(function(container) {
       var courseId = container.getAttribute('data-course');
       var state = courseStates[courseId] || 'disponible';
@@ -270,7 +265,9 @@
     if (typeof db !== 'undefined') {
       db.collection('courses').get().then(function(snapshot) {
         snapshot.forEach(function(doc) {
-          allCourses[doc.id] = doc.data();
+          var data = doc.data();
+          data.id = doc.id;
+          allCourses[doc.id] = data;
         });
         renderCourses();
       }).catch(function(error) {

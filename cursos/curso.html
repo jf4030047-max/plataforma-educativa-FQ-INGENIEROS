@@ -348,12 +348,67 @@
       }
     };
 
+    // Fallback dinámico: si el curso no está en FALLBACK_DATA pero tiene
+    // "topograf" en su ID o nombre, aplicar este template
+    var FALLBACK_TOPOGRAFIA = {
+      temario: [
+        { titulo: 'Introducción a la Topografía', temas: [
+          'Conceptos fundamentales de topografía',
+          'Equipos e instrumentos topográficos',
+          'Sistemas de coordenadas y georreferenciación'
+        ]},
+        { titulo: 'Levantamiento Topográfico', temas: [
+          'Métodos de levantamiento',
+          'Uso de estación total',
+          'Uso de GPS diferencial',
+          'Procesamiento de datos de campo'
+        ]},
+        { titulo: 'Modelamiento 3D', temas: [
+          'Introducción al modelamiento digital del terreno',
+          'Curvas de nivel y superficies',
+          'Software Civil 3D — Interfaz y herramientas',
+          'Creación de superficies desde puntos'
+        ]},
+        { titulo: 'Diseño Vial y Explanaciones', temas: [
+          'Alineamientos horizontales y verticales',
+          'Secciones transversales',
+          'Cálculo de volúmenes de corte y relleno',
+          'Diseño de rasantes'
+        ]},
+        { titulo: 'Proyecto Final', temas: [
+          'Caso práctico integral',
+          'Generación de planos topográficos',
+          'Presentación de informes'
+        ]}
+      ],
+      includes: [
+        { icon: 'videocam', text: 'Sesiones en vivo' },
+        { icon: 'play_circle', text: 'Acceso a grabaciones' },
+        { icon: 'description', text: 'Material de apoyo y plantillas' },
+        { icon: 'workspace_premium', text: 'Certificado digital' },
+        { icon: 'forum', text: 'Grupo de WhatsApp' },
+        { icon: 'quiz', text: 'Examen de certificación' }
+      ],
+      schedules: [
+        { id: 'h1', label: 'Por definir', detail: 'Consultar horarios' }
+      ],
+      icon: 'terrain',
+      badge: 'new',
+      badgeLabel: 'Nuevo',
+      modality: 'En vivo + Grabado',
+      tags: ['Topografía', 'Civil 3D', 'Modelamiento']
+    };
+
     function loadCoursesFromFirestore() {
       return db.collection('courses').get().then(function(snapshot) {
         console.log('Firestore: ' + snapshot.size + ' cursos cargados');
         snapshot.forEach(function(doc) {
           const data = doc.data();
-          const fb = FALLBACK_DATA[doc.id] || {};
+          // Detectar fallback: por ID exacto o por keyword en nombre/id
+          var fb = FALLBACK_DATA[doc.id] || {};
+          if (!fb.temario && (doc.id + ' ' + (data.name || '')).toLowerCase().indexOf('topograf') !== -1) {
+            fb = FALLBACK_TOPOGRAFIA;
+          }
           COURSES[doc.id] = {
             id: doc.id,
             name: data.name || '',
