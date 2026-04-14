@@ -235,8 +235,10 @@
     // Cargar cursos desde Firestore
     function loadCoursesFromFirestore() {
       return db.collection('courses').get().then(function(snapshot) {
+        console.log('Firestore: ' + snapshot.size + ' cursos cargados');
         snapshot.forEach(function(doc) {
           const data = doc.data();
+          console.log('Curso: ' + doc.id, 'temario:', data.temario ? data.temario.length + ' items' : 'NO TIENE');
           COURSES[doc.id] = {
             id: doc.id,
             name: data.name || '',
@@ -261,6 +263,15 @@
 
         // Ahora inicializar la pagina
         initCoursePage();
+      }).catch(function(error) {
+        console.error('Error cargando cursos de Firestore:', error);
+        document.getElementById('courseMain').innerHTML =
+          '<div style="text-align:center;padding:60px 20px">' +
+          '<span class="material-icons-round" style="font-size:56px;color:#dce3ed">error_outline</span>' +
+          '<h2 style="font-size:20px;color:#0f172a;margin:12px 0 6px">Error al cargar el curso</h2>' +
+          '<p style="color:#64748b;font-size:14px;margin-bottom:20px">' + error.message + '</p>' +
+          '<a href="catalogo.html" class="btn btn-primary" style="width:auto;display:inline-flex">Ver catálogo</a>' +
+          '</div>';
       });
     }
 
