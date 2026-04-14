@@ -328,23 +328,32 @@
   <script>
     // ═══ CONFIG: Claves por curso ═══
     // Cada profesor tiene su propia clave y solo ve su(s) curso(s)
+    // Usa palabras clave del nombre del curso para identificarlos (funciona con IDs auto-generados)
     var PROF_CODES = {
-      '121416': { name: 'Profesor SST', courses: ['sst-obras-civiles'] },
-      '141618': { name: 'Profesor Metrados', courses: ['metrados-presupuestos'] },
-      '161820': { name: 'Profesor Supervisión', courses: ['supervision-obra'] }
+      '20': { name: 'Profesor SST', keywords: ['seguridad', 'sst', 'salud'] },
+      '21': { name: 'Profesor Metrados', keywords: ['metrado', 'presupuesto'] },
+      '22': { name: 'Profesor Supervisión', keywords: ['supervis'] },
+      '23': { name: 'Profesor Topografía', keywords: ['topograf'] }
     };
-    var currentProf = null;  // { name, courses }
+    var currentProf = null;  // { name, keywords }
     var coursesData = [];
     var usersData = [];
     var examsData = [];
     var materialsData = [];
 
+    // Verifica si un curso pertenece al profesor actual
+    function courseMatchesProf(course) {
+      if (!currentProf) return true;
+      var name = ((course.name || '') + ' ' + (course.id || '')).toLowerCase();
+      return currentProf.keywords.some(function(kw) {
+        return name.indexOf(kw) !== -1;
+      });
+    }
+
     // Filtra cursos según el profesor logueado
     function myCourses() {
       if (!currentProf) return coursesData;
-      return coursesData.filter(function(c) {
-        return currentProf.courses.indexOf(c.id) !== -1;
-      });
+      return coursesData.filter(courseMatchesProf);
     }
 
     // ═══ LOGIN GATE ═══
@@ -463,9 +472,10 @@
     // ═══ HELPERS: filtros por profesor ═══
     function myAlumnos() {
       if (!currentProf) return usersData;
+      var myCids = myCourses().map(function(c) { return c.id; });
       return usersData.filter(function(u) {
         if (!u.enrolledCourses) return false;
-        return currentProf.courses.some(function(cid) {
+        return myCids.some(function(cid) {
           return u.enrolledCourses.indexOf(cid) !== -1;
         });
       });
@@ -473,15 +483,17 @@
 
     function myExams() {
       if (!currentProf) return examsData;
+      var myCids = myCourses().map(function(c) { return c.id; });
       return examsData.filter(function(e) {
-        return currentProf.courses.indexOf(e.courseId) !== -1;
+        return myCids.indexOf(e.courseId) !== -1;
       });
     }
 
     function myMaterials() {
       if (!currentProf) return materialsData;
+      var myCids = myCourses().map(function(c) { return c.id; });
       return materialsData.filter(function(m) {
-        return currentProf.courses.indexOf(m.courseId) !== -1;
+        return myCids.indexOf(m.courseId) !== -1;
       });
     }
 
