@@ -995,29 +995,27 @@
     }
 
     function renderCourses() {
-      // Esta función se mantiene para compatibilidad pero ahora maneja Zoom/Grabación
       const coursesList = document.getElementById('coursesList') || document.createElement('div');
       
       let html = '';
       coursesData.forEach(function(course) {
-        const stored = localStorage.getItem('course_' + course.id) || '{}';
-        const data = JSON.parse(stored);
-        
         html += '<div class="course-item" style="background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px">';
         html += '<div style="display:flex;align-items:center;gap:10px">';
-        html += '<h4 style="font-size:16px;font-weight:700;color:#0f172a">' + course.name + '</h4>';
+        html += '<h4 style="font-size:16px;font-weight:700;color:#0f172a">' + (course.name || course.id) + '</h4>';
+        if (course.zoomLink) html += '<span style="background:#e8f5e9;color:#2e7d32;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600">Zoom activo</span>';
+        if (course.recordingUrl) html += '<span style="background:#fff3e0;color:#e65100;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600">Grabación activa</span>';
         html += '</div>';
         
         // Input Zoom Link
         html += '<div>';
         html += '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Link de Zoom</label>';
-        html += '<input type="url" id="zoom_' + course.id + '" value="' + (data.zoomLink || '') + '" placeholder="https://zoom.us/j/..." style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />';
+        html += '<input type="url" id="zoom_' + course.id + '" value="' + escapeAttr(course.zoomLink || '') + '" placeholder="https://zoom.us/j/..." style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />';
         html += '</div>';
         
         // Input Recording URL
         html += '<div>';
         html += '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">URL de Grabación</label>';
-        html += '<input type="url" id="recording_' + course.id + '" value="' + (data.recordingUrl || '') + '" placeholder="https://example.com/video.mp4" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />';
+        html += '<input type="url" id="recording_' + course.id + '" value="' + escapeAttr(course.recordingUrl || '') + '" placeholder="https://example.com/video.mp4" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />';
         html += '</div>';
         
         // Buttons
@@ -1032,19 +1030,35 @@
     }
 
     function saveCourseData(courseId) {
-      const zoomLink = document.getElementById('zoom_' + courseId).value;
-      const recordingUrl = document.getElementById('recording_' + courseId).value;
+      const zoomLink = document.getElementById('zoom_' + courseId).value.trim();
+      const recordingUrl = document.getElementById('recording_' + courseId).value.trim();
       
-      const data = { zoomLink, recordingUrl };
-      localStorage.setItem('course_' + courseId, JSON.stringify(data));
-      FQNotify.toast('Datos de Zoom/Grabación guardados correctamente.', 'success');
+      db.collection('courses').doc(courseId).update({
+        zoomLink: zoomLink,
+        recordingUrl: recordingUrl,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(function() {
+        FQNotify.toast('Zoom/Grabación guardados en Firestore.', 'success');
+      })
+      .catch(function(err) {
+        FQNotify.toast('Error al guardar: ' + err.message, 'error');
+      });
     }
 
     function clearCourseData(courseId) {
-      if (!confirm('¿Estás seguro de limpiar los datos de este curso?')) return;
-      localStorage.removeItem('course_' + courseId);
-      renderCourses();
-      FQNotify.toast('Datos del curso limpiados.', 'info');
+      if (!confirm('¿Estás seguro de limpiar Zoom y Grabación de este curso?')) return;
+      db.collection('courses').doc(courseId).update({
+        zoomLink: '',
+        recordingUrl: '',
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(function() {
+        FQNotify.toast('Zoom/Grabación limpiados.', 'info');
+      })
+      .catch(function(err) {
+        FQNotify.toast('Error: ' + err.message, 'error');
+      });
     }
 
     // ═══ SETTINGS ═══
