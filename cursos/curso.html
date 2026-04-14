@@ -444,6 +444,9 @@
             badgeLabel: data.badgeLabel || fb.badgeLabel || 'Curso',
             zoomLink: data.zoomLink || '',
             recordingUrl: data.recordingUrl || '',
+            startDate: data.startDate || '',
+            startTime: data.startTime || '',
+            endTime: data.endTime || '',
             schedules: (data.schedules && data.schedules.length > 0) ? data.schedules : (fb.schedules || []),
             temario: (data.temario && data.temario.length > 0) ? data.temario : (fb.temario || []),
             includes: (data.includes && data.includes.length > 0) ? data.includes : (fb.includes || [])
@@ -570,6 +573,16 @@
         '<div class="course-meta-item"><span class="material-icons-round">video_library</span>' + c.sessions + ' sesiones</div>' +
         '<div class="course-meta-item"><span class="material-icons-round">event_seat</span>Cupos disponibles</div>' +
         '<div class="course-meta-item"><span class="material-icons-round">videocam</span>' + c.modality + '</div>';
+      if (c.startDate) {
+        var dp = c.startDate.split('-');
+        var meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+        var fechaTexto = parseInt(dp[2]) + ' de ' + meses[parseInt(dp[1])-1] + ', ' + dp[0];
+        metaHtml += '<div class="course-meta-item"><span class="material-icons-round">calendar_month</span>' + fechaTexto + '</div>';
+      }
+      if (c.startTime) {
+        var horarioTexto = c.startTime + (c.endTime ? ' — ' + c.endTime : '');
+        metaHtml += '<div class="course-meta-item"><span class="material-icons-round">access_time</span>' + horarioTexto + '</div>';
+      }
       document.getElementById('courseMeta').innerHTML = metaHtml;
 
       // Temario

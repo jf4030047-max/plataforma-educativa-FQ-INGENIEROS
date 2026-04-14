@@ -330,6 +330,18 @@
                 <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Número de sesiones</label>
                 <input type="number" id="courseSessions" placeholder="1" min="1" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
               </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Fecha de inicio</label>
+                <input type="date" id="courseStartDate" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Hora de inicio</label>
+                <input type="time" id="courseStartTime" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Hora de fin</label>
+                <input type="time" id="courseEndTime" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+              </div>
             </div>
 
             <!-- ═══ TEMARIO EDITOR ═══ -->
@@ -357,7 +369,7 @@
           <!-- Tabla de cursos -->
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Nombre</th><th>Precio</th><th>Duración</th><th>Sesiones</th><th>Acciones</th></tr></thead>
+              <thead><tr><th>Nombre</th><th>Precio</th><th>Duración</th><th>Sesiones</th><th>Fecha</th><th>Horario</th><th></th>Acciones</th></tr></thead>
               <tbody id="coursesTable"></tbody>
             </table>
           </div>
@@ -807,20 +819,32 @@
     function renderCoursesTable() {
       const tbody = document.getElementById('coursesTable');
       if (coursesData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:32px">No hay cursos creados aún.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#64748b;padding:32px">No hay cursos creados aún.</td></tr>';
       } else {
-        tbody.innerHTML = coursesData.map(c => `
+        tbody.innerHTML = coursesData.map(c => {
+          var fechaStr = '—';
+          if (c.startDate) {
+            var parts = c.startDate.split('-');
+            fechaStr = parts[2] + '/' + parts[1] + '/' + parts[0];
+          }
+          var horarioStr = '—';
+          if (c.startTime) {
+            horarioStr = c.startTime + (c.endTime ? ' - ' + c.endTime : '');
+          }
+          return `
           <tr>
             <td>${c.name || '—'}</td>
             <td>S/ ${c.price || 0}</td>
             <td>${c.duration || '—'}</td>
             <td>${c.sessions || 0}</td>
+            <td>${fechaStr}</td>
+            <td>${horarioStr}</td>
             <td>
               <button class="action-btn" onclick="editCourse('${c.id}')"><span class="material-icons-round" style="font-size:16px">edit</span> Editar</button>
               <button class="action-btn danger" onclick="deleteCourse('${c.id}')"><span class="material-icons-round" style="font-size:16px">delete</span></button>
             </td>
           </tr>
-        `).join('');
+        `}).join('');
       }
     }
 
@@ -1007,6 +1031,9 @@
       document.getElementById('courseDesc').value = '';
       document.getElementById('courseDuration').value = '';
       document.getElementById('courseSessions').value = '1';
+      document.getElementById('courseStartDate').value = '';
+      document.getElementById('courseStartTime').value = '';
+      document.getElementById('courseEndTime').value = '';
       temarioModules = [];
       renderTemarioEditor();
       document.getElementById('courseFormWrap').style.display = '';
@@ -1026,6 +1053,9 @@
       document.getElementById('courseDesc').value = course.desc || '';
       document.getElementById('courseDuration').value = course.duration || '';
       document.getElementById('courseSessions').value = course.sessions || 1;
+      document.getElementById('courseStartDate').value = course.startDate || '';
+      document.getElementById('courseStartTime').value = course.startTime || '';
+      document.getElementById('courseEndTime').value = course.endTime || '';
       loadTemarioFromCourse(course);
       document.getElementById('courseFormWrap').style.display = '';
       document.getElementById('courseFormWrap').scrollIntoView({ behavior: 'smooth' });
@@ -1037,12 +1067,15 @@
       const desc = document.getElementById('courseDesc').value.trim();
       const duration = document.getElementById('courseDuration').value.trim();
       const sessions = parseInt(document.getElementById('courseSessions').value) || 1;
+      const startDate = document.getElementById('courseStartDate').value || '';
+      const startTime = document.getElementById('courseStartTime').value || '';
+      const endTime = document.getElementById('courseEndTime').value || '';
 
       if (!name) { FQNotify.toast('El nombre del curso es requerido.', 'warning'); return; }
       if (!desc) { FQNotify.toast('La descripción del curso es requerida.', 'warning'); return; }
 
       const temario = getTemarioData();
-      const courseData = { name, price, desc, duration, sessions, temario, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+      const courseData = { name, price, desc, duration, sessions, startDate, startTime, endTime, temario, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
 
       if (editingCourseId) {
         // Actualizar
