@@ -204,7 +204,7 @@
       <header class="top-bar">
         <h2><span class="material-icons-round">school</span> Panel del Profesor</h2>
         <div class="top-bar-actions">
-          <span class="prof-badge"><span class="material-icons-round" style="font-size:16px">verified_user</span> Profesor</span>
+          <span class="prof-badge"><span class="material-icons-round" style="font-size:16px">verified_user</span> <span id="profNameBadge">Profesor</span></span>
           <button class="btn-logout" onclick="logoutProf()"><span class="material-icons-round" style="font-size:16px">logout</span> Salir</button>
         </div>
       </header>
@@ -326,20 +326,37 @@
   <script src="../assets/js/notifications.js"></script>
 
   <script>
-    // ═══ CONFIG ═══
-    var PROF_CODE_HASH = '121416';
+    // ═══ CONFIG: Claves por curso ═══
+    // Cada profesor tiene su propia clave y solo ve su(s) curso(s)
+    var PROF_CODES = {
+      '121416': { name: 'Profesor SST', courses: ['sst-obras-civiles'] },
+      '141618': { name: 'Profesor Metrados', courses: ['metrados-presupuestos'] },
+      '161820': { name: 'Profesor Supervisión', courses: ['supervision-obra'] }
+    };
+    var currentProf = null;  // { name, courses }
     var coursesData = [];
     var usersData = [];
     var examsData = [];
     var materialsData = [];
 
+    // Filtra cursos según el profesor logueado
+    function myCourses() {
+      if (!currentProf) return coursesData;
+      return coursesData.filter(function(c) {
+        return currentProf.courses.indexOf(c.id) !== -1;
+      });
+    }
+
     // ═══ LOGIN GATE ═══
     function verifyCode() {
       var code = document.getElementById('accessCode').value.trim();
-      if (code === PROF_CODE_HASH) {
-        sessionStorage.setItem('prof_auth', 'true');
+      var prof = PROF_CODES[code];
+      if (prof) {
+        currentProf = prof;
+        sessionStorage.setItem('prof_auth', code);
         document.getElementById('loginGate').style.display = 'none';
         document.getElementById('profLayout').style.display = 'grid';
+        document.getElementById('profNameBadge').textContent = prof.name;
         initProfPanel();
       } else {
         document.getElementById('loginError').style.display = 'block';
@@ -349,11 +366,14 @@
     }
 
     // Check session
-    if (sessionStorage.getItem('prof_auth') === 'true') {
+    var savedCode = sessionStorage.getItem('prof_auth');
+    if (savedCode && PROF_CODES[savedCode]) {
+      currentProf = PROF_CODES[savedCode];
       document.getElementById('loginGate').style.display = 'none';
       document.getElementById('profLayout').style.display = 'grid';
       // Wait for Firebase to load
       window.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('profNameBadge').textContent = currentProf.name;
         setTimeout(initProfPanel, 300);
       });
     }
@@ -440,23 +460,52 @@
       return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
+    // ═══ HELPERS: filtros por profesor ═══
+    function myAlumnos() {
+      if (!currentProf) return usersData;
+      return usersData.filter(function(u) {
+        if (!u.enrolledCourses) return false;
+        return currentProf.courses.some(function(cid) {
+          return u.enrolledCourses.indexOf(cid) !== -1;
+        });
+      });
+    }
+
+    function myExams() {
+      if (!currentProf) return examsData;
+      return examsData.filter(function(e) {
+        return currentProf.courses.indexOf(e.courseId) !== -1;
+      });
+    }
+
+    function myMaterials() {
+      if (!currentProf) return materialsData;
+      return materialsData.filter(function(m) {
+        return currentProf.courses.indexOf(m.courseId) !== -1;
+      });
+    }
+
     // ═══ DASHBOARD ═══
     function renderDashboard() {
+      var alumnos = myAlumnos();
+      var cursos = myCourses();
+      var exams = myExams();
+
       var el = document.getElementById('statAlumnos');
-      if (el) el.textContent = usersData.length;
+      if (el) el.textContent = alumnos.length;
 
       var el2 = document.getElementById('statCursos');
-      if (el2) el2.textContent = coursesData.length;
+      if (el2) el2.textContent = cursos.length;
 
       var el3 = document.getElementById('statExamenes');
-      if (el3) el3.textContent = examsData.length;
+      if (el3) el3.textContent = exams.length;
 
       var el4 = document.getElementById('alumnosCount');
-      if (el4) el4.textContent = usersData.length;
+      if (el4) el4.textContent = alumnos.length;
 
       // Courses summary
       var html = '';
-      coursesData.forEach(function(c) {
+      cursos.forEach(function(c) {
         var enrolled = usersData.filter(function(u) {
           return u.enrolledCourses && u.enrolledCourses.indexOf(c.id) !== -1;
         }).length;
@@ -474,8 +523,8 @@
         html += '</div>';
       });
 
-      if (coursesData.length === 0) {
-        html = '<div class="empty-state"><span class="material-icons-round">menu_book</span><p>No hay cursos disponibles aún.</p></div>';
+      if (cursos.length === 0) {
+        html = '<div class="empty-state"><span class="material-icons-round">menu_book</span><p>No hay cursos asignados a tu cuenta.</p></div>';
       }
 
       var dashEl = document.getElementById('dashCourses');
@@ -486,13 +535,14 @@
     function renderAlumnos() {
       var search = (document.getElementById('searchAlumnos') || {}).value || '';
       search = search.toLowerCase();
+      var alumnos = myAlumnos();
       var totalEl = document.getElementById('alumnosTotal');
-      if (totalEl) totalEl.textContent = '(' + usersData.length + ')';
+      if (totalEl) totalEl.textContent = '(' + alumnos.length + ')';
 
       var tbody = document.getElementById('alumnosTable');
       if (!tbody) return;
 
-      var filtered = usersData.filter(function(u) {
+      var filtered = alumnos.filter(function(u) {
         if (!search) return true;
         return ((u.name || '') + ' ' + (u.email || '')).toLowerCase().indexOf(search) !== -1;
       });
@@ -517,12 +567,13 @@
       var container = document.getElementById('zoomCards');
       if (!container) return;
 
-      if (coursesData.length === 0) {
-        container.innerHTML = '<div class="empty-state"><span class="material-icons-round">videocam</span><p>No hay cursos disponibles.</p></div>';
+      var cursos = myCourses();
+      if (cursos.length === 0) {
+        container.innerHTML = '<div class="empty-state"><span class="material-icons-round">videocam</span><p>No hay cursos asignados.</p></div>';
         return;
       }
 
-      container.innerHTML = coursesData.map(function(c) {
+      container.innerHTML = cursos.map(function(c) {
         return '<div class="course-card">' +
           '<h4><span class="material-icons-round" style="color:#d97706">' + (c.icon || 'menu_book') + '</span> ' + escapeHtml(c.name || c.id) + '</h4>' +
           '<div class="card-grid">' +
@@ -583,7 +634,8 @@
         ]
       };
 
-      container.innerHTML = coursesData.map(function(c) {
+      var cursos = myCourses();
+      container.innerHTML = cursos.map(function(c) {
         var temario = (c.temario && c.temario.length > 0) ? c.temario : (FALLBACK[c.id] || []);
         var temarioHtml = '';
 
@@ -714,12 +766,13 @@
       var tbody = document.getElementById('examsTable');
       if (!tbody) return;
 
-      if (examsData.length === 0) {
+      var exams = myExams();
+      if (exams.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:32px">No hay exámenes registrados.</td></tr>';
         return;
       }
 
-      tbody.innerHTML = examsData.map(function(e) {
+      tbody.innerHTML = exams.map(function(e) {
         var score = e.score || 0;
         var status = score >= 14 ? 'passed' : 'failed';
         var label = score >= 14 ? 'Aprobado' : 'Desaprobado';
@@ -737,7 +790,7 @@
     function renderMaterialCourseSelect() {
       var sel = document.getElementById('materialCourse');
       if (!sel) return;
-      sel.innerHTML = coursesData.map(function(c) {
+      sel.innerHTML = myCourses().map(function(c) {
         return '<option value="' + c.id + '">' + escapeHtml(c.name || c.id) + '</option>';
       }).join('');
     }
@@ -784,14 +837,15 @@
       var container = document.getElementById('materialList');
       if (!container) return;
 
-      if (materialsData.length === 0) {
+      var mats = myMaterials();
+      if (mats.length === 0) {
         container.innerHTML = '<div class="empty-state"><span class="material-icons-round">attach_file</span><p>No hay material de apoyo agregado aún.</p></div>';
         return;
       }
 
       // Group by course
       var grouped = {};
-      materialsData.forEach(function(m) {
+      mats.forEach(function(m) {
         var key = m.courseId || 'sin-curso';
         if (!grouped[key]) grouped[key] = [];
         grouped[key].push(m);
