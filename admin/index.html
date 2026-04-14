@@ -827,6 +827,68 @@
     // ═══ TEMARIO EDITOR HELPERS ═══
     var temarioModules = [];
 
+    var FALLBACK_TEMARIO = {
+      'sst-obras-civiles': [
+        { titulo: 'Introducción a la SST', temas: [
+          'Reseña histórica de la Seguridad y Salud en el Trabajo',
+          'Historia de la SST en el Perú',
+          'Términos y definiciones'
+        ]},
+        { titulo: 'Marco Legal en el Perú', temas: [
+          'Ley N° 29783 y su reglamento D.S. 005-2012-TR',
+          'Leyes de SST',
+          'Resoluciones Ministeriales',
+          'Aplicación en diferentes sectores',
+          'Organismos competentes en el Perú',
+          'Modificatorias',
+          'Principios de la ley'
+        ]},
+        { titulo: 'Peligros y Riesgos', temas: [
+          'Peligros',
+          'Riesgos',
+          'Consecuencias',
+          'Jerarquía de control'
+        ]},
+        { titulo: 'Incidentes y Accidentes', temas: [
+          'Tipos',
+          'Causas',
+          'Reportes'
+        ]},
+        { titulo: 'Análisis de Riesgos', temas: [
+          'Conceptos básicos',
+          'Proceso de análisis',
+          'Elaboración',
+          'Registros'
+        ]}
+      ],
+      'metrados-presupuestos': [
+        { titulo: 'Contenido del curso', temas: [
+          'Fundamentos de costos en construcción',
+          'Análisis de precios unitarios',
+          'Metrado de partidas principales',
+          'Presupuesto base y fórmulas polinómicas',
+          'Valorizaciones mensuales',
+          'Reajuste de precios',
+          'Software S10 — Introducción práctica',
+          'Caso práctico integral'
+        ]}
+      ],
+      'supervision-obra': [
+        { titulo: 'Contenido del curso', temas: [
+          'Rol del supervisor de obra',
+          'Marco legal y contractual',
+          'Control de calidad de materiales',
+          'Cuaderno de obra digital',
+          'Control de avance físico y financiero',
+          'Recepción de obra y liquidación',
+          'Gestión de adicionales y deductivos',
+          'Resolución de controversias',
+          'Supervisión en proyectos públicos (OSCE)',
+          'Caso práctico integral'
+        ]}
+      ]
+    };
+
     function renderTemarioEditor() {
       var container = document.getElementById('temarioEditor');
       var emptyMsg = document.getElementById('temarioEmpty');
@@ -907,13 +969,12 @@
 
     function loadTemarioFromCourse(course) {
       temarioModules = [];
-      if (course.temario && course.temario.length > 0) {
-        if (typeof course.temario[0] === 'string') {
-          // Flat list → convert to single module
-          temarioModules = [{ titulo: 'Contenido del curso', temas: course.temario.slice() }];
+      var temario = (course.temario && course.temario.length > 0) ? course.temario : (FALLBACK_TEMARIO[course.id] || []);
+      if (temario.length > 0) {
+        if (typeof temario[0] === 'string') {
+          temarioModules = [{ titulo: 'Contenido del curso', temas: temario.slice() }];
         } else {
-          // Structured modules
-          temarioModules = course.temario.map(function(m) {
+          temarioModules = temario.map(function(m) {
             return { titulo: m.titulo || '', temas: (m.temas || []).slice() };
           });
         }
