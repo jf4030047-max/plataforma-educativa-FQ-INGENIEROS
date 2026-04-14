@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Estados de cursos (centralizado)
   const courseStates = {
     'sst-obras-civiles': 'disponible',
-    'metrados-presupuestos': 'proximamente',
+    'topografia-civil-3d': 'proximamente',
     'supervision-obra': 'proximamente'
   };
 
