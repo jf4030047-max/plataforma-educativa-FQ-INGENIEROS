@@ -18,11 +18,14 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   // Auto-fix: asegurar fecha de SST en Firestore
-  const SST_DATE_FIX = { 'sst-obras-civiles': { startDate: '2026-04-23', startTime: '17:00', endTime: '18:00' } };
+  const SST_DATE_FIX = { 'sst-obras-civiles': { startDate: '2026-04-23', startTime: '17:00', endTime: '20:00' } };
   Object.keys(SST_DATE_FIX).forEach(function(cid) {
     db.collection('courses').doc(cid).get().then(function(doc) {
-      if (doc.exists && !doc.data().startDate) {
-        doc.ref.update(SST_DATE_FIX[cid]);
+      if (doc.exists) {
+        var d = doc.data();
+        if (!d.startDate || d.endTime !== SST_DATE_FIX[cid].endTime) {
+          doc.ref.update(SST_DATE_FIX[cid]);
+        }
       }
     }).catch(function() {});
   });
