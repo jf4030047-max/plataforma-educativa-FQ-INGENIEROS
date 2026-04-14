@@ -526,7 +526,7 @@
       document.getElementById('breadcrumbName').textContent = c.name;
 
       // Badge: solo un indicador para cursos "próximamente"
-      if (c.id === 'topografia-civil-3d' || c.id === 'supervision-obra') {
+      if (c.id === 'supervision-obra') {
         document.getElementById('badgeRow').innerHTML = '<span class="cbadge" style="background:#fef3c7;color:#92400e;font-size:16px;padding:7px 18px;display:block;text-align:center;margin-bottom:8px;"><span class="material-icons-round" style="font-size:18px;vertical-align:middle;">upcoming</span> Próximamente</span>';
       } else {
         document.getElementById('badgeRow').innerHTML = '<span class="cbadge ' + c.badge + '" style="font-size:16px;padding:7px 18px;">' + c.badgeLabel + '</span>' + (c.price === 0 ? '<span class="cbadge free" style="font-size:16px;padding:7px 18px;">Gratuito</span>' : '');

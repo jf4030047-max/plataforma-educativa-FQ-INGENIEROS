@@ -1,0 +1,356 @@
+{
+  "metadata": {
+    "extractedFrom": ["cursos/catalogo.html", "cursos/curso.html", "index.html"],
+    "extractedDate": "2026-04-13",
+    "dataSource": "HTML markup + Firestore dynamic loading",
+    "note": "Full details (temario, includes, schedules) are loaded from Firestore at runtime. Below shows all fields found in HTML and code structure."
+  },
+  "courses": {
+    "sst-obras-civiles": {
+      "id": "sst-obras-civiles",
+      "name": "Seguridad y Salud en el Trabajo en Obras Civiles",
+      "price": 0,
+      "priceLabel": "Gratis",
+      "priceDisplay": "Gratis",
+      "desc": "Conoce los fundamentos de la Seguridad y Salud en el Trabajo aplicados a obras civiles, incluyendo marco legal peruano, identificación de peligros y riesgos, investigación de incidentes y elaboración de análisis de riesgos según normativa vigente.",
+      "duration": "1 hora",
+      "sessions": 1,
+      "enrolled": 0,
+      "modality": "En vivo + Grabado",
+      "icon": "menu_book",
+      "badge": "new",
+      "badgeLabel": "Nuevo",
+      "tags": [
+        "Seguridad",
+        "Obras Civiles",
+        "Normativa"
+      ],
+      "status": "disponible",
+      "schedules": [
+        {
+          "id": "sst-schedule-1",
+          "label": "Jueves (Opción 1)",
+          "detail": "5:00 p.m. — 6:00 p.m."
+        },
+        {
+          "id": "sst-schedule-2",
+          "label": "Jueves (Opción 2)",
+          "detail": "7:00 p.m. — 8:00 p.m."
+        }
+      ],
+      "temario": [
+        "Fundamentos de SST",
+        "Marco legal peruano",
+        "Identificación de peligros y riesgos",
+        "Investigación de incidentes",
+        "Análisis de riesgos"
+      ],
+      "includes": [
+        {
+          "icon": "videocam",
+          "text": "Clases en vivo por Zoom"
+        },
+        {
+          "icon": "play_circle",
+          "text": "Grabaciones disponibles"
+        },
+        {
+          "icon": "description",
+          "text": "Material descargable"
+        },
+        {
+          "icon": "workspace_premium",
+          "text": "Constancia de participación"
+        }
+      ],
+      "zoomLink": "",
+      "recordingUrl": "",
+      "meta": {
+        "duration": "1 hora",
+        "sessions": "1 sesión",
+        "availability": "Cupos disponibles",
+        "modality": "En vivo + Grabado"
+      }
+    },
+    "topografia-civil-3d": {
+      "id": "topografia-civil-3d",
+      "name": "Topografía en Civil 3D",
+      "price": 50,
+      "priceLabel": "S/ 50",
+      "priceDisplay": "S/ 50",
+      "desc": "Aprende topografía aplicada a proyectos civiles con herramientas 3D. Domina el levantamiento topográfico, el modelado de superficies y el uso de Civil 3D para diseño de infraestructura.",
+      "duration": "10 horas",
+      "sessions": 8,
+      "enrolled": 0,
+      "modality": "En vivo + Grabado",
+      "icon": "terrain",
+      "badge": "nuevo",
+      "badgeLabel": "Nuevo",
+      "tags": [
+        "Topografía",
+        "Civil 3D",
+        "Modelado"
+      ],
+      "status": "disponible",
+      "schedules": [],
+      "temario": [
+        {
+          "titulo": "Módulo 1: Fundamentos de Topografía",
+          "temas": [
+            "Conceptos básicos de topografía",
+            "Equipos e instrumentos topográficos"
+          ]
+        },
+        {
+          "titulo": "Módulo 2: Levantamiento Topográfico",
+          "temas": [
+            "Trabajo de campo",
+            "Importación de datos y puntos"
+          ]
+        },
+        {
+          "titulo": "Módulo 3: AutoCAD Civil 3D",
+          "temas": [
+            "Modelado de superficies TIN",
+            "Diseño de alineamientos y perfiles"
+          ]
+        }
+      ],
+      "includes": [
+        {
+          "icon": "videocam",
+          "text": "Clases en vivo por Zoom"
+        },
+        {
+          "icon": "play_circle",
+          "text": "Acceso a grabaciones"
+        },
+        {
+          "icon": "description",
+          "text": "Plantillas y archivos de práctica"
+        },
+        {
+          "icon": "workspace_premium",
+          "text": "Certificado digital"
+        },
+        {
+          "icon": "verified",
+          "text": "Certificado con examen"
+        }
+      ],
+      "zoomLink": "",
+      "recordingUrl": "",
+      "meta": {
+        "duration": "10 horas",
+        "sessions": "8 sesiones",
+        "availability": "Cupos disponibles",
+        "modality": "En vivo + Grabado"
+      }
+    },
+    "supervision-obra": {
+      "id": "supervision-obra",
+      "name": "Supervisión de Obra",
+      "price": 80,
+      "priceLabel": "S/ 80",
+      "priceDisplay": "S/ 80",
+      "desc": "Desarrolla competencias en dirección técnica, control de calidad, gestión de cuaderno de obra y aplicación de buenas prácticas de supervisión. Enfocado en proyectos civiles y normativas actuales.",
+      "duration": "16 horas",
+      "sessions": 16,
+      "enrolled": 64,
+      "modality": "En vivo + Grabado",
+      "icon": "menu_book",
+      "badge": "pro",
+      "badgeLabel": "Pro",
+      "tags": [
+        "Supervisión",
+        "Control de Calidad",
+        "Dirección"
+      ],
+      "status": "proximamente",
+      "schedules": [],
+      "temario": [
+        {
+          "titulo": "Módulo 1: Dirección Técnica",
+          "temas": [
+            "Responsabilidades del supervisor",
+            "Gestión administrativa"
+          ]
+        },
+        {
+          "titulo": "Módulo 2: Control de Calidad",
+          "temas": [
+            "Normas y especificaciones técnicas",
+            "Inspección y recepción de obras"
+          ]
+        },
+        {
+          "titulo": "Módulo 3: Cuaderno de Obra",
+          "temas": [
+            "Documentación obligatoria",
+            "Registro de eventos"
+          ]
+        },
+        {
+          "titulo": "Módulo 4: Buenas Prácticas",
+          "temas": [
+            "Seguridad en obra",
+            "Sostenibilidad y medio ambiente"
+          ]
+        }
+      ],
+      "includes": [
+        {
+          "icon": "videocam",
+          "text": "Clases en vivo por Zoom"
+        },
+        {
+          "icon": "play_circle",
+          "text": "Grabaciones disponibles"
+        },
+        {
+          "icon": "description",
+          "text": "Formatos de supervisión"
+        },
+        {
+          "icon": "assessment",
+          "text": "Casos de estudio"
+        },
+        {
+          "icon": "workspace_premium",
+          "text": "Constancia de participación"
+        },
+        {
+          "icon": "verified",
+          "text": "Certificado con examen"
+        }
+      ],
+      "zoomLink": "",
+      "recordingUrl": "",
+      "meta": {
+        "duration": "16 horas",
+        "sessions": "16 sesiones",
+        "availability": "Cupos disponibles",
+        "modality": "En vivo + Grabado",
+        "enrolled": "64 inscritos"
+      }
+    }
+  },
+  "fieldDefinitions": {
+    "common_fields": {
+      "id": "string - Unique course identifier (used in URLs and queries)",
+      "name": "string - Full course title",
+      "price": "number - Price in Soles (0 for free)",
+      "priceLabel": "string - Formatted price display (e.g., 'S/ 50', 'Gratis')",
+      "desc": "string - Short course description (1-2 sentences)",
+      "duration": "string - Total course duration (e.g., '12 horas')",
+      "sessions": "number - Total number of sessions/modules",
+      "enrolled": "number - Current enrollment count",
+      "modality": "string - Delivery method (En vivo, En vivo + Grabado, etc.)",
+      "icon": "string - Material Design icon name",
+      "badge": "string - Badge type (new, top, pro, free)",
+      "badgeLabel": "string - Badge display text",
+      "tags": "array - Array of category tags",
+      "status": "string - Course status (disponible, proximamente)",
+      "schedules": "array of objects - Available class schedules",
+      "temario": "array - Course syllabus/topics (can be simple strings or objects with sub-topics)",
+      "includes": "array of objects - Course benefits/features with icon and text",
+      "zoomLink": "string - Zoom meeting link (empty if not available)",
+      "recordingUrl": "string - Recording URL (empty if not available)",
+      "meta": "object - Metadata for display purposes"
+    },
+    "schedule_object": {
+      "id": "string - Unique schedule identifier",
+      "label": "string - Human-readable schedule name",
+      "detail": "string - Time details (e.g., '5:00 p.m. — 6:00 p.m.')"
+    },
+    "temario_item": {
+      "simple_format": "string - Single topic",
+      "structured_format": {
+        "titulo": "string - Module/section title",
+        "temas": "array of strings - Sub-topics within module"
+      }
+    },
+    "include_item": {
+      "icon": "string - Material Design icon name",
+      "text": "string - Feature description"
+    }
+  },
+  "catalogPage_cardData": {
+    "note": "HTML markup structure from cursos/catalogo.html",
+    "sst-obras-civiles": {
+      "badge": "Nuevo",
+      "price_display": "Gratis",
+      "title": "Seguridad y Salud en el Trabajo en Obras Civiles",
+      "description": "Conoce los fundamentos de la Seguridad y Salud en el Trabajo aplicados a obras civiles, incluyendo marco legal peruano, identificación de peligros y riesgos, investigación de incidentes y elaboración de análisis de riesgos según normativa vigente.",
+      "tags": ["Seguridad", "Obras Civiles", "Normativa"],
+      "meta": {
+        "duration": "1 hora",
+        "capacity": "Cupos disponibles",
+        "modality": "En vivo + Grabado"
+      },
+      "button": "Inscribirme",
+      "state": "disponible"
+    },
+    "topografia-civil-3d": {
+      "badge": "Nuevo",
+      "price_display": "S/ 50",
+      "title": "Topografía en Civil 3D",
+      "description": "Aprende topografía aplicada a proyectos civiles con herramientas 3D. Domina el levantamiento topográfico, el modelado de superficies y el uso de Civil 3D para diseño de infraestructura.",
+      "tags": ["Topografía", "Civil 3D", "Modelado"],
+      "meta": {
+        "duration": "10 horas",
+        "modality": "En vivo + Grabado"
+      },
+      "button": "Inscribirme",
+      "state": "disponible"
+    },
+    "supervision-obra": {
+      "badge": "Pro",
+      "price_display": "S/ 80",
+      "title": "Supervisión de Obra",
+      "description": "Desarrolla competencias en dirección técnica, control de calidad, gestión de cuaderno de obra y aplicación de buenas prácticas de supervisión. Enfocado en proyectos civiles y normativas actuales.",
+      "tags": ["Supervisión", "Control de Calidad", "Dirección"],
+      "meta": {
+        "duration": "16 horas",
+        "enrolled": "64 inscritos",
+        "modality": "En vivo + Grabado"
+      },
+      "button": "Próximamente",
+      "state": "proximamente"
+    }
+  },
+  "firestore_expected_structure": {
+    "note": "Based on loadCoursesFromFirestore() function in curso.html - these fields are expected to exist in the Firestore 'courses' collection",
+    "required_fields": [
+      "id",
+      "name",
+      "price",
+      "desc",
+      "duration",
+      "sessions",
+      "enrolled",
+      "modality",
+      "icon",
+      "tags",
+      "badge",
+      "badgeLabel",
+      "schedules",
+      "temario",
+      "includes"
+    ],
+    "optional_fields": [
+      "zoomLink",
+      "recordingUrl",
+      "hasRecording"
+    ]
+  },
+  "migration_notes": {
+    "note1": "The course data is currently loaded from Firestore at runtime (loadCoursesFromFirestore function)",
+    "note2": "Static data shown above comes from HTML markup + visible code structure",
+    "note3": "To complete migration, ensure Firestore 'courses' collection contains all courses with complete temario, includes, and schedules arrays",
+    "note4": "The priceLabel field is calculated as 'S/ ' + price or 'Gratis' - can be computed or stored",
+    "note5": "Schedule data should match the structure: {id, label, detail}",
+    "note6": "Temario can be either simple array of strings OR array of objects with titulo/temas structure",
+    "note7": "Includes array must have objects with {icon, text} structure"
+  }
+}
