@@ -227,7 +227,7 @@
 
     var courseId = new URLSearchParams(window.location.search).get('course');
 
-    // Load courses from Firestore
+    // Load courses from Firestore (shared by public agenda and private view)
     function loadCoursesFromFirestore() {
       return db.collection('courses').get().then(function(snapshot) {
         snapshot.forEach(function(doc) {
@@ -245,17 +245,149 @@
             scheduleTime: data.scheduleTime || {},
             zoomLink: data.zoomLink || '',
             recordingUrl: data.recordingUrl || '',
+            startDate: data.startDate || '',
+            startTime: data.startTime || '',
+            endTime: data.endTime || '',
             temario: data.temario || [],
             schedules: data.schedules || []
           };
-          
-          // Store schedules in SCHEDULES map for backward compatibility
           if (data.schedules && data.schedules.length > 0) {
             SCHEDULES[doc.id] = data.schedules;
           }
         });
       });
     }
+
+    // ═══ VISTA PÚBLICA: Agenda (sin parámetro ?course=) ═══
+    if (!courseId) {
+      loadCoursesFromFirestore().then(function() {
+        var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+        var DIAS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+        var contentEl = document.getElementById('content');
+        var courses = Object.values(COURSES);
+
+        // Separar en con fecha y sin fecha
+        var withDate = courses.filter(function(c) { return c.startDate; }).sort(function(a, b) {
+          return a.startDate.localeCompare(b.startDate);
+        });
+        var withoutDate = courses.filter(function(c) { return !c.startDate; });
+
+        var html = '';
+
+        // Header
+        html += '<div style="text-align:center;margin-bottom:32px">';
+        html += '<span class="material-icons-round" style="font-size:48px;color:#1565c0;margin-bottom:8px;display:block">calendar_month</span>';
+        html += '<h1 style="font-size:clamp(22px,4vw,30px);font-weight:800;color:#0f172a;margin-bottom:8px">Agenda de Clases</h1>';
+        html += '<p style="color:#64748b;font-size:15px">Conoce las próximas sesiones en vivo y grabadas de FQ Ingenieros.</p>';
+        html += '</div>';
+
+        // Próximas clases
+        if (withDate.length > 0) {
+          html += '<div style="margin-bottom:32px">';
+          html += '<h2 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:16px;display:flex;align-items:center;gap:8px"><span class="material-icons-round" style="color:#1565c0">event</span> Próximas sesiones programadas</h2>';
+
+          withDate.forEach(function(c) {
+            var p = c.startDate.split('-');
+            var dateObj = new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
+            var now = new Date();
+            var isPast = dateObj < new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            var isToday = dateObj.toDateString() === now.toDateString();
+
+            var statusBadge = '';
+            if (isToday) {
+              statusBadge = '<span style="background:#dcfce7;color:#16a34a;font-size:11px;padding:3px 12px;border-radius:12px;font-weight:700"><span class="material-icons-round" style="font-size:12px;vertical-align:middle">fiber_manual_record</span> Hoy</span>';
+            } else if (isPast) {
+              statusBadge = '<span style="background:#f1f5f9;color:#94a3b8;font-size:11px;padding:3px 12px;border-radius:12px;font-weight:600">Finalizada</span>';
+            } else {
+              statusBadge = '<span style="background:#dbeafe;color:#1565c0;font-size:11px;padding:3px 12px;border-radius:12px;font-weight:600">Programada</span>';
+            }
+
+            var fechaTexto = DIAS[dateObj.getDay()] + ' ' + parseInt(p[2]) + ' de ' + MESES[parseInt(p[1])-1] + ', ' + p[0];
+            var horario = '';
+            if (c.startTime) {
+              horario = c.startTime + (c.endTime ? ' — ' + c.endTime : '');
+            }
+
+            var borderColor = isPast ? '#e2e8f0' : (isToday ? '#22c55e' : '#1565c0');
+
+            html += '<div style="display:flex;align-items:stretch;gap:0;background:#fff;border:1px solid #e2e8f0;border-left:5px solid ' + borderColor + ';border-radius:14px;margin-bottom:14px;overflow:hidden' + (isPast ? ';opacity:.55' : '') + '">';
+
+            // Fecha columna
+            html += '<div style="background:#f8fafc;padding:18px 20px;text-align:center;min-width:70px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid #e2e8f0">';
+            html += '<div style="font-size:28px;font-weight:800;color:#0f172a;line-height:1">' + parseInt(p[2]) + '</div>';
+            html += '<div style="font-size:12px;color:#64748b;text-transform:uppercase;font-weight:600;margin-top:2px">' + MESES[parseInt(p[1])-1].substring(0,3) + '</div>';
+            html += '</div>';
+
+            // Info columna
+            html += '<div style="flex:1;padding:16px 20px;display:flex;flex-direction:column;justify-content:center">';
+            html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+            html += '<span class="material-icons-round" style="font-size:20px;color:#1565c0">' + (c.icon || 'menu_book') + '</span>';
+            html += '<strong style="font-size:15px;color:#0f172a">' + c.name + '</strong>';
+            html += '</div>';
+            html += '<div style="display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:#475569">';
+            html += '<span><span class="material-icons-round" style="font-size:14px;vertical-align:middle;margin-right:3px">calendar_today</span>' + fechaTexto + '</span>';
+            if (horario) {
+              html += '<span><span class="material-icons-round" style="font-size:14px;vertical-align:middle;margin-right:3px">schedule</span>' + horario + '</span>';
+            }
+            html += '<span><span class="material-icons-round" style="font-size:14px;vertical-align:middle;margin-right:3px">videocam</span>' + (c.modality || 'En vivo') + '</span>';
+            if (c.duration) {
+              html += '<span><span class="material-icons-round" style="font-size:14px;vertical-align:middle;margin-right:3px">timer</span>' + c.duration + '</span>';
+            }
+            html += '</div>';
+            html += '</div>';
+
+            // Status + acción
+            html += '<div style="padding:16px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-width:130px">';
+            html += statusBadge;
+            if (!isPast) {
+              html += '<a href="../cursos/curso.html?id=' + c.id + '" class="btn btn-primary" style="font-size:12px;padding:8px 16px;white-space:nowrap"><span class="material-icons-round" style="font-size:14px">how_to_reg</span> Inscribirme</a>';
+            }
+            if (c.recordingUrl) {
+              html += '<a href="../sesiones/index.html?course=' + c.id + '" class="btn btn-outline" style="font-size:12px;padding:6px 14px;white-space:nowrap"><span class="material-icons-round" style="font-size:14px">play_circle</span> Grabación</a>';
+            }
+            html += '</div>';
+
+            html += '</div>';
+          });
+          html += '</div>';
+        }
+
+        // Cursos sin fecha aún
+        if (withoutDate.length > 0) {
+          html += '<div style="margin-bottom:32px">';
+          html += '<h2 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:16px;display:flex;align-items:center;gap:8px"><span class="material-icons-round" style="color:#64748b">pending</span> Cursos disponibles (fecha por definir)</h2>';
+
+          withoutDate.forEach(function(c) {
+            html += '<div style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 20px;margin-bottom:10px">';
+            html += '<span class="material-icons-round" style="font-size:28px;color:#1565c0">' + (c.icon || 'menu_book') + '</span>';
+            html += '<div style="flex:1">';
+            html += '<strong style="font-size:15px;color:#0f172a;display:block">' + c.name + '</strong>';
+            html += '<span style="font-size:13px;color:#64748b">' + (c.duration || '') + ' · ' + (c.modality || 'En vivo') + '</span>';
+            html += '</div>';
+            html += '<a href="../cursos/curso.html?id=' + c.id + '" class="btn btn-outline" style="font-size:12px;padding:8px 16px;white-space:nowrap">Ver curso</a>';
+            html += '</div>';
+          });
+          html += '</div>';
+        }
+
+        // Si no hay cursos
+        if (courses.length === 0) {
+          html += '<div class="state-box"><span class="material-icons-round">event_busy</span><h2>No hay clases programadas</h2><p>Aún no se han configurado sesiones. ¡Vuelve pronto!</p><a href="../index.html" class="btn btn-primary">Volver al inicio</a></div>';
+        }
+
+        // Nota final
+        html += '<div style="text-align:center;margin-top:24px;padding:20px;background:#eff6ff;border-radius:12px">';
+        html += '<p style="font-size:14px;color:#1565c0;font-weight:600"><span class="material-icons-round" style="font-size:16px;vertical-align:middle;margin-right:4px">info</span> Para acceder a las sesiones en vivo y grabaciones, inscríbete en el curso y accede desde tu dashboard.</p>';
+        html += '</div>';
+
+        contentEl.innerHTML = html;
+      }).catch(function(err) {
+        document.getElementById('content').innerHTML =
+          '<div class="state-box"><span class="material-icons-round">error_outline</span><h2>Error al cargar la agenda</h2><p>Intenta recargar la página.</p><a href="../index.html" class="btn btn-primary">Volver al inicio</a></div>';
+      });
+      // No continuar con la lógica de curso específico
+    } else {
+    // ═══ VISTA PRIVADA: Curso específico ═══
 
     /* ══════════════════════════════════════════════
        Helpers
@@ -894,6 +1026,7 @@
     });
 
     updateOfflineBanner();
+    } // end else (vista privada curso específico)
   </script>
 </body>
 </html>
