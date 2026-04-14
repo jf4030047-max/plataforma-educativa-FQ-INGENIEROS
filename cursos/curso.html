@@ -490,6 +490,35 @@
     function initCoursePage() {
       course = courseId ? COURSES[courseId] : null;
 
+      // Si no se encontró por ID exacto, buscar por keyword en nombre
+      if (!course && courseId) {
+        var keyword = courseId.replace(/-/g, ' ').toLowerCase();
+        Object.keys(COURSES).forEach(function(key) {
+          if (!course && COURSES[key].name && COURSES[key].name.toLowerCase().indexOf('topograf') !== -1 && keyword.indexOf('topograf') !== -1) {
+            course = COURSES[key];
+          }
+        });
+        // Si aún no se encontró y es topografía, usar fallback
+        if (!course && keyword.indexOf('topograf') !== -1 && FALLBACK_TOPOGRAFIA) {
+          course = {
+            id: courseId,
+            name: 'Topografía en Civil 3D',
+            price: 0, priceLabel: 'Por definir',
+            desc: 'Domina el levantamiento topográfico y el modelamiento digital del terreno con Civil 3D. Aprende diseño vial, cálculo de volúmenes y generación de planos profesionales.',
+            duration: '10 horas', sessions: 8, enrolled: 0,
+            modality: FALLBACK_TOPOGRAFIA.modality,
+            icon: FALLBACK_TOPOGRAFIA.icon,
+            tags: FALLBACK_TOPOGRAFIA.tags,
+            badge: FALLBACK_TOPOGRAFIA.badge,
+            badgeLabel: FALLBACK_TOPOGRAFIA.badgeLabel,
+            zoomLink: '', recordingUrl: '',
+            schedules: FALLBACK_TOPOGRAFIA.schedules || [],
+            temario: FALLBACK_TOPOGRAFIA.temario || [],
+            includes: FALLBACK_TOPOGRAFIA.includes || []
+          };
+        }
+      }
+
       // Cargar datos de Zoom y grabación desde localStorage
       if (course) {
         try {
