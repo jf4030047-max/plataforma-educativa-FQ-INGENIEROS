@@ -892,33 +892,39 @@
             var docId = user.uid + '_' + courseId;
             db.collection('enrollments').doc(docId).delete().then(function() {
               try { localStorage.removeItem('enrollment_' + user.uid + '_' + courseId); } catch (_) {}
-              // Restaurar UI: mostrar botón de inscripción y horarios
-              document.getElementById('enrolledState').style.display = 'none';
-              document.getElementById('enrollActions').style.display = '';
-              if (course.schedules && course.schedules.length > 0) {
-                document.getElementById('scheduleSection').style.display = '';
-                // Restaurar opciones de horario
-                var schedHtml = '';
-                course.schedules.forEach(function(s, i) {
-                  schedHtml +=
-                    '<label class="schedule-opt" onclick="selectSchedule(this)">' +
-                    '<input type="radio" name="schedule" value="' + s.id + '"' + (i === 0 ? ' checked' : '') + ' />' +
-                    '<div class="schedule-radio"></div>' +
-                    '<div class="schedule-opt-text">' + s.label + '<small>' + s.detail + '</small></div>' +
-                    '</label>';
+              // Refrescar estado desde Firestore para asegurar UI correcta
+              setTimeout(function() {
+                db.collection('enrollments').doc(docId).get().then(function(doc) {
+                  if (!doc.exists) {
+                    document.getElementById('enrolledState').style.display = 'none';
+                    document.getElementById('enrollActions').style.display = '';
+                    if (course.schedules && course.schedules.length > 0) {
+                      document.getElementById('scheduleSection').style.display = '';
+                      // Restaurar opciones de horario
+                      var schedHtml = '';
+                      course.schedules.forEach(function(s, i) {
+                        schedHtml +=
+                          '<label class="schedule-opt" onclick="selectSchedule(this)">' +
+                          '<input type="radio" name="schedule" value="' + s.id + '"' + (i === 0 ? ' checked' : '') + ' />' +
+                          '<div class="schedule-radio"></div>' +
+                          '<div class="schedule-opt-text">' + s.label + '<small>' + (s.detail || '') + '</small></div>' +
+                          '</label>';
+                      });
+                      document.getElementById('scheduleOptions').innerHTML = schedHtml;
+                      var firstOpt = document.querySelector('.schedule-opt');
+                      if (firstOpt) firstOpt.classList.add('selected');
+                    }
+                    document.getElementById('enrollActions').innerHTML = '<button class="btn btn-primary" id="btnMatricular" onclick="handleEnroll()"><span class="material-icons-round">how_to_reg</span> Matricularme</button><div class="enroll-hint"><span class="material-icons-round">lock</span> Inscripción segura</div>';
+                    var btnMatricular = document.getElementById('btnMatricular');
+                    if (btnMatricular) {
+                      btnMatricular.onclick = handleEnroll;
+                    }
+                    FQNotify.toast('Inscripción cancelada correctamente.', 'success');
+                  } else {
+                    FQNotify.toast('No se pudo cancelar la inscripción. Intenta nuevamente.', 'error');
+                  }
                 });
-                document.getElementById('scheduleOptions').innerHTML = schedHtml;
-                var firstOpt = document.querySelector('.schedule-opt');
-                if (firstOpt) firstOpt.classList.add('selected');
-              }
-              // Restaurar botón de inscripción
-              document.getElementById('enrollActions').innerHTML = '<button class="btn btn-primary" id="btnMatricular" onclick="handleEnroll()"><span class="material-icons-round">how_to_reg</span> Matricularme</button><div class="enroll-hint"><span class="material-icons-round">lock</span> Inscripción segura</div>';
-              // Reasignar evento al nuevo botón
-              var btnMatricular = document.getElementById('btnMatricular');
-              if (btnMatricular) {
-                btnMatricular.onclick = handleEnroll;
-              }
-              FQNotify.toast('Inscripción cancelada correctamente.', 'success');
+              }, 500);
             }).catch(function(err) {
               FQNotify.toast('No se pudo cancelar la inscripción. Intenta nuevamente.', 'error');
               console.error('[Cancelación] Error:', err);
