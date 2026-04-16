@@ -345,8 +345,10 @@
               name: user.displayName || 'Usuario'
             };
             updateUI(profile);
-            // Verificar si necesita completar perfil
-            if (doc.exists && needsProfileCompletion(profile)) {
+            // Verificar si necesita completar perfil (solo en login fresco, no al recargar)
+            var isNewLogin = user.metadata && user.metadata.lastSignInTime &&
+              (new Date().getTime() - new Date(user.metadata.lastSignInTime).getTime() < 15000);
+            if (doc.exists && isNewLogin && needsProfileCompletion(profile)) {
               showProfileModal(user, profile);
             }
           }).catch(function () {

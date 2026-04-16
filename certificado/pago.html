@@ -45,8 +45,7 @@
     .mc-yape .mc-icon{background:linear-gradient(135deg,#6a1b9a,#8e24aa);color:#fff}
     .mc-bcp .mc-icon{background:linear-gradient(135deg,#e65100,#ff6d00);color:#fff}
     .mc-plin .mc-icon{background:linear-gradient(135deg,#00897b,#26a69a);color:#fff}
-    .mc-interbank .mc-icon{background:linear-gradient(135deg,#1b5e20,#43a047);color:#fff}
-    .mc-bbva .mc-icon{background:linear-gradient(135deg,#0d47a1,#1565c0);color:#fff}
+    /* Eliminados Interbank y BBVA */
     .mc-transfer .mc-icon{background:linear-gradient(135deg,#37474f,#546e7a);color:#fff}
     .method-card h4{font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px}
     .method-card p{font-size:12.5px;color:#64748b;line-height:1.5}
@@ -159,22 +158,11 @@
                 <p>Envía tu pago por Plin desde cualquier banco asociado.</p>
               </div>
 
+
               <div class="method-card mc-bcp" onclick="selectMethod(this, 'BCP')">
                 <div class="mc-icon"><span class="material-icons-round">account_balance</span></div>
                 <h4>BCP — Banco de Crédito</h4>
                 <p>Transferencia o depósito a cuenta BCP.</p>
-              </div>
-
-              <div class="method-card mc-interbank" onclick="selectMethod(this, 'Interbank')">
-                <div class="mc-icon"><span class="material-icons-round">account_balance</span></div>
-                <h4>Interbank</h4>
-                <p>Transferencia o depósito a cuenta Interbank.</p>
-              </div>
-
-              <div class="method-card mc-bbva" onclick="selectMethod(this, 'BBVA')">
-                <div class="mc-icon"><span class="material-icons-round">account_balance</span></div>
-                <h4>BBVA Continental</h4>
-                <p>Transferencia o depósito a cuenta BBVA.</p>
               </div>
 
               <div class="method-card mc-transfer" onclick="selectMethod(this, 'Transferencia interbancaria')">
@@ -191,9 +179,9 @@
             <h2><span class="material-icons-round" style="vertical-align:middle;margin-right:6px">info</span> Datos para el pago</h2>
             <div class="info-box">
               <div class="info-row"><span class="label">Método seleccionado</span><span class="value highlight" id="selectedMethod">Yape</span></div>
-              <div class="info-row"><span class="label">Titular</span><span class="value">FQ INGENIEROS E.I.R.L.</span></div>
+              <div class="info-row"><span class="label">Titular</span><span class="value" id="accountHolder">FQ INGENIEROS E.I.R.L.</span></div>
               <div class="info-row"><span class="label">Número / Cuenta</span><span class="value" id="accountNumber">958 003 888</span></div>
-              <div class="info-row"><span class="label">Monto del certificado</span><span class="value highlight">S/ 20.00</span></div>
+              <div class="info-row"><span class="label">Monto del certificado</span><span class="value highlight" id="certAmount">S/ 20.00</span></div>
               <div class="info-row"><span class="label">Concepto</span><span class="value">Certificado de curso</span></div>
             </div>
           </section>
@@ -262,7 +250,7 @@
             <p>5. Descarga tu certificado</p>
           </div>
           <hr class="divider"/>
-          <a href="../certificado/examen.html" class="btn btn-outline"><span class="material-icons-round">quiz</span> ¿Aún no diste el examen?</a>
+          <a href="#" class="btn btn-outline" id="examLink"><span class="material-icons-round">quiz</span> ¿Aún no diste el examen?</a>
         </aside>
       </div>
 
@@ -276,28 +264,95 @@
   </footer>
 
   <script>
+    /* Set exam link dynamically */
+    var courseParam = new URLSearchParams(window.location.search).get('course') || '';
+    var examLink = document.getElementById('examLink');
+    if (examLink) examLink.href = '../certificado/examen.html' + (courseParam ? '?course=' + courseParam : '');
+
+    // --- Dynamic Payment Data ---
+    let paymentData = {
+      holder: 'FQ INGENIEROS E.I.R.L.',
+      amount: '20.00',
+      accounts: {
+        'Yape': '958 003 888',
+        'Plin': '958 003 888',
+        'BCP': '355-72921034-0-46',
+        'Transferencia interbancaria': '002-35517292103404662'
+      }
+    };
+
+    // Fetch payment data from Firestore (settings/paymentData)
+    function fetchPaymentData() {
+      if (typeof firebase === 'undefined' || !firebase.firestore) return;
+      var db = firebase.firestore();
+      db.collection('settings').doc('paymentData').get().then(function(doc) {
+        if (doc.exists) {
+          var d = doc.data();
+          paymentData.holder = d.holder || paymentData.holder;
+          paymentData.amount = d.amount || paymentData.amount;
+          paymentData.accounts = d.accounts || paymentData.accounts;
+        }
+        updatePaymentUI('Yape');
+      }).catch(function() {
+        updatePaymentUI('Yape');
+      });
+    }
+
+    function updatePaymentUI(method) {
+      document.getElementById('selectedMethod').textContent = method;
+      document.getElementById('summaryMethod').textContent = method;
+      document.getElementById('accountHolder').textContent = paymentData.holder;
+      document.getElementById('accountNumber').textContent = paymentData.accounts[method] || '—';
+      document.getElementById('certAmount').textContent = 'S/ ' + paymentData.amount;
+    }
+
     function selectMethod(el, name) {
       document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
       el.classList.add('selected');
-      document.getElementById('selectedMethod').textContent = name;
-      document.getElementById('summaryMethod').textContent = name;
-
-      const accounts = {
-        'Yape': '958 003 888',
-        'Plin': '958 003 888',
-        'BCP': 'Cta. Ahorros: 123-456789-0-12',
-        'Interbank': 'Cta. Ahorros: 000-123456789-01',
-        'BBVA': 'Cta. Ahorros: 0011-0123-45-01234567',
-        'Transferencia interbancaria': 'CCI: 002-123-004567890123-45'
-      };
-      document.getElementById('accountNumber').textContent = accounts[name] || '—';
+      updatePaymentUI(name);
     }
+
+    // On load, fetch payment data
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchPaymentData();
+    });
 
     function submitPayment(e) {
       e.preventDefault();
-      document.getElementById('summaryStatus').textContent = 'Enviado';
-      document.getElementById('summaryStatus').style.color = '#81c784';
-      alert('¡Comprobante enviado correctamente! Revisaremos tu pago y te notificaremos por correo.');
+      var user = auth.currentUser;
+      if (!user) { alert('Debes iniciar sesión.'); return; }
+
+      var courseParam = new URLSearchParams(window.location.search).get('course') || '';
+      var form = document.getElementById('payForm');
+      var formData = {
+        userId: user.uid,
+        userEmail: user.email || '',
+        courseId: courseParam,
+        fullName: form.querySelector('input[type="text"]').value.trim(),
+        email: form.querySelector('input[type="email"]').value.trim(),
+        course: form.querySelector('select').value,
+        operationNumber: form.querySelectorAll('input[type="text"]')[1].value.trim(),
+        method: document.getElementById('selectedMethod').textContent,
+        amount: 20,
+        status: 'pending',
+        submittedAt: new Date().toISOString()
+      };
+
+      var btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-icons-round">hourglass_top</span> Enviando...';
+
+      db.collection('payments').add(formData).then(function() {
+        document.getElementById('summaryStatus').textContent = 'Enviado';
+        document.getElementById('summaryStatus').style.color = '#81c784';
+        btn.innerHTML = '<span class="material-icons-round">check_circle</span> ¡Comprobante enviado!';
+        btn.style.background = '#16a34a';
+        alert('¡Comprobante enviado correctamente! Revisaremos tu pago en un máximo de 24 horas y te notificaremos.');
+      }).catch(function(err) {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-icons-round">send</span> Enviar comprobante';
+        alert('Error al enviar: ' + err.message);
+      });
     }
   </script>
   <!-- Firebase SDK -->

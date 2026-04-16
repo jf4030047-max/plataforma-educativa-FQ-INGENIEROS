@@ -419,7 +419,7 @@
     };
 
     function loadCoursesFromFirestore() {
-      return db.collection('courses').get().then(function(snapshot) {
+      return db.collection('courses').get({ source: 'server' }).then(function(snapshot) {
         console.log('Firestore: ' + snapshot.size + ' cursos cargados');
         snapshot.forEach(function(doc) {
           const data = doc.data();

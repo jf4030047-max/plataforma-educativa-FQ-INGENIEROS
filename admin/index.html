@@ -369,7 +369,7 @@
           <!-- Tabla de cursos -->
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Nombre</th><th>Precio</th><th>Duración</th><th>Sesiones</th><th>Fecha</th><th>Horario</th><th></th>Acciones</th></tr></thead>
+              <thead><tr><th>ID</th><th>Nombre</th><th>Precio</th><th>Duración</th><th>Sesiones</th><th>Fecha</th><th>Horario</th><th>Acciones</th></tr></thead>
               <tbody id="coursesTable"></tbody>
             </table>
           </div>
@@ -434,22 +434,79 @@
               <button class="btn-sm btn-blue" onclick="saveAdminCreds()">Guardar cambios</button>
             </div>
 
-            <div class="setting-card">
+              <div class="setting-card">
               <h4><span class="material-icons-round" style="font-size:20px;color:#1565c0">payments</span> Datos de pago</h4>
               <p>Cuentas habilitadas para cobrar certificados.</p>
-              <div style="margin-bottom:10px">
-                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:4px">Yape / Plin</label>
-                <input type="text" value="958 003 888" readonly disabled style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit;background:#f1f5f9;color:#64748b;cursor:not-allowed" />
-              </div>
-              <div style="margin-bottom:10px">
-                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:4px">Cuenta BCP Soles</label>
-                <input type="text" value="355-72921034-0-46" readonly disabled style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit;background:#f1f5f9;color:#64748b;cursor:not-allowed" />
-              </div>
-              <div style="margin-bottom:10px">
-                <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:4px">Cuenta Interbancaria (CCI)</label>
-                <input type="text" value="002-35517292103404662" readonly disabled style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit;background:#f1f5f9;color:#64748b;cursor:not-allowed" />
-              </div>
+              <form id="paymentDataForm" onsubmit="savePaymentData(event)">
+                <div style="margin-bottom:10px">
+                  <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:4px">Titular</label>
+                  <input type="text" id="payHolder" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+                </div>
+                <div style="margin-bottom:10px">
+                  <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:4px">Monto certificado (S/)</label>
+                  <input type="number" id="payAmount" min="0" step="0.01" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+                </div>
+                <div style="margin-bottom:10px">
+                  <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:4px">Yape</label>
+                  <input type="text" id="payYape" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+                </div>
+                <div style="margin-bottom:10px">
+                  <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:4px">Plin</label>
+                  <input type="text" id="payPlin" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+                </div>
+                <div style="margin-bottom:10px">
+                  <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:4px">Cuenta BCP Soles</label>
+                  <input type="text" id="payBCP" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+                </div>
+                <div style="margin-bottom:10px">
+                  <label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:4px">CCI (Transferencia interbancaria)</label>
+                  <input type="text" id="payCCI" style="width:100%;padding:8px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />
+                </div>
+                <button type="submit" class="btn-sm btn-blue" style="margin-top:10px">Guardar datos de pago</button>
+              </form>
             </div>
+  <script>
+    // --- Payment Data Admin Logic ---
+    function loadPaymentDataAdmin() {
+      if (typeof firebase === 'undefined' || !firebase.firestore) return;
+      var db = firebase.firestore();
+      db.collection('settings').doc('paymentData').get().then(function(doc) {
+        var d = doc.exists ? doc.data() : {};
+        document.getElementById('payHolder').value = d.holder || '';
+        document.getElementById('payAmount').value = d.amount || '';
+        document.getElementById('payYape').value = (d.accounts && d.accounts.Yape) || '';
+        document.getElementById('payPlin').value = (d.accounts && d.accounts.Plin) || '';
+        document.getElementById('payBCP').value = (d.accounts && d.accounts.BCP) || '';
+        document.getElementById('payCCI').value = (d.accounts && d.accounts['Transferencia interbancaria']) || '';
+      });
+    }
+
+    function savePaymentData(e) {
+      e.preventDefault();
+      if (typeof firebase === 'undefined' || !firebase.firestore) return;
+      var db = firebase.firestore();
+      var holder = document.getElementById('payHolder').value.trim();
+      var amount = document.getElementById('payAmount').value.trim();
+      var accounts = {
+        Yape: document.getElementById('payYape').value.trim(),
+        Plin: document.getElementById('payPlin').value.trim(),
+        BCP: document.getElementById('payBCP').value.trim(),
+        'Transferencia interbancaria': document.getElementById('payCCI').value.trim()
+      };
+      db.collection('settings').doc('paymentData').set({ holder, amount, accounts }, { merge: true })
+        .then(function() {
+          alert('Datos de pago guardados correctamente.');
+        })
+        .catch(function(err) {
+          alert('Error al guardar: ' + err.message);
+        });
+    }
+
+    // Load payment data when admin panel is shown
+    document.addEventListener('DOMContentLoaded', function() {
+      if (document.getElementById('paymentDataForm')) loadPaymentDataAdmin();
+    });
+  </script>
 
             <div class="setting-card">
               <h4><span class="material-icons-round" style="font-size:20px;color:#1565c0">delete_sweep</span> Datos del sistema</h4>
@@ -819,7 +876,7 @@
     function renderCoursesTable() {
       const tbody = document.getElementById('coursesTable');
       if (coursesData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#64748b;padding:32px">No hay cursos creados aún.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#64748b;padding:32px">No hay cursos creados aún.</td></tr>';
       } else {
         tbody.innerHTML = coursesData.map(c => {
           var fechaStr = '—';
@@ -833,6 +890,7 @@
           }
           return `
           <tr>
+            <td style="font-size:11px;color:#64748b;font-family:monospace;max-width:140px;overflow:hidden;text-overflow:ellipsis">${c.id}</td>
             <td>${c.name || '—'}</td>
             <td>S/ ${c.price || 0}</td>
             <td>${c.duration || '—'}</td>
@@ -1086,12 +1144,21 @@
           })
           .catch(err => FQNotify.toast('Error: ' + err.message, 'error'));
       } else {
-        // Crear
-        courseData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-        db.collection('courses').add(courseData)
-          .then(() => {
-            FQNotify.toast('Curso creado correctamente.', 'success');
-            closeCourseForm();
+        // Crear con ID basado en el nombre (slug)
+        var slug = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        // Verificar si ya existe
+        db.collection('courses').doc(slug).get().then(function(existing) {
+          if (existing.exists) {
+            FQNotify.toast('Ya existe un curso con ID "' + slug + '". Cambia el nombre o edita el existente.', 'warning');
+            return;
+          }
+          courseData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          return db.collection('courses').doc(slug).set(courseData);
+        }).then(function(result) {
+            if (result !== undefined || !arguments.length) {
+              FQNotify.toast('Curso creado con ID: ' + slug, 'success');
+              closeCourseForm();
+            }
           })
           .catch(err => FQNotify.toast('Error: ' + err.message, 'error'));
       }

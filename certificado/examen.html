@@ -3,23 +3,520 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Examen | FQ</title>
-  <link rel="stylesheet" href="../styles.css" />
+  <title>Examen de Evaluación | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/header.css" />
+  <link rel="stylesheet" href="../assets/css/notifications.css" />
   <style>
-    .simple { padding: 110px 0 60px; }
-    .simple .box { background:#14283d; border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:22px; }
-    .simple a { color:#f9a825; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
+    .container{width:min(800px,92%);margin:0 auto}
+    .page{padding:88px 0 60px}
+
+    /* States */
+    .state-box{text-align:center;padding:60px 20px;background:#fff;border:1px solid #dce3ed;border-radius:16px}
+    .state-box .material-icons-round{font-size:56px;color:#dce3ed;margin-bottom:12px}
+    .state-box h2{font-size:18px;color:#0f172a;margin-bottom:6px}
+    .state-box p{font-size:14px;color:#64748b;margin-bottom:20px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .2s;text-decoration:none}
+    .btn-primary{background:#1565c0;color:#fff}
+    .btn-primary:hover{background:#1e88e5;transform:translateY(-1px)}
+    .btn-success{background:#16a34a;color:#fff}
+    .btn-success:hover{background:#15803d}
+    .btn-outline{background:#fff;color:#1565c0;border:1.5px solid #1565c0}
+    .btn-outline:hover{background:#eff6ff}
+    .btn-lg{padding:14px 32px;font-size:15px}
+    .btn-full{width:100%}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+    /* Intro */
+    .exam-intro{text-align:center}
+    .exam-intro-icon{width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,#1565c0,#1e88e5);display:inline-grid;place-items:center;margin-bottom:16px}
+    .exam-intro-icon .material-icons-round{font-size:36px;color:#fff}
+    .exam-intro h1{font-size:clamp(22px,4vw,32px);font-weight:800;color:#0f172a;margin-bottom:6px}
+    .exam-intro .course-name{font-size:16px;color:#1565c0;font-weight:600;margin-bottom:24px}
+    .exam-info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+    .exam-info-item{background:#fff;border:1px solid #dce3ed;border-radius:12px;padding:16px 12px;text-align:center}
+    .exam-info-item .material-icons-round{font-size:24px;color:#1565c0;margin-bottom:6px;display:block}
+    .exam-info-item strong{display:block;font-size:18px;font-weight:800;color:#0f172a}
+    .exam-info-item span{font-size:11px;color:#64748b}
+    .exam-rules{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:20px 24px;text-align:left;margin-bottom:24px}
+    .exam-rules h3{font-size:15px;font-weight:700;color:#0f172a;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .exam-rules ul{list-style:none;padding:0}
+    .exam-rules li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#475569;padding:5px 0}
+    .exam-rules li .material-icons-round{font-size:16px;color:#1565c0;flex-shrink:0;margin-top:1px}
+
+    /* Timer bar */
+    .timer-bar{position:sticky;top:64px;z-index:20;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);border-bottom:1px solid #dce3ed;padding:10px 0;margin-bottom:20px}
+    .timer-inner{display:flex;align-items:center;justify-content:space-between}
+    .timer-left{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#475569}
+    .timer-left .material-icons-round{font-size:18px;color:#1565c0}
+    .timer-clock{display:flex;align-items:center;gap:6px;font-size:18px;font-weight:800;color:#0f172a;font-variant-numeric:tabular-nums}
+    .timer-clock .material-icons-round{font-size:20px}
+    .timer-clock.warn{color:#dc2626}
+    .timer-clock.warn .material-icons-round{color:#dc2626}
+    .timer-right{font-size:12px;color:#64748b}
+    .timer-progress{height:3px;background:#e2e8f0;border-radius:2px;margin-top:6px}
+    .timer-progress-fill{height:100%;background:linear-gradient(90deg,#1565c0,#1e88e5);border-radius:2px;transition:width .3s}
+    .timer-progress-fill.warn{background:linear-gradient(90deg,#dc2626,#ef4444)}
+
+    /* Question cards */
+    .question-card{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:22px;margin-bottom:14px;transition:border-color .2s}
+    .question-card.answered{border-color:#bfdbfe}
+    .question-card.answered .q-number{background:#1565c0;color:#fff}
+    .q-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+    .q-number{width:32px;height:32px;border-radius:10px;background:#eff6ff;color:#1565c0;font-size:13px;font-weight:800;display:grid;place-items:center;flex-shrink:0;transition:all .2s}
+    .q-text{font-size:15px;font-weight:600;color:#0f172a;line-height:1.5;flex:1}
+    .options-list{display:flex;flex-direction:column;gap:8px;padding-left:44px}
+    .option-label{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all .15s;font-size:14px;color:#334155}
+    .option-label:hover{border-color:#bfdbfe;background:#f8fafc}
+    .option-label.selected{border-color:#1565c0;background:#eff6ff;color:#0f172a;font-weight:600}
+    .option-radio{width:18px;height:18px;border-radius:50%;border:2px solid #cbd5e1;display:grid;place-items:center;flex-shrink:0;transition:all .15s}
+    .option-label.selected .option-radio{border-color:#1565c0;background:#1565c0}
+    .option-label.selected .option-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff}
+    .exam-submit-area{text-align:center;padding:20px 0;border-top:1px solid #e2e8f0;margin-top:10px}
+    .unanswered-warn{font-size:12px;color:#f59e0b;margin-bottom:12px;display:none}
+
+    /* Results */
+    .results-card{background:#fff;border:1px solid #dce3ed;border-radius:16px;padding:32px;text-align:center}
+    .score-circle{width:130px;height:130px;border-radius:50%;display:inline-grid;place-items:center;margin-bottom:16px;position:relative}
+    .score-circle.passed{background:conic-gradient(#16a34a calc(var(--pct) * 1%),#e2e8f0 0)}
+    .score-circle.failed{background:conic-gradient(#dc2626 calc(var(--pct) * 1%),#e2e8f0 0)}
+    .score-inner{width:100px;height:100px;border-radius:50%;background:#fff;display:grid;place-items:center;position:absolute}
+    .score-inner strong{font-size:32px;font-weight:800}
+    .score-inner span{font-size:12px;color:#64748b;display:block;margin-top:-2px}
+    .score-circle.passed .score-inner strong{color:#16a34a}
+    .score-circle.failed .score-inner strong{color:#dc2626}
+    .result-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 18px;border-radius:999px;font-size:14px;font-weight:700;margin-bottom:12px}
+    .result-badge.passed{background:#d1fae5;color:#065f46}
+    .result-badge.failed{background:#fef2f2;color:#991b1b}
+    .result-detail{font-size:14px;color:#64748b;margin-bottom:24px}
+    .result-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:28px}
+
+    /* Review */
+    .review-section{text-align:left;margin-top:20px;border-top:1px solid #e2e8f0;padding-top:20px}
+    .review-section h3{font-size:16px;font-weight:700;color:#0f172a;margin-bottom:14px}
+    .review-item{padding:12px 16px;border-radius:10px;margin-bottom:8px;font-size:13px}
+    .review-item.correct{background:#f0fdf4;border:1px solid #bbf7d0}
+    .review-item.incorrect{background:#fef2f2;border:1px solid #fecaca}
+    .review-q{font-weight:600;color:#0f172a;margin-bottom:4px}
+    .review-a{color:#475569}
+    .review-a strong{font-weight:600}
+    .review-item.correct .review-icon{color:#16a34a}
+    .review-item.incorrect .review-icon{color:#dc2626}
+
+    /* Already passed */
+    .passed-hero{background:linear-gradient(135deg,#16a34a,#22c55e);border-radius:16px;padding:32px;text-align:center;color:#fff;margin-bottom:20px}
+    .passed-hero .material-icons-round{font-size:56px;margin-bottom:8px}
+    .passed-hero h2{font-size:24px;font-weight:800;margin-bottom:4px}
+    .passed-hero p{opacity:.85;font-size:14px}
+
+    /* Footer */
+    .page-footer{text-align:center;padding:28px 0;color:#64748b;font-size:13px;border-top:1px solid #dce3ed;margin-top:48px}
+    .page-footer a{color:#1565c0;text-decoration:none}
+    .loading{text-align:center;padding:40px;color:#64748b;font-size:14px}
+
+    @media(max-width:640px){
+      .exam-info-grid{grid-template-columns:1fr 1fr}
+      .options-list{padding-left:0}
+      .result-actions{flex-direction:column}
+      .result-actions .btn{width:100%}
+    }
   </style>
 </head>
 <body>
-  <main class="simple">
-    <div class="container">
-      <div class="box">
-        <h1>Examen para certificado</h1>
-        <p>Aquí se rendirá el examen para habilitar el certificado.</p>
-        <p style="margin-top:12px;"><a href="../index.html">Volver al inicio</a></p>
+
+  <header class="top-bar">
+    <div class="container top-bar-inner">
+      <a class="brand" href="../index.html">
+        <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
+      </a>
+      <div class="top-bar-right">
+        <div class="navbar-actions" id="navActions"></div>
+        <a class="back-link" href="../dashboard/index.html"><span class="material-icons-round">arrow_back</span> Dashboard</a>
       </div>
     </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+      <div id="examApp"><div class="loading"><span class="material-icons-round" style="font-size:28px;color:#dce3ed;display:block;margin-bottom:8px">hourglass_top</span>Cargando examen...</div></div>
+    </div>
   </main>
+
+  <footer class="page-footer">
+    <div class="container">
+      <p>&copy; 2026 FQ INGENIEROS &middot; <a href="../index.html">Inicio</a> &middot; <a href="../empresa/about.html">Nosotros</a></p>
+    </div>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/auth-ui.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+
+  <script>
+  (function(){
+    /* ══════════════ CONFIG ══════════════ */
+    var EXAM_TIME = 20 * 60;
+    var PASS_PCT = 70;
+    var courseId = new URLSearchParams(location.search).get('course');
+    var app = document.getElementById('examApp');
+    var currentUser = null;
+    var questions = [];
+    var answers = [];
+    var timerInterval = null;
+    var timeLeft = EXAM_TIME;
+    var courseName = '';
+
+    /* ══════════════ DEFAULT QUESTIONS ══════════════ */
+    var DEFAULT_QUESTIONS = {
+      'sst-obras-civiles': [
+        {q:'¿Cuál es la ley principal que regula la Seguridad y Salud en el Trabajo en el Perú?',o:['Ley 29873','Ley 29783','Ley 30222','Ley 28806'],a:1},
+        {q:'¿Qué significan las siglas IPERC?',o:['Instituto Peruano de Evaluación de Riesgos en Construcción','Inspección Preventiva de Equipos y Recursos de Campo','Identificación de Peligros, Evaluación de Riesgos y Control','Informe Preliminar de Emergencias Registradas en Campo'],a:2},
+        {q:'¿Cuál es el principal objetivo de la seguridad y salud en el trabajo?',o:['Cumplir con la normativa vigente','Evitar multas y sanciones','Reducir costos de producción','Prevenir accidentes y enfermedades ocupacionales'],a:3},
+        {q:'¿Qué es un EPP?',o:['Estándar de Procedimiento de Prevención','Equipo de Protección Personal','Evaluación de Peligros Potenciales','Estructura de Planificación Preventiva'],a:1},
+        {q:'Según la Ley 29783, ¿quién es responsable de proveer los EPP al trabajador?',o:['El trabajador','El supervisor','El empleador','El comité de SST'],a:2},
+        {q:'¿Qué documento establece las medidas de prevención antes de iniciar una tarea de alto riesgo?',o:['Reglamento interno','PETS — Procedimiento Escrito de Trabajo Seguro','Manual de funciones','Contrato de trabajo'],a:1},
+        {q:'¿Cuál es la función principal del Comité de Seguridad y Salud en el Trabajo?',o:['Sancionar a los trabajadores','Elaborar planillas','Promover y vigilar el cumplimiento de las normas de SST','Contratar personal'],a:2},
+        {q:'¿Qué tipo de señalización indica prohibición en obra?',o:['Azul con símbolo blanco','Verde con símbolo blanco','Roja con franja diagonal','Amarilla con símbolo negro'],a:2},
+        {q:'En una obra civil, ¿cuál es la altura mínima para instalar barandas de protección perimetral?',o:['0.50 metros','1.00 metro','1.50 metros','1.80 metros'],a:3},
+        {q:'¿Qué se debe hacer inmediatamente después de un accidente de trabajo?',o:['Esperar instrucciones del jefe','Continuar con las labores','Llenar el formulario de accidentes','Atender al accidentado y reportar el incidente'],a:3}
+      ],
+      'topografia-civil-3d': [
+        {q:'¿Qué tipo de software es AutoCAD Civil 3D?',o:['Software de diseño gráfico','Software de diseño y documentación de ingeniería civil','Software de edición de video','Software de gestión de proyectos'],a:1},
+        {q:'¿Qué es una superficie TIN en Civil 3D?',o:['Un tipo de archivo exportable','Una red irregular de triángulos que representa el terreno','Un nivel de detalle de renderizado','Un formato de impresión'],a:1},
+        {q:'¿Para qué se utiliza un perfil longitudinal?',o:['Para mostrar la sección transversal de una vía','Para representar la variación de elevación a lo largo de un alineamiento','Para calcular áreas de corte y relleno','Para diseñar intersecciones'],a:1},
+        {q:'¿Qué son las curvas de nivel?',o:['Líneas que conectan puntos de igual elevación','Curvas horizontales en un diseño vial','Curvas de transición en autopistas','Líneas de flujo de agua'],a:0},
+        {q:'¿Qué tipo de alineamiento se crea primero al diseñar una carretera en Civil 3D?',o:['Alineamiento vertical','Alineamiento horizontal','Alineamiento diagonal','Alineamiento transversal'],a:1},
+        {q:'¿Qué es un ensamblaje (assembly) en Civil 3D?',o:['Una colección de subensamblajes que definen la sección transversal de una obra lineal','Un grupo de superficies agrupadas','Un conjunto de puntos topográficos','Una lista de coordenadas GPS'],a:0},
+        {q:'¿Cuál es la unidad de medida angular más utilizada en topografía?',o:['Radianes','Grados sexagesimales','Porcentaje','Milímetros'],a:1},
+        {q:'¿Qué es un corredor (corridor) en Civil 3D?',o:['Un modelo 3D que combina alineamiento, perfil y ensamblaje','Un pasillo de circulación','Una zona de amortiguamiento','Un tipo de curva de nivel'],a:0},
+        {q:'¿Para qué sirve el cálculo de volúmenes en Civil 3D?',o:['Para determinar el volumen de tráfico','Para estimar cantidades de corte y relleno de tierra','Para calcular el caudal de agua','Para medir la capacidad de una estructura'],a:1},
+        {q:'¿Qué es un punto COGO en Civil 3D?',o:['Un punto georreferenciado con coordenadas y elevación','Un punto de referencia visual','Un marcador de límite de propiedad','Un tipo de coordenada polar'],a:0}
+      ]
+    };
+
+    /* ══════════════ UTILITIES ══════════════ */
+    function shuffle(arr) {
+      var a = arr.slice();
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = a[i]; a[i] = a[j]; a[j] = t;
+      }
+      return a;
+    }
+
+    function esc(s) { return s.replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+    function fmtTime(s) {
+      var m = Math.floor(s / 60);
+      var sec = s % 60;
+      return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    /* ══════════════ RENDER STATES ══════════════ */
+    function showMessage(icon, title, text, btnHtml) {
+      app.innerHTML = '<div class="state-box"><span class="material-icons-round">' + icon + '</span>' +
+        '<h2>' + title + '</h2><p>' + text + '</p>' + (btnHtml || '') + '</div>';
+    }
+
+    function showIntro() {
+      var n = questions.length;
+      var h = '<div class="exam-intro">';
+      h += '<div class="exam-intro-icon"><span class="material-icons-round">quiz</span></div>';
+      h += '<h1>Examen de Evaluación</h1>';
+      h += '<p class="course-name">' + esc(courseName) + '</p>';
+      h += '<div class="exam-info-grid">';
+      h += '<div class="exam-info-item"><span class="material-icons-round">help_outline</span><strong>' + n + '</strong><span>Preguntas</span></div>';
+      h += '<div class="exam-info-item"><span class="material-icons-round">timer</span><strong>20</strong><span>Minutos</span></div>';
+      h += '<div class="exam-info-item"><span class="material-icons-round">verified</span><strong>' + PASS_PCT + '%</strong><span>Para aprobar</span></div>';
+      h += '<div class="exam-info-item"><span class="material-icons-round">radio_button_checked</span><strong>1</strong><span>Respuesta por pregunta</span></div>';
+      h += '</div>';
+      h += '<div class="exam-rules"><h3><span class="material-icons-round">info</span> Instrucciones</h3><ul>';
+      h += '<li><span class="material-icons-round">check_circle</span> Cada pregunta tiene 4 opciones, solo una es correcta</li>';
+      h += '<li><span class="material-icons-round">check_circle</span> Puedes cambiar tus respuestas antes de enviar</li>';
+      h += '<li><span class="material-icons-round">check_circle</span> Al agotarse el tiempo se envía automáticamente</li>';
+      h += '<li><span class="material-icons-round">check_circle</span> Necesitas ' + PASS_PCT + '% o más para aprobar</li>';
+      h += '<li><span class="material-icons-round">check_circle</span> Si no apruebas, puedes reintentar</li>';
+      h += '</ul></div>';
+      h += '<button class="btn btn-primary btn-lg" onclick="window._startExam()"><span class="material-icons-round">play_arrow</span> Comenzar examen</button>';
+      h += '</div>';
+      app.innerHTML = h;
+    }
+
+    function showExam() {
+      timeLeft = EXAM_TIME;
+      var h = '<div class="timer-bar"><div class="container"><div class="timer-inner">';
+      h += '<div class="timer-left"><span class="material-icons-round">quiz</span> <span id="qProgress">0 de ' + questions.length + ' respondidas</span></div>';
+      h += '<div class="timer-clock" id="timerClock"><span class="material-icons-round">timer</span> <span id="timerDisplay">' + fmtTime(timeLeft) + '</span></div>';
+      h += '<div class="timer-right">' + esc(courseName) + '</div>';
+      h += '</div><div class="timer-progress"><div class="timer-progress-fill" id="timerBar" style="width:100%"></div></div></div></div>';
+
+      h += '<div id="questionsContainer">';
+      questions.forEach(function(q, i) {
+        h += '<div class="question-card" id="qcard' + i + '">';
+        h += '<div class="q-header"><div class="q-number">' + (i+1) + '</div><div class="q-text">' + esc(q.q) + '</div></div>';
+        h += '<div class="options-list">';
+        q.o.forEach(function(opt, j) {
+          h += '<div class="option-label" onclick="window._selectOption(' + i + ',' + j + ',this)">';
+          h += '<div class="option-radio"></div><span>' + esc(opt) + '</span></div>';
+        });
+        h += '</div></div>';
+      });
+      h += '</div>';
+
+      h += '<div class="exam-submit-area">';
+      h += '<p class="unanswered-warn" id="unansweredWarn"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">warning</span> Tienes preguntas sin responder</p>';
+      h += '<button class="btn btn-primary btn-lg" onclick="window._submitExam()"><span class="material-icons-round">send</span> Enviar respuestas</button>';
+      h += '</div>';
+
+      app.innerHTML = h;
+      startTimer();
+    }
+
+    function showResults(data) {
+      var h = '<div class="results-card">';
+      h += '<div class="score-circle ' + (data.passed ? 'passed' : 'failed') + '" style="--pct:' + data.pct + '">';
+      h += '<div class="score-inner"><strong>' + data.pct + '%</strong><span>' + data.correct + '/' + data.total + '</span></div></div>';
+      h += '<div class="result-badge ' + (data.passed ? 'passed' : 'failed') + '"><span class="material-icons-round">' + (data.passed ? 'check_circle' : 'cancel') + '</span>';
+      h += data.passed ? '¡Aprobado!' : 'No aprobado';
+      h += '</div>';
+      h += '<p class="result-detail">' + (data.passed
+        ? 'Has aprobado el examen con ' + data.correct + ' respuestas correctas de ' + data.total + '. ¡Ya puedes solicitar tu certificado!'
+        : 'Obtuviste ' + data.correct + ' respuestas correctas de ' + data.total + '. Necesitas ' + PASS_PCT + '% para aprobar. ¡Puedes reintentar!') + '</p>';
+
+      h += '<div class="result-actions">';
+      if (data.passed) {
+        h += '<a href="pago.html?course=' + courseId + '" class="btn btn-success"><span class="material-icons-round">payments</span> Pagar certificado (S/ 20)</a>';
+        h += '<a href="../sesiones/index.html?course=' + courseId + '" class="btn btn-outline"><span class="material-icons-round">arrow_back</span> Volver al curso</a>';
+      } else {
+        h += '<button class="btn btn-primary" onclick="window._retryExam()"><span class="material-icons-round">refresh</span> Reintentar examen</button>';
+        h += '<a href="../sesiones/index.html?course=' + courseId + '" class="btn btn-outline"><span class="material-icons-round">arrow_back</span> Volver al curso</a>';
+      }
+      h += '</div>';
+
+      /* Answer review */
+      h += '<div class="review-section"><h3><span class="material-icons-round" style="color:#1565c0;vertical-align:middle;margin-right:6px">grading</span> Revisión de respuestas</h3>';
+      questions.forEach(function(q, i) {
+        var isCorrect = answers[i] === q.a;
+        h += '<div class="review-item ' + (isCorrect ? 'correct' : 'incorrect') + '">';
+        h += '<div class="review-q"><span class="material-icons-round review-icon" style="font-size:16px;vertical-align:middle;margin-right:4px">' + (isCorrect ? 'check_circle' : 'cancel') + '</span> ' + (i+1) + '. ' + esc(q.q) + '</div>';
+        h += '<div class="review-a">Tu respuesta: <strong>' + (answers[i] >= 0 ? esc(q.o[answers[i]]) : 'Sin responder') + '</strong></div>';
+        if (!isCorrect) {
+          h += '<div class="review-a" style="color:#16a34a">Correcta: <strong>' + esc(q.o[q.a]) + '</strong></div>';
+        }
+        h += '</div>';
+      });
+      h += '</div></div>';
+      app.innerHTML = h;
+    }
+
+    function showAlreadyPassed(enrollment) {
+      var h = '<div class="passed-hero"><span class="material-icons-round">emoji_events</span>';
+      h += '<h2>¡Ya aprobaste este examen!</h2>';
+      h += '<p>Puntaje: ' + (enrollment.examScore || 0) + '%</p></div>';
+      h += '<div style="text-align:center">';
+      h += '<a href="pago.html?course=' + courseId + '" class="btn btn-success btn-lg" style="margin-bottom:12px"><span class="material-icons-round">payments</span> Pagar certificado (S/ 20)</a><br>';
+      h += '<a href="../sesiones/index.html?course=' + courseId + '" class="btn btn-outline" style="margin-top:8px"><span class="material-icons-round">arrow_back</span> Volver al curso</a>';
+      h += '</div>';
+      app.innerHTML = h;
+    }
+
+    /* ══════════════ TIMER ══════════════ */
+    function startTimer() {
+      updateTimerUI();
+      timerInterval = setInterval(function() {
+        timeLeft--;
+        updateTimerUI();
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          doSubmit();
+        }
+      }, 1000);
+    }
+
+    function updateTimerUI() {
+      var display = document.getElementById('timerDisplay');
+      var clock = document.getElementById('timerClock');
+      var bar = document.getElementById('timerBar');
+      if (!display) return;
+      display.textContent = fmtTime(timeLeft);
+      var pct = (timeLeft / EXAM_TIME) * 100;
+      if (bar) bar.style.width = pct + '%';
+      if (timeLeft <= 120) {
+        if (clock) clock.classList.add('warn');
+        if (bar) bar.classList.add('warn');
+      }
+    }
+
+    /* ══════════════ INTERACTIONS ══════════════ */
+    window._selectOption = function(qi, oi, el) {
+      answers[qi] = oi;
+      var card = document.getElementById('qcard' + qi);
+      if (card) card.classList.add('answered');
+      var opts = card.querySelectorAll('.option-label');
+      opts.forEach(function(o) { o.classList.remove('selected'); });
+      el.classList.add('selected');
+      /* Update progress */
+      var answered = answers.filter(function(a) { return a >= 0; }).length;
+      var prog = document.getElementById('qProgress');
+      if (prog) prog.textContent = answered + ' de ' + questions.length + ' respondidas';
+    };
+
+    window._startExam = function() { showExam(); };
+
+    window._submitExam = function() {
+      var unanswered = answers.filter(function(a) { return a < 0; }).length;
+      if (unanswered > 0) {
+        var warn = document.getElementById('unansweredWarn');
+        if (warn) { warn.style.display = 'block'; warn.textContent = 'Tienes ' + unanswered + ' pregunta(s) sin responder. ¿Enviar así?'; }
+        /* Allow submit on second click */
+        var btn = document.querySelector('.exam-submit-area .btn');
+        if (btn && !btn._confirmed) {
+          btn._confirmed = true;
+          btn.innerHTML = '<span class="material-icons-round">check</span> Confirmar envío';
+          return;
+        }
+      }
+      clearInterval(timerInterval);
+      doSubmit();
+    };
+
+    window._retryExam = function() {
+      questions = shuffle(questions);
+      answers = new Array(questions.length).fill(-1);
+      showIntro();
+    };
+
+    /* ══════════════ SUBMIT & SAVE ══════════════ */
+    function doSubmit() {
+      var correct = 0;
+      questions.forEach(function(q, i) {
+        if (answers[i] === q.a) correct++;
+      });
+      var total = questions.length;
+      var pct = Math.round((correct / total) * 100);
+      var passed = pct >= PASS_PCT;
+
+      /* Save to Firestore exams collection */
+      var examDoc = {
+        userId: currentUser.uid,
+        userEmail: currentUser.email || '',
+        courseId: courseId,
+        courseName: courseName,
+        score: correct,
+        total: total,
+        percentage: pct,
+        passed: passed,
+        completedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      db.collection('exams').add(examDoc).then(function() {
+        console.log('[Examen] Resultado guardado: ' + pct + '% ' + (passed ? 'APROBADO' : 'NO APROBADO'));
+      }).catch(function(err) {
+        console.error('[Examen] Error al guardar:', err);
+      });
+
+      /* Update enrollment if passed */
+      if (passed) {
+        var enrollId = currentUser.uid + '_' + courseId;
+        db.collection('enrollments').doc(enrollId).update({
+          examPassed: true,
+          examScore: pct,
+          examDate: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(function() {
+          console.log('[Examen] Enrollment actualizado: examPassed=true');
+        }).catch(function(err) {
+          console.error('[Examen] Error al actualizar enrollment:', err);
+        });
+      }
+
+      showResults({ correct: correct, total: total, pct: pct, passed: passed });
+    }
+
+    /* ══════════════ INITIALIZATION ══════════════ */
+    function init(user) {
+      currentUser = user;
+      if (!courseId) {
+        showMessage('search_off', 'Curso no especificado', 'No se indicó un curso para el examen.', '<a href="../dashboard/index.html" class="btn btn-primary">Ir al dashboard</a>');
+        return;
+      }
+
+      /* Load course name */
+      db.collection('courses').doc(courseId).get().then(function(doc) {
+        if (doc.exists) courseName = doc.data().name || courseId;
+        else courseName = courseId;
+
+        /* Check enrollment */
+        var enrollId = user.uid + '_' + courseId;
+        return db.collection('enrollments').doc(enrollId).get();
+      }).then(function(doc) {
+        if (!doc.exists || doc.data().status !== 'active') {
+          showMessage('block', 'No estás matriculado', 'Debes matricularte en el curso antes de rendir el examen.',
+            '<a href="../cursos/curso.html?id=' + courseId + '" class="btn btn-primary">Ver curso e inscribirme</a>');
+          return;
+        }
+        var enrollment = doc.data();
+
+        /* Must have completed the course content */
+        if (!(enrollment.completed || enrollment.attended || enrollment.watched)) {
+          showMessage('pending', 'Curso incompleto', 'Debes asistir a la sesión en vivo o ver la grabación antes de rendir el examen.',
+            '<a href="../sesiones/index.html?course=' + courseId + '" class="btn btn-primary">Ir a sesiones</a>');
+          return;
+        }
+
+        /* Must have payment verified before exam */
+        if (!enrollment.paymentVerified) {
+          showMessage('payments', 'Pago requerido', 'Debes pagar S/ 20 y esperar la verificación antes de rendir el examen.',
+            '<a href="../certificado/pago.html?course=' + courseId + '" class="btn btn-primary"><span class="material-icons-round">payments</span> Ir a pagar</a>');
+          return;
+        }
+
+        /* Check if already passed */
+        if (enrollment.examPassed) {
+          showAlreadyPassed(enrollment);
+          return;
+        }
+
+        /* Load questions: Firestore first, then defaults */
+        db.collection('exam_questions').doc(courseId).get().then(function(qDoc) {
+          if (qDoc.exists && Array.isArray(qDoc.data().questions) && qDoc.data().questions.length > 0) {
+            questions = qDoc.data().questions;
+          } else if (DEFAULT_QUESTIONS[courseId]) {
+            questions = DEFAULT_QUESTIONS[courseId].slice();
+          } else {
+            showMessage('help_outline', 'Sin preguntas disponibles', 'Aún no hay preguntas configuradas para este curso. Inténtalo más tarde.',
+              '<a href="../sesiones/index.html?course=' + courseId + '" class="btn btn-primary">Volver al curso</a>');
+            return;
+          }
+          questions = shuffle(questions);
+          answers = new Array(questions.length).fill(-1);
+          showIntro();
+        });
+      }).catch(function(err) {
+        console.error('[Examen] Error:', err);
+        showMessage('error_outline', 'Error al cargar', 'No se pudo verificar tu inscripción. Intenta recargar la página.',
+          '<a href="javascript:location.reload()" class="btn btn-primary">Recargar</a>');
+      });
+    }
+
+    /* ══════════════ AUTH ══════════════ */
+    auth.onAuthStateChanged(function(user) {
+      if (!user) {
+        showMessage('lock', 'Inicia sesión', 'Debes iniciar sesión para rendir el examen.',
+          '<a href="../auth/login.html?redirect=' + encodeURIComponent(location.href) + '" class="btn btn-primary"><span class="material-icons-round">login</span> Iniciar sesión</a>');
+        return;
+      }
+      init(user);
+    });
+  })();
+  </script>
 </body>
 </html>

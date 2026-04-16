@@ -1,5 +1,29 @@
 {
   "firestore": {
     "rules": "firestore.rules"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "firestore.rules",
+      "**/node_modules/**",
+      ".git/**",
+      "backup-27-03-2026/**",
+      "cleanup-duplicate.html",
+      "init-courses.html",
+      "COURSE_DATA_EXTRACTED.json",
+      "auth-users.json"
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
+          { "key": "Pragma", "value": "no-cache" },
+          { "key": "Expires", "value": "0" }
+        ]
+      }
+    ]
   }
 }

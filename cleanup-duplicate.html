@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Limpiar cursos duplicados</title>
+  <style>
+    body { font-family: 'Inter', sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f8fafc; }
+    .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 16px; }
+    .card h3 { margin: 0 0 8px; }
+    .id { font-family: monospace; color: #64748b; font-size: 12px; }
+    .real { border-left: 4px solid #22c55e; }
+    .duplicate { border-left: 4px solid #ef4444; }
+    button { background: #ef4444; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; }
+    button:hover { background: #dc2626; }
+    #log { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.8; white-space: pre-wrap; margin-top: 16px; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+    .tag-real { background: #d1fae5; color: #065f46; }
+    .tag-dup { background: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body>
+  <h2>🔍 Limpieza de cursos duplicados</h2>
+  <p style="color:#64748b;font-size:14px">Este script busca cursos de Topografía duplicados y elimina la copia (la que tiene ID aleatorio).</p>
+  <div id="results"></div>
+  <div id="log">Iniciando...</div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="assets/js/firebase-config.js"></script>
+  <script>
+    var db = firebase.firestore();
+    var auth = firebase.auth();
+    var logEl = document.getElementById('log');
+    var resultsEl = document.getElementById('results');
+
+    function log(msg) { logEl.textContent += '\n' + msg; }
+
+    auth.onAuthStateChanged(function(user) {
+      if (!user) {
+        log('⚠ No estás logueado. Abre primero la plataforma e inicia sesión como admin, luego recarga esta página.');
+        return;
+      }
+      log('✓ Logueado como: ' + user.email);
+
+      // ═══ FIX 1: Corregir fecha de Topografía ═══
+      log('\n── Corrección de fecha ──');
+      db.collection('courses').doc('topografia-civil-3d').get().then(function(doc) {
+        if (!doc.exists) { log('⚠ Curso topografia-civil-3d no encontrado.'); return; }
+        var d = doc.data();
+        log('Fecha actual en Firestore: ' + (d.startDate || '(sin fecha)'));
+        if (d.startDate !== '2026-05-09') {
+          return doc.ref.update({ startDate: '2026-05-09' }).then(function() {
+            log('✅ Fecha actualizada a 2026-05-09 (sábado 9 de mayo)');
+          });
+        } else {
+          log('✅ Fecha ya es correcta: 2026-05-09');
+        }
+      }).catch(function(err) { log('❌ Error al corregir fecha: ' + err.message); });
+
+      // ═══ FIX 2: Buscar duplicados ═══
+      log('\n── Búsqueda de duplicados ──');
+      log('Buscando cursos de Topografía...');
+
+      db.collection('courses').get().then(function(snapshot) {
+        var topoCourses = [];
+        snapshot.forEach(function(doc) {
+          var data = doc.data();
+          if (data.name && data.name.toLowerCase().indexOf('topograf') !== -1) {
+            topoCourses.push({ id: doc.id, name: data.name, data: data });
+          }
+        });
+
+        log('Encontrados ' + topoCourses.length + ' curso(s) con "Topografía" en el nombre.');
+        log('Total cursos en Firestore: ' + snapshot.size);
+
+        if (topoCourses.length <= 1) {
+          log('\n✅ No hay duplicados. Solo existe un curso de Topografía.');
+          resultsEl.innerHTML = '<div class="card real"><h3>✅ Sin duplicados</h3><p>Solo hay un curso de Topografía.</p></div>';
+          return;
+        }
+
+        var html = '';
+        var duplicates = [];
+        topoCourses.forEach(function(c) {
+          var isReal = (c.id === 'topografia-civil-3d');
+          html += '<div class="card ' + (isReal ? 'real' : 'duplicate') + '">';
+          html += '<span class="tag ' + (isReal ? 'tag-real' : 'tag-dup') + '">' + (isReal ? 'ORIGINAL' : 'DUPLICADO') + '</span>';
+          html += '<h3>' + c.name + '</h3>';
+          html += '<div class="id">ID: ' + c.id + '</div>';
+          html += '<p style="font-size:13px;color:#475569">' + (c.data.desc || '').substring(0, 100) + '...</p>';
+          if (!isReal) {
+            html += '<button onclick="deleteDuplicate(\'' + c.id + '\', this)">🗑️ Eliminar este duplicado</button>';
+            duplicates.push(c.id);
+          }
+          html += '</div>';
+        });
+
+        resultsEl.innerHTML = html;
+        log('\nCursos de Topografía encontrados:');
+        topoCourses.forEach(function(c) {
+          log('  • ' + c.id + (c.id === 'topografia-civil-3d' ? ' ← ORIGINAL (conservar)' : ' ← DUPLICADO (eliminar)'));
+        });
+
+      }).catch(function(err) {
+        log('❌ Error: ' + err.message);
+      });
+    });
+
+    function deleteDuplicate(id, btn) {
+      if (!confirm('¿Eliminar el curso duplicado con ID "' + id + '"? Esta acción no se puede deshacer.')) return;
+      btn.textContent = 'Eliminando...';
+      btn.disabled = true;
+
+      // Also delete any enrollments linked to this duplicate ID
+      log('\nEliminando curso duplicado: ' + id + '...');
+      db.collection('courses').doc(id).delete().then(function() {
+        log('✅ Curso duplicado eliminado correctamente.');
+        btn.parentElement.style.opacity = '0.4';
+        btn.textContent = '✓ Eliminado';
+
+        // Check for orphaned enrollments with this duplicate ID
+        return db.collection('enrollments').where('courseId', '==', id).get();
+      }).then(function(snap) {
+        if (snap && !snap.empty) {
+          log('Encontradas ' + snap.size + ' inscripción(es) huérfana(s). Eliminando...');
+          var batch = db.batch();
+          snap.forEach(function(doc) { batch.delete(doc.ref); });
+          return batch.commit();
+        }
+      }).then(function() {
+        log('✅ Limpieza completada. Puedes cerrar esta página.');
+      }).catch(function(err) {
+        log('❌ Error al eliminar: ' + err.message);
+        btn.textContent = 'Error - Reintentar';
+        btn.disabled = false;
+      });
+    }
+  </script>
+</body>
+</html>

@@ -91,15 +91,46 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('[FQ][DBG] renderCourseProgress() - course:', course);
     console.log('[FQ][DBG] renderCourseProgress() - enrollment:', enrollment);
 
+    // Calculate real progress: 0% → not started, 50% → session, 75% → payment verified, 100% → exam passed
+    let realProgress = progress;
+    if (enrollment.examPassed) realProgress = 100;
+    else if (enrollment.paymentVerified) realProgress = Math.max(realProgress, 75);
+    else if ((enrollment.attended || enrollment.watched || enrollment.completed) && realProgress < 50) realProgress = 50;
+
+    let examBadge = '';
+    if (enrollment.examPassed) {
+      examBadge = `<div style="display:inline-flex;align-items:center;gap:4px;background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;margin-top:4px"><span class="material-icons-round" style="font-size:14px">check_circle</span> Certificado obtenido (${enrollment.examScore || 0}%)</div>`;
+    } else if (enrollment.paymentVerified) {
+      examBadge = `<div style="display:inline-flex;align-items:center;gap:4px;background:#dbeafe;color:#1565c0;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;margin-top:4px"><span class="material-icons-round" style="font-size:14px">verified</span> Pago verificado — Examen pendiente</div>`;
+    } else if (enrollment.completed || enrollment.attended || enrollment.watched) {
+      examBadge = `<div style="display:inline-flex;align-items:center;gap:4px;background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;margin-top:4px"><span class="material-icons-round" style="font-size:14px">payments</span> Pago pendiente (S/ 20)</div>`;
+    }
+
+    let progressColor = realProgress >= 75 ? 'pf-green' : 'pf-blue';
+
     heroCourseBody.innerHTML = `
       <div class="hero-course-label">Curso en progreso</div>
       <h3><a href="../cursos/panel.html?id=${courseId}" data-course-id="${courseId}" class="dash-course-link" style="color:inherit;text-decoration:none">${courseName}</a></h3>
       ${scheduleText ? `<div style=\"font-size:13px;color:#1565c0;font-weight:500;margin-bottom:2px\">${scheduleText}</div>` : ''}
       <div class="hero-course-meta">${meta}</div>
-      <div class="progress-bar"><div class="progress-fill pf-blue" style="width:${progress}%"></div></div>
-      <span class="hero-course-pct">${progress}%</span>
+      <div class="hero-course-progress"><div class="progress-bar" style="flex:1"><div class="progress-fill ${progressColor}" style="width:${realProgress}%"></div></div></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px">
+        <span class="hero-course-pct">${realProgress}%</span>
+        ${examBadge}
+      </div>
     `;
-    heroCourseAction.innerHTML = `<a href="../cursos/panel.html?id=${courseId}" data-course-id="${courseId}" class="btn btn-primary btn-sm dash-course-link">Continuar</a>`;
+
+    let heroAction = '';
+    if (enrollment.examPassed) {
+      heroAction = `<a href="../sesiones/index.html?course=${courseId}" class="btn btn-primary btn-sm" style="white-space:nowrap"><span class="material-icons-round" style="font-size:16px">download</span> Descargar certificado</a>`;
+    } else if (enrollment.paymentVerified) {
+      heroAction = `<a href="../certificado/examen.html?course=${courseId}" class="btn btn-primary btn-sm" style="white-space:nowrap"><span class="material-icons-round" style="font-size:16px">quiz</span> Dar examen</a>`;
+    } else if (enrollment.completed || enrollment.attended || enrollment.watched) {
+      heroAction = `<a href="../certificado/pago.html?course=${courseId}" class="btn btn-primary btn-sm" style="white-space:nowrap"><span class="material-icons-round" style="font-size:16px">payments</span> Pagar S/ 20</a>`;
+    } else {
+      heroAction = `<a href="../sesiones/index.html?course=${courseId}" data-course-id="${courseId}" class="btn btn-primary btn-sm dash-course-link" style="white-space:nowrap">Continuar</a>`;
+    }
+    heroCourseAction.innerHTML = heroAction;
   }
 
   auth.onAuthStateChanged(async function(user) {

@@ -1,3 +1,33 @@
+// Sincronizar precios en cards de cursos disponibles
+function syncCoursePrices() {
+  const priceMap = {
+    'sst-obras-civiles': 'price-sst-obras',
+    'topografia-civil-3d': 'price-topografia',
+    'supervision-obra': 'price-supervision'
+  };
+  Object.entries(priceMap).forEach(([courseId, elId]) => {
+    fetch(BASE + courseId)
+      .then(r => r.ok ? r.json() : null)
+      .then(doc => {
+        var el = document.getElementById(elId);
+        if (!el) return;
+        if (!doc || !doc.fields) {
+          el.textContent = 'Por definir';
+          return;
+        }
+        var f = doc.fields;
+        var price = fsVal(f.price);
+        el.textContent = (price && price !== '0') ? 'S/ ' + price : 'Por definir';
+      })
+      .catch(() => {
+        var el = document.getElementById(elId);
+        if (el) el.textContent = 'Por definir';
+      });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  syncCoursePrices();
 // index-dynamic.js
 // Sincroniza el estado de autenticación y matrícula en la página de inicio
 
@@ -17,18 +47,50 @@ document.addEventListener('DOMContentLoaded', function () {
     'supervision-obra': 'proximamente'
   };
 
-  // Auto-fix: asegurar fecha de SST en Firestore
-  const SST_DATE_FIX = { 'sst-obras-civiles': { startDate: '2026-04-23', startTime: '17:00', endTime: '20:00' } };
-  Object.keys(SST_DATE_FIX).forEach(function(cid) {
-    db.collection('courses').doc(cid).get().then(function(doc) {
-      if (doc.exists) {
-        var d = doc.data();
-        if (!d.startDate || d.endTime !== SST_DATE_FIX[cid].endTime) {
-          doc.ref.update(SST_DATE_FIX[cid]);
-        }
-      }
-    }).catch(function() {});
-  });
+  // Sync hero card info via REST API (no SDK cache)
+  var meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  var dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  function formatDate(dateStr) {
+    var p = dateStr.split('-');
+    var d = new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
+    return dias[d.getDay()] + ' ' + d.getDate() + ' de ' + meses[d.getMonth()] + ', ' + d.getFullYear();
+  }
+  function fsVal(field) { return field ? (field.stringValue || field.integerValue || '') : ''; }
+
+  var PROJECT = 'fq-ingenieros-educativa';
+  var BASE = 'https://firestore.googleapis.com/v1/projects/' + PROJECT + '/databases/(default)/documents/courses/';
+
+  // SST
+  fetch(BASE + 'sst-obras-civiles').then(function(r){return r.json()}).then(function(doc){
+    var f = doc.fields || {};
+    var el;
+    if (fsVal(f.startDate) && (el = document.getElementById('sst-date'))) {
+      el.innerHTML = '<span class="material-icons-round">calendar_month</span> ' + formatDate(fsVal(f.startDate));
+    }
+    if (fsVal(f.startTime) && (el = document.getElementById('sst-time'))) {
+      var txt = fsVal(f.startTime);
+      if (fsVal(f.endTime)) txt += ' — ' + fsVal(f.endTime);
+      el.innerHTML = '<span class="material-icons-round">schedule</span> ' + txt;
+    }
+  }).catch(function(){});
+
+  // Topografia
+  fetch(BASE + 'topografia-civil-3d').then(function(r){return r.json()}).then(function(doc){
+    var f = doc.fields || {};
+    var el;
+    if (fsVal(f.startDate) && (el = document.getElementById('topo-date'))) {
+      el.innerHTML = '<span class="material-icons-round">calendar_month</span> ' + formatDate(fsVal(f.startDate));
+    }
+    if (fsVal(f.duration) && (el = document.getElementById('topo-duration'))) {
+      el.innerHTML = '<span class="material-icons-round">schedule</span> ' + fsVal(f.duration) + (fsVal(f.modality) ? ' · ' + fsVal(f.modality) : '');
+    }
+    if ((el = document.getElementById('topo-price'))) {
+      var price = fsVal(f.price);
+      el.innerHTML = '<span class="material-icons-round">sell</span> ' + (price && price !== '0' ? 'S/ ' + price : 'Precio por definir');
+    }
+  }).catch(function(){});
+
+  // Si hay un campo priceLabel, ignóralo para mostrar siempre el valor numérico si existe
 
   async function renderCourseActions(user) {
     const actions = document.querySelectorAll('.course-action');

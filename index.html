@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Plataforma Educativa | FQ INGENIEROS</title>
   <meta name="description" content="Cursos virtuales en vivo y grabados para profesionales. Constancias y certificación por FQ INGENIEROS." />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -65,14 +68,20 @@
             <div><strong>más de 10</strong><span>Cursos</span></div>
             <div><strong>98%</strong><span>Satisfacción</span></div>
           </div>
+          <div class="hero-video" style="margin-top:2rem;text-align:center">
+            <video controls style="max-width:100%;border-radius:1rem;box-shadow:0 2px 16px #0002">
+              <source src="Guion gráfico 2.mp4" type="video/mp4">
+              Tu navegador no soporta video HTML5.
+            </video>
+          </div>
         </div>
 
         <aside class="hero-card">
           <div class="hc-badge"><span class="material-icons-round">bolt</span> Curso actual</div>
           <h3><a href="cursos/curso.html?id=sst-obras-civiles" style="color:inherit;text-decoration:none">Seguridad y Salud en el Trabajo en Obras Civiles</a></h3>
           <ul class="hc-details">
-            <li><span class="material-icons-round">calendar_month</span> jueves 23 de abril, 2026</li>
-            <li><span class="material-icons-round">schedule</span> 5:00 p.m. — 6:00 p.m. / 7:00 p.m. — 8:00 p.m.</li>
+            <li id="sst-date"><span class="material-icons-round">calendar_month</span> jueves 23 de abril, 2026</li>
+            <li id="sst-time"><span class="material-icons-round">schedule</span> 5:00 p.m. — 6:00 p.m. / 7:00 p.m. — 8:00 p.m.</li>
             <li><span class="material-icons-round">videocam</span> Zoom en vivo + Grabación</li>
             <li><span class="material-icons-round">workspace_premium</span> Constancia incluida</li>
           </ul>
@@ -83,9 +92,9 @@
           <div class="hc-badge"><span class="material-icons-round">terrain</span> Nuevo curso</div>
           <h3><a href="cursos/curso.html?id=topografia-civil-3d" style="color:inherit;text-decoration:none">Topografía en Civil 3D</a></h3>
           <ul class="hc-details">
-            <li><span class="material-icons-round">calendar_month</span> sábado 25 de abril, 2026</li>
-            <li><span class="material-icons-round">schedule</span> 8 horas · En vivo + Grabado</li>
-            <li><span class="material-icons-round">sell</span> Precio por definir</li>
+            <li id="topo-date"><span class="material-icons-round">calendar_month</span> sábado 9 de mayo, 2026</li>
+            <li id="topo-duration"><span class="material-icons-round">schedule</span> 8 horas · En vivo + Grabado</li>
+            <li id="topo-price"><span class="material-icons-round">sell</span> Precio por definir</li>
           </ul>
           <div class="course-action" data-course="topografia-civil-3d"></div>
 
@@ -118,7 +127,10 @@
           <article class="course-card">
             <div class="cc-top">
               <span class="badge badge-blue">Nuevo</span>
-              <span class="cc-price">Gratis</span>
+              <span class="cc-price" id="price-sst-obras">Gratis</span>
+            </div>
+            <div style="text-align:center;margin-bottom:0.5rem">
+              <img src="_cbf93f1f-98f4-462b-afa8-aa378cc5b584.jfif" alt="Seguridad y Salud en el Trabajo" style="max-width:180px;height:auto;border-radius:1rem;box-shadow:0 2px 16px #0002">
             </div>
             <h3><a href="cursos/curso.html?id=sst-obras-civiles">Seguridad y Salud en el Trabajo en Obras Civiles</a></h3>
             <p>Conoce los fundamentos de la Seguridad y Salud en el Trabajo aplicados a obras civiles, incluyendo marco legal peruano, identificación de peligros y riesgos, investigación de incidentes y elaboración de análisis de riesgos según normativa vigente.</p>
@@ -133,7 +145,10 @@
           <article class="course-card">
             <div class="cc-top">
               <span class="badge badge-accent">Nuevo</span>
-              <span class="cc-price">Por definir</span>
+              <span class="cc-price" id="price-topografia">Por definir</span>
+            </div>
+            <div style="text-align:center;margin-bottom:0.5rem">
+              <img src="_ca1bc5d1-4cda-4d5a-b5a0-6631012b8b6f.jfif" alt="Topografía en Civil 3D" style="max-width:180px;height:auto;border-radius:1rem;box-shadow:0 2px 16px #0002">
             </div>
             <h3><a href="cursos/curso.html?id=topografia-civil-3d">Topografía en Civil 3D</a></h3>
           <p>Domina el levantamiento topográfico y el modelamiento digital del terreno con Civil 3D. Aprende diseño vial, cálculo de volúmenes y generación de planos profesionales.</p>
@@ -148,7 +163,7 @@
           <article class="course-card">
             <div class="cc-top">
               <span class="badge badge-silver">Pro</span>
-              <span class="cc-price">S/ 80</span>
+              <span class="cc-price" id="price-supervision">S/ 80</span>
             </div>
             <h3><a href="cursos/curso.html?id=supervision-obra">Supervisión de Obra</a></h3>
             <p>Desarrolla competencias en dirección técnica, control de calidad, gestión de cuaderno de obra y aplicación de buenas prácticas de supervisión. Enfocado en proyectos civiles y normativas actuales.</p>
@@ -335,8 +350,40 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="assets/js/firebase-config.js"></script>
   <script src="assets/js/auth-ui.js"></script>
-  <script src="assets/js/index-dynamic.js"></script>
+  <script src="assets/js/index-dynamic.js?v=20260415b"></script>
+  <script>
+  /* Forzar fecha correcta desde REST API (sin caché) */
+  (function(){
+    var M=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    var D=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+    function fmt(s){var p=s.split('-');var d=new Date(+p[0],+p[1]-1,+p[2]);return D[d.getDay()]+' '+d.getDate()+' de '+M[d.getMonth()]+', '+d.getFullYear();}
+    function v(f){return f?(f.stringValue||f.integerValue||''):'';}
+    var B='https://firestore.googleapis.com/v1/projects/fq-ingenieros-educativa/databases/(default)/documents/courses/';
+    fetch(B+'topografia-civil-3d?t='+Date.now()).then(function(r){return r.json()}).then(function(j){
+      var f=j.fields||{};var el;
+      if(v(f.startDate)&&(el=document.getElementById('topo-date')))el.innerHTML='<span class="material-icons-round">calendar_month</span> '+fmt(v(f.startDate));
+      if(v(f.duration)&&(el=document.getElementById('topo-duration')))el.innerHTML='<span class="material-icons-round">schedule</span> '+v(f.duration)+(v(f.modality)?' · '+v(f.modality):'');
+      if((el=document.getElementById('topo-price'))){var p=v(f.price);el.innerHTML='<span class="material-icons-round">sell</span> '+(p&&p!=='0'?'S/ '+p:'Precio por definir');}
+    }).catch(function(){});
+    fetch(B+'sst-obras-civiles?t='+Date.now()).then(function(r){return r.json()}).then(function(j){
+      var f=j.fields||{};var el;
+      if(v(f.startDate)&&(el=document.getElementById('sst-date')))el.innerHTML='<span class="material-icons-round">calendar_month</span> '+fmt(v(f.startDate));
+      if(v(f.startTime)&&(el=document.getElementById('sst-time'))){var t=v(f.startTime);if(v(f.endTime))t+=' — '+v(f.endTime);el.innerHTML='<span class="material-icons-round">schedule</span> '+t;}
+    }).catch(function(){});
+  })();
+  </script>
 
   <!-- Eliminados scripts duplicados/conflictivos. La barra de usuario es gestionada solo por assets/js/auth-ui.js -->
 </body>
+  <script>
+    // Forzar precio de topografía desde REST API, sin caché
+    fetch('https://firestore.googleapis.com/v1/projects/fq-ingenieros-educativa/databases/(default)/documents/courses/topografia-civil-3d?t='+Date.now())
+      .then(r=>r.json())
+      .then(j=>{
+        var f=j.fields||{};
+        var el=document.getElementById('price-topografia');
+        var price=f.price&&(f.price.integerValue||f.price.stringValue);
+        if(el) el.textContent=(price&&price!=='0')?'S/ '+price:'Por definir';
+      });
+  </script>
 </html>

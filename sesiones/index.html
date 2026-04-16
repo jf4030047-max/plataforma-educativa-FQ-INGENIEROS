@@ -217,6 +217,8 @@
   <script src="../assets/js/firebase-config.js"></script>
   <script src="../assets/js/auth-ui.js"></script>
   <script src="../assets/js/notifications.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="../assets/js/certificate-generator.js"></script>
 
   <script>
     /* ══════════════════════════════════════════════
@@ -590,11 +592,21 @@
       var attended  = !!enrollment.attended;
       var watched   = !!enrollment.watched;
       var completed = attended || watched;
-      var progressPct = completed ? 100 : 0;
+      var examPassed = !!enrollment.examPassed;
+      var paymentVerified = !!enrollment.paymentVerified;
+      /* Progress: 0%=inscrito, 50%=sesión completada (constancia), 75%=pago verificado, 100%=examen aprobado (certificado) */
+      var progressPct = 0;
+      if (examPassed) progressPct = 100;
+      else if (paymentVerified) progressPct = 75;
+      else if (completed) progressPct = 50;
 
       /* ── Progress status badge ── */
       var statusClass, statusIcon, statusText;
-      if (attended) {
+      if (examPassed) {
+        statusClass = 'status-completed'; statusIcon = 'emoji_events'; statusText = '¡Certificado obtenido! Examen aprobado con ' + (enrollment.examScore || 0) + '%';
+      } else if (paymentVerified) {
+        statusClass = 'status-watched'; statusIcon = 'payments'; statusText = 'Pago verificado — Listo para rendir el examen';
+      } else if (attended) {
         statusClass = 'status-attended'; statusIcon = 'check_circle'; statusText = 'Completado (en vivo)';
       } else if (watched) {
         statusClass = 'status-watched'; statusIcon = 'play_circle'; statusText = 'Completado (grabación)';
@@ -607,9 +619,16 @@
       html += '</div>';
 
       /* ── Progress bar ── */
+      var progressColor = progressPct >= 100 ? '#16a34a' : progressPct >= 50 ? '#1565c0' : '#e2e8f0';
+      var pctColor = progressPct >= 100 ? '#065f46' : progressPct >= 50 ? '#1565c0' : '#92400e';
       html += '<div class="progress-bar-wrap" id="progressWrap">';
-      html += '<div class="progress-bar-info"><span>Progreso del curso</span><strong class="pct-' + progressPct + '">' + progressPct + '%</strong></div>';
-      html += '<div class="progress-bar-track"><div class="progress-bar-fill fill-' + progressPct + '" id="progressFill"></div></div>';
+      html += '<div class="progress-bar-info"><span>Progreso del curso</span><strong style="color:' + pctColor + '">' + progressPct + '%</strong></div>';
+      html += '<div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill" style="width:' + progressPct + '%;background:' + progressColor + ';border-radius:99px;height:100%"></div></div>';
+      html += '<div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#94a3b8">';
+      html += '<span>0%</span>';
+      html += '<span style="' + (progressPct >= 50 ? 'color:#1565c0;font-weight:600' : '') + '">50% Constancia</span>';
+      html += '<span style="' + (progressPct >= 100 ? 'color:#065f46;font-weight:600' : '') + '">100% Certificado</span>';
+      html += '</div>';
       html += '</div>';
 
       /* ── Session action card ── */
@@ -654,32 +673,47 @@
       html += '<div class="panel-card-header"><span class="material-icons-round">workspace_premium</span><h2>Constancia y Certificado</h2></div>';
       html += '<div class="credential-grid">';
 
-      /* Constancia — unlocked only when certificateFreeUnlocked is true */
-      var constanciaUnlocked = enrollment.certificateFreeUnlocked === true;
+      /* Constancia — auto-unlocked at 50% (attended or watched) */
+      var constanciaUnlocked = completed;
       html += '<div class="credential-card ' + (constanciaUnlocked ? 'available' : 'locked') + '">';
       html += '<span class="material-icons-round cred-icon">' + (constanciaUnlocked ? 'verified' : 'lock') + '</span>';
-      html += '<div class="cred-tag free">Gratuita</div>';
+      html += '<div class="cred-tag free">Gratuita · 50%</div>';
       html += '<h3>Constancia de participación</h3>';
       if (constanciaUnlocked) {
+        html += '<p style="color:#065f46;font-weight:600;margin-bottom:6px"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">check_circle</span> Otorgada automáticamente al completar la sesión</p>';
         html += '<p>Descarga tu constancia digital de participación.</p>';
-        html += '<a href="#" class="btn btn-outline" id="btnConstancia"><span class="material-icons-round">download</span> Descargar</a>';
+        html += '<a href="#" class="btn btn-outline" id="btnConstancia"><span class="material-icons-round">download</span> Descargar constancia PDF</a>';
       } else {
-        html += '<p>Disponible después de asistir a la sesión en vivo o ver la grabación.</p>';
-        html += '<span class="cred-tag lock"><span class="material-icons-round" style="font-size:12px">lock</span> Bloqueada</span>';
+        html += '<p>Se otorga <strong>automáticamente</strong> al asistir a la sesión en vivo o ver la grabación completa.</p>';
+        html += '<div style="background:#eff6ff;border-radius:8px;padding:10px 14px;margin-top:8px;font-size:12px;color:#1565c0;display:flex;align-items:center;gap:6px"><span class="material-icons-round" style="font-size:16px">info</span> Completa la sesión para desbloquear (50% del progreso)</div>';
       }
       html += '</div>';
 
-      /* Certificado — unlocked only when completed */
+      /* Certificado — flujo: PAGO → EXAMEN → CERTIFICADO (50% restante) */
+      var certIcon = examPassed ? 'workspace_premium' : paymentVerified ? 'quiz' : (completed ? 'payments' : 'lock');
       html += '<div class="credential-card ' + (completed ? '' : 'locked') + '">';
-      html += '<span class="material-icons-round cred-icon">' + (completed ? 'workspace_premium' : 'lock') + '</span>';
-      html += '<div class="cred-tag paid">S/ 20</div>';
-      html += '<h3>Certificado</h3>';
-      if (completed) {
-        html += '<p>Rinde el examen de evaluación y obtén tu certificado oficial.</p>';
-        html += '<a href="#" class="btn btn-outline" id="btnCertificado"><span class="material-icons-round">quiz</span> Iniciar evaluación</a>';
+      html += '<span class="material-icons-round cred-icon">' + certIcon + '</span>';
+      html += '<div class="cred-tag paid">S/ 20 · 50%</div>';
+      html += '<h3>Certificado profesional</h3>';
+      if (examPassed) {
+        html += '<p style="color:#065f46;font-weight:600;margin-bottom:6px"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">check_circle</span> ¡Certificado completado! (100%)</p>';
+        html += '<p>Descarga tu certificado profesional con calificación de ' + (enrollment.examScore || 0) + '%.</p>';
+        html += '<a href="#" class="btn btn-outline" id="btnCertificado"><span class="material-icons-round">download</span> Descargar certificado PDF</a>';
+      } else if (paymentVerified) {
+        html += '<p style="color:#1565c0;font-weight:600;margin-bottom:6px"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">check_circle</span> Pago verificado ✓</p>';
+        html += '<p>Ya puedes rendir el examen de evaluación para obtener tu certificado.</p>';
+        html += '<a href="#" class="btn btn-primary" id="btnCertificado" style="width:100%;margin-top:8px"><span class="material-icons-round">quiz</span> Rendir examen ahora</a>';
+      } else if (completed) {
+        html += '<p>Para obtener tu certificado profesional:</p>';
+        html += '<div style="background:#f8fafc;border-radius:10px;padding:12px 14px;margin:8px 0;font-size:12px;color:#475569;line-height:1.8">';
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:22px;height:22px;border-radius:50%;background:#fef3c7;color:#92400e;display:inline-grid;place-items:center;font-size:11px;font-weight:800;flex-shrink:0">1</span> <strong>Pagar S/ 20</strong> y subir voucher de pago</div>';
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:22px;height:22px;border-radius:50%;background:#e2e8f0;color:#64748b;display:inline-grid;place-items:center;font-size:11px;font-weight:800;flex-shrink:0">2</span> Esperar verificación del pago (máx 24h)</div>';
+        html += '<div style="display:flex;align-items:center;gap:8px"><span style="width:22px;height:22px;border-radius:50%;background:#e2e8f0;color:#64748b;display:inline-grid;place-items:center;font-size:11px;font-weight:800;flex-shrink:0">3</span> Rendir examen (≥70%) y descargar certificado</div>';
+        html += '</div>';
+        html += '<a href="#" class="btn btn-outline" id="btnCertificado" style="width:100%"><span class="material-icons-round">payments</span> Pagar S/ 20 para continuar</a>';
       } else {
-        html += '<p>Requiere asistencia + evaluación aprobada + pago de S/ 20.</p>';
-        html += '<span class="cred-tag lock"><span class="material-icons-round" style="font-size:12px">lock</span> Bloqueado</span>';
+        html += '<p>Requiere completar la sesión primero, luego pagar S/ 20 y rendir el examen.</p>';
+        html += '<div style="background:#f8fafc;border-radius:8px;padding:8px 12px;margin-top:8px;font-size:11px;color:#475569"><strong>1.</strong> Completar sesión → <strong>2.</strong> Pago S/ 20 → <strong>3.</strong> Examen → Certificado</div>';
       }
       html += '</div>';
       html += '</div></div>';
@@ -732,6 +766,77 @@
         btnCancelEnroll.addEventListener('click', function() {
           showCancelConfirm(enrollment);
         });
+      }
+
+      /* ── Wire up credential buttons ── */
+      var btnConstancia = document.getElementById('btnConstancia');
+      var btnCertificado = document.getElementById('btnCertificado');
+
+      if (btnConstancia) {
+        btnConstancia.addEventListener('click', function(e) {
+          e.preventDefault();
+          var user = auth.currentUser;
+          if (!user) return;
+          btnConstancia.innerHTML = '<span class="material-icons-round">hourglass_top</span> Generando...';
+          btnConstancia.style.pointerEvents = 'none';
+          db.collection('users').doc(user.uid).get().then(function(doc) {
+            var ud = doc.data() || {};
+            FQCertificate.generateConstancia({
+              studentName: ud.name || user.displayName || 'Estudiante',
+              courseName: course.name,
+              date: new Date().toLocaleDateString('es-PE', {year:'numeric',month:'long',day:'numeric'}),
+              duration: course.duration || '',
+              docNumber: ud.docNumber || '',
+              certId: 'CONST-' + courseId.toUpperCase().substring(0,8) + '-' + user.uid.substring(0,6).toUpperCase()
+            });
+            btnConstancia.innerHTML = '<span class="material-icons-round">download</span> Descargar';
+            btnConstancia.style.pointerEvents = '';
+            FQNotify.toast('Constancia descargada correctamente.', 'success');
+          }).catch(function() {
+            btnConstancia.innerHTML = '<span class="material-icons-round">download</span> Descargar';
+            btnConstancia.style.pointerEvents = '';
+            FQNotify.toast('Error al generar la constancia.', 'error');
+          });
+        });
+      }
+
+      if (btnCertificado) {
+        var user = auth.currentUser;
+        if (user && examPassed) {
+          /* Examen aprobado → descargar certificado PDF */
+          btnCertificado.addEventListener('click', function(e) {
+            e.preventDefault();
+            btnCertificado.innerHTML = '<span class="material-icons-round">hourglass_top</span> Generando...';
+            btnCertificado.style.pointerEvents = 'none';
+            db.collection('users').doc(user.uid).get().then(function(doc) {
+              var ud = doc.data() || {};
+              FQCertificate.generateCertificado({
+                studentName: ud.name || user.displayName || 'Estudiante',
+                courseName: course.name,
+                date: new Date().toLocaleDateString('es-PE', {year:'numeric',month:'long',day:'numeric'}),
+                examScore: enrollment.examScore || 0,
+                duration: course.duration || '',
+                docNumber: ud.docNumber || '',
+                certId: 'CERT-' + courseId.toUpperCase().substring(0,8) + '-' + user.uid.substring(0,6).toUpperCase()
+              });
+              btnCertificado.innerHTML = '<span class="material-icons-round">download</span> Descargar certificado PDF';
+              btnCertificado.style.pointerEvents = '';
+              FQNotify.toast('Certificado descargado correctamente.', 'success');
+            });
+          });
+        } else if (user && paymentVerified) {
+          /* Pago verificado → ir al examen */
+          btnCertificado.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '../certificado/examen.html?course=' + courseId;
+          });
+        } else if (btnCertificado && completed) {
+          /* Sesión completada → ir a pagar */
+          btnCertificado.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '../certificado/pago.html?course=' + courseId;
+          });
+        }
       }
 
       /* Auto-refresh countdown every minute if session hasn't started */
@@ -787,22 +892,21 @@
           attended: true,
           attendedAt: firebase.firestore.FieldValue.serverTimestamp(),
           completed: true,
-          progress: 100
+          progress: 50,
+          certificateFreeUnlocked: true,
+          constanciaAutoDate: firebase.firestore.FieldValue.serverTimestamp()
         };
-        if (data.certificateFreeUnlocked !== true) {
-          updateObj.certificateFreeUnlocked = true;
-        }
         return db.collection('enrollments').doc(docId).update(updateObj);
       }).then(function() {
-        console.log('[Asistencia] ✅ attended=true, progress=100');
-        FQNotify.toast('Asistencia registrada. ¡Disfruta la sesión!', 'success');
+        console.log('[Asistencia] ✅ attended=true, progress=50, constancia auto-otorgada');
+        FQNotify.toast('¡Asistencia registrada! Tu constancia gratuita ya está disponible para descargar.', 'success');
         /* Update badge + progress bar without full reload */
         var badge = document.querySelector('.progress-status');
         if (badge) {
           badge.className = 'progress-status status-attended';
-          badge.innerHTML = '<span class="material-icons-round">check_circle</span>Completado (en vivo)';
+          badge.innerHTML = '<span class="material-icons-round">check_circle</span>Sesión completada (50%) — Constancia otorgada';
         }
-        updateProgressBar(100);
+        updateProgressBar(50);
       }).catch(function(err) {
         console.error('[Asistencia] Error:', err.code, err.message);
       });
@@ -824,22 +928,21 @@
           watched: true,
           watchedAt: firebase.firestore.FieldValue.serverTimestamp(),
           completed: true,
-          progress: 100
+          progress: 50,
+          certificateFreeUnlocked: true,
+          constanciaAutoDate: firebase.firestore.FieldValue.serverTimestamp()
         };
-        if (data.certificateFreeUnlocked !== true) {
-          updateObj.certificateFreeUnlocked = true;
-        }
         return db.collection('enrollments').doc(docId).update(updateObj);
       }).then(function() {
-        console.log('[Grabación] ✅ watched=true, progress=100');
-        FQNotify.toast('Reproduciendo grabación. Tu progreso se ha registrado.', 'success');
+        console.log('[Grabación] ✅ watched=true, progress=50, constancia auto-otorgada');
+        FQNotify.toast('¡Grabación completada! Tu constancia gratuita ya está disponible para descargar.', 'success');
         /* Update badge + progress bar */
         var badge = document.querySelector('.progress-status');
         if (badge && !badge.classList.contains('status-attended')) {
           badge.className = 'progress-status status-watched';
-          badge.innerHTML = '<span class="material-icons-round">play_circle</span>Completado (grabación)';
+          badge.innerHTML = '<span class="material-icons-round">play_circle</span>Sesión completada (50%) — Constancia otorgada';
         }
-        updateProgressBar(100);
+        updateProgressBar(50);
         /* Unlock credentials visually after short delay */
         setTimeout(function() { location.reload(); }, 1500);
       }).catch(function(err) {
@@ -851,12 +954,18 @@
     function updateProgressBar(pct) {
       var fill = document.getElementById('progressFill');
       if (fill) {
-        fill.className = 'progress-bar-fill fill-' + pct;
+        fill.style.width = pct + '%';
+        fill.className = 'progress-bar-fill';
+        if (pct >= 100) fill.classList.add('fill-100');
+        else if (pct >= 75) fill.style.background = 'linear-gradient(90deg,#1565c0,#22c55e)';
+        else if (pct >= 50) fill.style.background = 'linear-gradient(90deg,#1565c0,#1e88e5)';
       }
       var info = document.querySelector('.progress-bar-info strong');
       if (info) {
-        info.className = 'pct-' + pct;
         info.textContent = pct + '%';
+        if (pct >= 100) info.style.color = '#065f46';
+        else if (pct >= 50) info.style.color = '#1565c0';
+        else info.style.color = '#92400e';
       }
     }
 
