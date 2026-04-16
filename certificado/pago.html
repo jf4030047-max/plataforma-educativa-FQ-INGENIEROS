@@ -371,5 +371,74 @@
     });
   </script>
 
+  <div style="text-align:center; margin: 2rem 0;">
+    <a href="https://meet.jit.si/FQIngenierosClaseEnVivo" target="_blank" class="btn btn-primary" style="font-size:18px;padding:14px 28px;border-radius:10px;">
+      Unirse a la clase en vivo (Jitsi Meet)
+    </a>
+    <p style="margin-top:10px;color:#64748b;font-size:14px">Se abrirá una nueva pestaña. Puedes compartir este enlace con tus alumnos.</p>
+  </div>
+
+  <div style="max-width:500px;margin:2rem auto;padding:2rem;border:1px solid #e0e7ef;border-radius:12px;">
+    <h3>Subir grabación de la clase</h3>
+    <input type="file" id="videoFile" accept="video/*" style="margin-bottom:1rem;">
+    <button onclick="uploadVideo()" class="btn btn-accent">Subir grabación</button>
+    <div id="uploadStatus" style="margin-top:1rem;color:#1565c0;"></div>
+  </div>
+
+  <div style="max-width:700px;margin:2rem auto;">
+    <h3>Grabaciones disponibles</h3>
+    <ul id="recordingsList" style="list-style:none;padding:0;"></ul>
+  </div>
+
+  <script src="/assets/js/firebase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script>
+    const storage = firebase.storage();
+    const db = firebase.firestore();
+
+    function uploadVideo() {
+      const fileInput = document.getElementById('videoFile');
+      const status = document.getElementById('uploadStatus');
+      if (!fileInput.files.length) {
+        status.textContent = 'Selecciona un archivo de video.';
+        return;
+      }
+      const file = fileInput.files[0];
+      const storageRef = storage.ref('recordings/' + Date.now() + '_' + file.name);
+      status.textContent = 'Subiendo...';
+      storageRef.put(file).then(snapshot => {
+        return snapshot.ref.getDownloadURL();
+      }).then(url => {
+        return db.collection('recordings').add({
+          url: url,
+          name: file.name,
+          date: new Date()
+        });
+      }).then(() => {
+        status.textContent = '¡Grabación subida correctamente!';
+        fileInput.value = '';
+        loadRecordings();
+      }).catch(err => {
+        status.textContent = 'Error: ' + err.message;
+      });
+    }
+
+    function loadRecordings() {
+      const list = document.getElementById('recordingsList');
+      list.innerHTML = 'Cargando...';
+      db.collection('recordings').orderBy('date', 'desc').get().then(snapshot => {
+        let html = '';
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          html += `<li style='margin-bottom:1rem;'><a href='${data.url}' target='_blank'>🎥 ${data.name}</a> <span style='color:#64748b;font-size:13px;'>(${data.date.toDate ? data.date.toDate().toLocaleString() : ''})</span></li>`;
+        });
+        list.innerHTML = html || '<li>No hay grabaciones aún.</li>';
+      });
+    }
+
+    loadRecordings();
+  </script>
+
 </body>
 </html>

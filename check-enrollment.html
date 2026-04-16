@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Verificar Inscripción</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="assets/js/firebase-config.js"></script>
+  <script>
+
+    // Usar la instancia global de auth/db de firebase-config.js
+    const auth = window.auth || (window.firebase && firebase.auth ? firebase.auth() : undefined);
+    const db = window.db || (window.firebase && firebase.firestore ? firebase.firestore() : undefined);
+
+    function checkEnrollment() {
+      const courseId = document.getElementById('courseId').value.trim();
+      auth.onAuthStateChanged(function(user) {
+        if (!user) {
+          document.getElementById('result').textContent = 'No autenticado.';
+          return;
+        }
+        const docId = user.uid + '_' + courseId;
+        db.collection('enrollments').doc(docId).get().then(function(doc) {
+          if (doc.exists) {
+            const data = doc.data();
+            document.getElementById('result').textContent = 'Inscrito: ' + (data.status || 'sin status') + ' | Horario: ' + (data.schedule ? data.schedule.label : 'N/A');
+          } else {
+            document.getElementById('result').textContent = 'No inscrito en Firestore.';
+          }
+        }).catch(function(e){
+          document.getElementById('result').textContent = 'Error: ' + e;
+        });
+      });
+    }
+  </script>
+</head>
+<body>
+  <h2>Verificar inscripción en Firestore</h2>
+  <label>Course ID: <input id="courseId" value="sst-obras-civiles"></label>
+  <button onclick="checkEnrollment()">Verificar</button>
+  <div id="result" style="margin-top:20px;color:#1565c0;font-weight:bold"></div>
+</body>
+</html>

@@ -189,8 +189,8 @@
               <span class="material-icons-round">check_circle</span> Ya estás matriculado
             </div>
             <div class="enrolled-schedule" id="enrolledSchedule"></div>
-            <a href="../sesiones/index.html" class="btn btn-primary" id="btnIrCurso" style="margin-bottom:8px">
-              <span class="material-icons-round">play_circle</span> Ir al curso
+            <a href="https://meet.jit.si/FQIngenierosClaseEnVivo" class="btn btn-primary" id="btnIrCurso" style="margin-bottom:8px" target="_blank">
+              <span class="material-icons-round">play_circle</span> Acceder a la clase en vivo
             </a>
             <a href="../dashboard/index.html" class="btn btn-outline">
               <span class="material-icons-round">dashboard</span> Mi dashboard
@@ -223,6 +223,8 @@
   <script src="../assets/js/firebase-config.js"></script>
   <script src="../assets/js/auth-ui.js"></script>
   <script src="../assets/js/notifications.js"></script>
+
+  <!-- Usar solo la instancia global de auth/db de firebase-config.js -->
 
   <script>
     /* ══════════════════════════════════════════════
@@ -554,6 +556,11 @@
     /* ═══════════════════════════════════════════════ */
 
     function renderCourse(c) {
+        // DEBUG: Mostrar estado de inscripción en consola
+        console.log('[DEBUG] renderCourse:', c.id);
+      // Al renderizar, ocultar ambos estados hasta verificar inscripción
+      document.getElementById('enrolledState').style.display = 'none';
+      document.getElementById('enrollActions').style.display = 'none';
       document.title = c.name + ' | FQ INGENIEROS';
       document.getElementById('breadcrumbName').textContent = c.name;
 
@@ -663,8 +670,49 @@
         if (firstOpt) firstOpt.classList.add('selected');
       }
 
-      // Botón acción (siempre mostrar)
+      // Botón acción (siempre preparar, pero mostrar solo si corresponde)
       document.getElementById('enrollActions').innerHTML = '<button class="btn btn-primary" id="btnMatricular" onclick="handleEnroll()"><span class="material-icons-round">how_to_reg</span> Matricularme</button><div class="enroll-hint"><span class="material-icons-round">lock</span> Inscripción segura</div>';
+
+      // Verificar inscripción real en Firestore y localStorage
+      firebase.auth().onAuthStateChanged(function(user) {
+        console.log('[DEBUG] Usuario:', user ? user.uid : null);
+        if (!user || !c) {
+          document.getElementById('enrolledState').style.display = 'none';
+          document.getElementById('enrollActions').style.display = '';
+          return;
+        }
+        var docId = user.uid + '_' + courseId;
+        // Primero, revisar localStorage para experiencia instantánea
+        // Ya no se usa localStorage para mostrar botones, solo Firestore
+        // Siempre consultar Firestore para sincronizar el estado real
+        db.collection('enrollments').doc(docId).onSnapshot(function(doc) {
+          // Usar onSnapshot para reflejar cambios en tiempo real
+          console.log('[DEBUG] Firestore', docId, doc.exists ? doc.data() : null);
+          if (doc.exists && doc.data().status === 'active') {
+            document.getElementById('enrolledState').style.display = '';
+            document.getElementById('enrollActions').style.display = 'none';
+            var fbData = doc.data();
+            if (fbData.schedule && fbData.schedule.label) {
+              document.getElementById('enrolledSchedule').innerHTML =
+                '<span class="material-icons-round">schedule</span> Horario: ' + fbData.schedule.label + ' (' + (fbData.schedule.detail || '') + ')';
+            }
+            try {
+              localStorage.setItem('enrollment_' + user.uid + '_' + courseId, JSON.stringify({
+                enrolled: true,
+                schedule: fbData.schedule || null,
+                fecha: fbData.schedule ? fbData.schedule.detail : null,
+                ts: Date.now()
+              }));
+            } catch (_) {}
+          } else {
+            document.getElementById('enrolledState').style.display = 'none';
+            document.getElementById('enrollActions').style.display = '';
+            try { localStorage.removeItem('enrollment_' + user.uid + '_' + courseId); } catch (_) {}
+          }
+        }, function() {
+          // Si falla, mantener el estado local
+        });
+      });
     }
 
     function selectSchedule(el) {
@@ -695,6 +743,14 @@
           if (s.id === selectedSchedule) scheduleMeta = s;
         });
       }
+      // Limpiar scheduleMeta: eliminar detail si es undefined (definitivo)
+      var cleanSchedule = null;
+      if (scheduleMeta) {
+        cleanSchedule = { id: scheduleMeta.id, label: scheduleMeta.label };
+        if (typeof scheduleMeta.detail !== 'undefined' && scheduleMeta.detail !== null) {
+          cleanSchedule.detail = scheduleMeta.detail;
+        }
+      }
 
       /* Validate schedule selection when course has schedules */
       if (course.schedules && course.schedules.length > 0 && !scheduleMeta) {
@@ -717,8 +773,9 @@
       document.getElementById('enrolledState').style.display = '';
 
       if (scheduleMeta) {
+        var safeDetail = scheduleMeta.detail !== undefined ? scheduleMeta.detail : "";
         document.getElementById('enrolledSchedule').innerHTML =
-          '<span class="material-icons-round">schedule</span> Horario: ' + scheduleMeta.label + ' (' + scheduleMeta.detail + ')';
+          '<span class="material-icons-round">schedule</span> Horario: ' + scheduleMeta.label + ' (' + safeDetail + ')';
       }
       document.getElementById('btnIrCurso').href = '../sesiones/index.html?course=' + course.id;
 
@@ -726,11 +783,11 @@
 
       /* ── Persist to localStorage for instant load next time ── */
       try {
-        var cacheKey = 'enrollment_' + user.uid + '_' + course.id;
+        var cacheKey = 'enrollment_' + user.uid + '_' + courseId;
         localStorage.setItem(cacheKey, JSON.stringify({
           enrolled: true,
-          schedule: scheduleMeta ? { id: scheduleMeta.id, label: scheduleMeta.label, detail: scheduleMeta.detail } : null,
-          fecha: scheduleMeta ? scheduleMeta.detail : null,
+          schedule: scheduleMeta ? { id: scheduleMeta.id, label: scheduleMeta.label, detail: scheduleMeta.detail !== undefined ? scheduleMeta.detail : "" } : null,
+          fecha: scheduleMeta ? (scheduleMeta.detail !== undefined ? scheduleMeta.detail : "") : null,
           ts: Date.now()
         }));
       } catch (_) {}
@@ -739,20 +796,24 @@
       var enrollmentData = {
         userId: user.uid,
         userEmail: user.email,
-        courseId: course.id,
+        courseId: courseId,
         courseName: course.name,
-        schedule: scheduleMeta ? { id: scheduleMeta.id, label: scheduleMeta.label, detail: scheduleMeta.detail } : null,
+        schedule: cleanSchedule,
         enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
         status: 'active',
         progress: 0
       };
 
-      var docId = user.uid + '_' + course.id;
+      var docId = user.uid + '_' + courseId;
       console.log('[Matrícula] Guardando en enrollments/' + docId, enrollmentData);
 
       db.collection('enrollments').doc(docId).set(enrollmentData)
         .then(function() {
           console.log('[Matrícula] ✅ Guardado exitoso');
+          // Forzar recarga de la UI de inscripción para reflejar el estado real
+          setTimeout(function() {
+            if (typeof renderCourse === 'function') renderCourse(course);
+          }, 500);
         })
         .catch(function(err) {
           console.error('[Matrícula] ❌ Error de Firestore:', err);
@@ -767,7 +828,7 @@
           FQNotify.btnReset(btn);
 
           /* Clear localStorage cache */
-          try { localStorage.removeItem('enrollment_' + user.uid + '_' + course.id); } catch (_) {}
+          try { localStorage.removeItem('enrollment_' + user.uid + '_' + courseId); } catch (_) {}
 
           var msg;
           switch (err.code) {
@@ -828,9 +889,9 @@
               FQNotify.toast('No se pudo cancelar la inscripción. Sesión no encontrada.', 'error');
               return;
             }
-            var docId = user.uid + '_' + course.id;
+            var docId = user.uid + '_' + courseId;
             db.collection('enrollments').doc(docId).delete().then(function() {
-              try { localStorage.removeItem('enrollment_' + user.uid + '_' + course.id); } catch (_) {}
+              try { localStorage.removeItem('enrollment_' + user.uid + '_' + courseId); } catch (_) {}
               // Restaurar UI: mostrar botón de inscripción y horarios
               document.getElementById('enrolledState').style.display = 'none';
               document.getElementById('enrollActions').style.display = '';
@@ -887,7 +948,7 @@
     (window.auth || firebase.auth()).onAuthStateChanged(function(user) {
       if (!user || !course) return;
 
-      var cacheKey = 'enrollment_' + user.uid + '_' + course.id;
+      var cacheKey = 'enrollment_' + user.uid + '_' + courseId;
 
       /* 1️⃣ Instant: check localStorage first */
       try {
@@ -899,7 +960,7 @@
       } catch (_) {}
 
       /* 2️⃣ Background: validate with Firestore */
-      db.collection('enrollments').doc(user.uid + '_' + course.id).get()
+      db.collection('enrollments').doc(user.uid + '_' + courseId).get()
         .then(function(doc) {
           if (doc.exists && doc.data().status === 'active') {
             var fbData = doc.data();
@@ -951,8 +1012,8 @@
       /* Re-sync enrollment state */
       var user = auth.currentUser;
       if (user && course) {
-        var cacheKey = 'enrollment_' + user.uid + '_' + course.id;
-        db.collection('enrollments').doc(user.uid + '_' + course.id).get()
+        var cacheKey = 'enrollment_' + user.uid + '_' + courseId;
+        db.collection('enrollments').doc(user.uid + '_' + courseId).get()
           .then(function(doc) {
             if (doc.exists && doc.data().status === 'active') {
               var fbData = doc.data();
