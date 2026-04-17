@@ -14,9 +14,12 @@
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
     .container{width:min(1140px,92%);margin:0 auto}
+
     /* Breadcrumb */
+
     /* Layout */
     .course-layout{display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start}
+
     /* Main info */
     .course-main .badge-row{display:flex;gap:8px;margin-bottom:12px}
     .cbadge{padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
@@ -29,9 +32,94 @@
     .course-meta{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px}
     .course-meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:#64748b;font-weight:500}
     .course-meta-item .material-icons-round{font-size:18px;color:#1565c0}
+
+    /* Section */
+    .section{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:22px;margin-bottom:18px}
+    .section h2{font-size:17px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+    .section h2 .material-icons-round{font-size:20px;color:#1565c0}
+
+    /* Temario accordion */
+    .temario-accordion{list-style:none;padding:0;margin:0}
+    .temario-module{border:1px solid #e2e8f0;border-radius:10px;margin-bottom:10px;overflow:hidden;transition:box-shadow .2s}
+    .temario-module:hover{box-shadow:0 2px 8px rgba(0,0,0,.06)}
+    .temario-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:#f8fafc;border:none;width:100%;text-align:left;font:inherit;color:#0f172a;transition:background .2s}
+    .temario-header:hover{background:#eff6ff}
+    .temario-num{width:30px;height:30px;border-radius:8px;background:#dbeafe;color:#1565c0;font-size:13px;font-weight:700;display:grid;place-items:center;flex-shrink:0}
+    .temario-title{flex:1;font-size:14px;font-weight:600}
+    .temario-toggle{font-size:20px;color:#94a3b8;transition:transform .3s}
+    .temario-module.open .temario-toggle{transform:rotate(180deg);color:#1565c0}
+    .temario-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+    .temario-module.open .temario-body{max-height:600px}
+    .temario-topics{list-style:none;padding:6px 16px 14px 58px;margin:0}
+    .temario-topics li{position:relative;padding:7px 0 7px 18px;font-size:13px;color:#475569;border-bottom:1px solid #f1f5f9}
+    .temario-topics li:last-child{border-bottom:none}
+    .temario-topics li::before{content:'';position:absolute;left:0;top:50%;width:6px;height:6px;border-radius:50%;background:#1565c0;transform:translateY(-50%)}
+
+    /* Includes */
+    .includes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .include-item{display:flex;align-items:center;gap:8px;font-size:13px;color:#334155}
+    .include-item .material-icons-round{font-size:18px;color:#16a34a}
+
+    /* Sidebar card */
+    .enroll-card{background:#fff;border:1px solid #dce3ed;border-radius:16px;padding:24px;position:sticky;top:80px}
+    .enroll-price{font-size:28px;font-weight:800;color:#0f172a;margin-bottom:4px}
+    .enroll-price-note{font-size:12px;color:#64748b;margin-bottom:18px}
+    .enroll-info{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid #eef2f7}
+    .enroll-info-item{display:flex;align-items:center;gap:8px;font-size:13px;color:#475569}
+    .enroll-info-item .material-icons-round{font-size:18px;color:#1565c0}
+
+    /* Schedule select */
+    .schedule-label{font-size:13px;font-weight:600;color:#0f172a;margin-bottom:8px}
+    .schedule-options{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
+    .schedule-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid #dce3ed;border-radius:10px;cursor:pointer;transition:all .15s;background:#fff}
+    .schedule-opt:hover{border-color:#93c5fd;background:#f0f7ff}
+    .schedule-opt.selected{border-color:#1565c0;background:#eff6ff}
+    .schedule-opt input{display:none}
+    .schedule-radio{width:18px;height:18px;border-radius:50%;border:2px solid #cbd5e1;display:grid;place-items:center;flex-shrink:0;transition:all .15s}
+    .schedule-opt.selected .schedule-radio{border-color:#1565c0;background:#1565c0}
+    .schedule-opt.selected .schedule-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff}
+    .schedule-opt-text{font-size:13px;font-weight:500;color:#334155}
+    .schedule-opt-text small{display:block;font-size:11px;font-weight:400;color:#64748b;margin-top:1px}
+
+    /* Buttons */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .2s;text-decoration:none;width:100%;font-family:inherit}
+    .btn-primary{background:#1565c0;color:#fff}
+    .btn-primary:hover{background:#1e88e5;box-shadow:0 4px 18px rgba(21,101,192,.3)}
+    .btn-primary:disabled{background:#94a3b8;cursor:not-allowed;box-shadow:none}
+    .btn-outline{background:#fff;color:#1565c0;border:1.5px solid #1565c0}
+    .btn-outline:hover{background:#eff6ff}
+    .btn-success{background:#16a34a;color:#fff}
+    .enroll-hint{font-size:11px;color:#64748b;text-align:center;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:4px}
+    .enroll-hint .material-icons-round{font-size:14px}
+
+    /* Enrolled state */
+    .enrolled-badge{display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:10px;background:#d1fae5;color:#065f46;font-size:14px;font-weight:600;margin-bottom:12px}
+    .enrolled-badge .material-icons-round{font-size:20px}
+    .enrolled-schedule{font-size:13px;color:#475569;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+    .enrolled-schedule .material-icons-round{font-size:16px;color:#1565c0}
+
+    /* Footer */
+    .page-footer{text-align:center;padding:28px 0;color:#64748b;font-size:13px;border-top:1px solid #dce3ed;margin-top:48px}
+    .page-footer a{color:#1565c0;text-decoration:none}
+
+    /* Responsive */
+    @media(max-width:800px){
+      .course-layout{grid-template-columns:1fr}
+      .enroll-card{position:static}
+    }
+    @media(max-width:500px){
+      .includes-grid{grid-template-columns:1fr}
+      .course-meta{gap:12px}
+    }
+
+    /* Offline banner */
+    .offline-banner{position:fixed;bottom:0;left:0;right:0;background:#fef3c7;color:#92400e;padding:10px 16px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600;z-index:9999;transform:translateY(100%);transition:transform .3s ease;border-top:1px solid #fcd34d}
+    .offline-banner.visible{transform:translateY(0)}
+    .offline-banner .material-icons-round{font-size:18px}
   </style>
 </head>
 <body>
+
   <!-- Top bar -->
   <header class="top-bar">
     <div class="container top-bar-inner">
@@ -45,16 +133,959 @@
       </div>
     </div>
   </header>
+
   <main class="page">
     <div class="container">
-      <!-- ...resto del contenido original de cursos/curso.html... -->
+
+      <div class="breadcrumb">
+        <a href="../index.html">Inicio</a>
+        <span class="material-icons-round" style="font-size:14px">chevron_right</span>
+        <a href="catalogo.html">Cursos</a>
+        <span class="material-icons-round" style="font-size:14px">chevron_right</span>
+        <span id="breadcrumbName">Cargando...</span>
+      </div>
+
+      <div class="course-layout">
+
+        <!-- Main -->
+        <div class="course-main" id="courseMain">
+          <div class="badge-row" id="badgeRow"></div>
+          <h1 id="courseTitle">Cargando curso...</h1>
+          <p class="desc" id="courseDesc"></p>
+
+          <div class="course-meta" id="courseMeta"></div>
+
+          <!-- Temario -->
+          <div class="section">
+            <h2><span class="material-icons-round">list_alt</span> Temario</h2>
+            <div class="temario-accordion" id="temarioList"></div>
+          </div>
+
+          <!-- Qué incluye -->
+          <div class="section">
+            <h2><span class="material-icons-round">verified</span> ¿Qué incluye?</h2>
+            <div class="includes-grid" id="includesGrid"></div>
+          </div>
+
+          <!-- Grabación de la clase (si existe) -->
+          <div class="section" id="recordingSection" style="display:none">
+            <h2><span class="material-icons-round">play_circle</span> Grabación de la clase</h2>
+            <video id="courseRecording" controls style="width:100%;max-width:700px;border-radius:10px"></video>
+          </div>
+        </div>
+
+        <!-- Sidebar enrollment -->
+        <aside class="enroll-card" id="enrollCard">
+          <div id="enrollPrice"></div>
+          <div class="enroll-info" id="enrollInfo"></div>
+
+          <!-- Schedule: shown when applicable -->
+          <!-- Schedule: solo para cursos disponibles -->
+          <div id="scheduleSection" style="display:none">
+            <div class="schedule-label">Elige tu horario:</div>
+            <div class="schedule-options" id="scheduleOptions"></div>
+          </div>
+
+          <!-- Action buttons -->
+          <div id="enrollActions"></div>
+
+          <!-- Enrolled state (hidden by default) -->
+          <div id="enrolledState" style="display:none">
+            <div class="enrolled-badge">
+              <span class="material-icons-round">check_circle</span> Ya estás matriculado
+            </div>
+            <div class="enrolled-schedule" id="enrolledSchedule"></div>
+            <a href="https://meet.jit.si/FQIngenierosClaseEnVivo" class="btn btn-primary" id="btnIrCurso" style="margin-bottom:8px" target="_blank">
+              <span class="material-icons-round">play_circle</span> Acceder a la clase en vivo
+            </a>
+            <a href="../dashboard/index.html" class="btn btn-outline">
+              <span class="material-icons-round">dashboard</span> Mi dashboard
+            </a>
+            <button class="btn btn-outline" id="btnCancelarInscripcion" style="margin-top:12px">
+              <span class="material-icons-round">cancel</span> Cancelar inscripción
+            </button>
+          </div>
+        </aside>
+
+      </div>
     </div>
   </main>
+
   <footer class="page-footer">
     <div class="container">
       <p>© 2026 FQ INGENIEROS · <a href="../index.html">Inicio</a> · <a href="../empresa/about.html">Nosotros</a></p>
     </div>
   </footer>
-  <!-- ...scripts y lógica original... -->
+
+  <!-- Offline banner -->
+  <div class="offline-banner" id="offlineBanner">
+    <span class="material-icons-round">wifi_off</span> Estás sin conexión — Los datos guardados están disponibles
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/auth-ui.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+
+  <script>
+    // Mostrar grabación si existe en Firestore
+    function showCourseRecording(courseId) {
+      const section = document.getElementById('recordingSection');
+      const video = document.getElementById('courseRecording');
+      db.collection('recordings')
+        .where('courseId', '==', courseId)
+        .orderBy('uploadedAt', 'desc')
+        .limit(1)
+        .get()
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            const data = snapshot.docs[0].data();
+            video.src = data.url;
+            section.style.display = '';
+          } else {
+            section.style.display = 'none';
+          }
+        });
+    }
+    // Llamar después de renderizar el curso
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        if (typeof courseId !== 'undefined' && courseId) {
+          showCourseRecording(courseId);
+        }
+      }, 1200); // Espera a que cargue Firestore y el curso
+    });
+  </script>
+
+  <!-- Usar solo la instancia global de auth/db de firebase-config.js -->
+
+  <script>
+    /* ══════════════════════════════════════════════
+       Course data - Loaded from Firestore
+       ══════════════════════════════════════════════ */
+    var COURSES = {}; // Se llena dinámicamente desde Firestore
+    var courseId = new URLSearchParams(window.location.search).get('id');
+    var course = null;
+
+    // Cargar cursos desde Firestore
+    var FALLBACK_DATA = {
+      'sst-obras-civiles': {
+        temario: [
+          { titulo: 'Introducción a la SST', temas: [
+            'Reseña histórica de la Seguridad y Salud en el Trabajo',
+            'Historia de la SST en el Perú',
+            'Términos y definiciones'
+          ]},
+          { titulo: 'Marco Legal en el Perú', temas: [
+            'Ley N° 29783 y su reglamento D.S. 005-2012-TR',
+            'Leyes de SST',
+            'Resoluciones Ministeriales',
+            'Aplicación en diferentes sectores',
+            'Organismos competentes en el Perú',
+            'Modificatorias',
+            'Principios de la ley'
+          ]},
+          { titulo: 'Peligros y Riesgos', temas: [
+            'Peligros',
+            'Riesgos',
+            'Consecuencias',
+            'Jerarquía de control'
+          ]},
+          { titulo: 'Incidentes y Accidentes', temas: [
+            'Tipos',
+            'Causas',
+            'Reportes'
+          ]},
+          { titulo: 'Análisis de Riesgos', temas: [
+            'Conceptos básicos',
+            'Proceso de análisis',
+            'Elaboración',
+            'Registros'
+          ]}
+        ],
+        includes: [
+          { icon: 'videocam', text: '1 sesión en vivo (1 hora)' },
+          { icon: 'play_circle', text: 'Acceso a la grabación después de la capacitación' },
+          { icon: 'description', text: 'Material de apoyo (si aplica)' },
+          { icon: 'verified', text: 'Constancia de participación digital (gratuita)' },
+          { icon: 'workspace_premium', text: 'Certificado opcional (previo examen y pago de S/ 20)' },
+          { icon: 'forum', text: 'Grupo de coordinación opcional (WhatsApp)' }
+        ],
+        schedules: [
+          { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Jueves 23 de abril' },
+          { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Jueves 23 de abril' }
+        ],
+        icon: 'health_and_safety',
+        badge: 'new',
+        badgeLabel: 'Nuevo',
+        modality: 'En vivo + Grabado',
+        tags: ['Seguridad', 'Obras Civiles', 'Normativa']
+      },
+      'topografia-civil-3d': {
+        temario: [
+          { titulo: 'Introducción a la Topografía', temas: [
+            'Conceptos fundamentales de topografía',
+            'Equipos e instrumentos topográficos',
+            'Sistemas de coordenadas y georreferenciación'
+          ]},
+          { titulo: 'Levantamiento Topográfico', temas: [
+            'Métodos de levantamiento',
+            'Uso de estación total',
+            'Uso de GPS diferencial',
+            'Procesamiento de datos de campo'
+          ]},
+          { titulo: 'Modelamiento 3D', temas: [
+            'Introducción al modelamiento digital del terreno',
+            'Curvas de nivel y superficies',
+            'Software Civil 3D — Interfaz y herramientas',
+            'Creación de superficies desde puntos'
+          ]},
+          { titulo: 'Diseño Vial y Explanaciones', temas: [
+            'Alineamientos horizontales y verticales',
+            'Secciones transversales',
+            'Cálculo de volúmenes de corte y relleno',
+            'Diseño de rasantes'
+          ]},
+          { titulo: 'Proyecto Final', temas: [
+            'Caso práctico integral',
+            'Generación de planos topográficos',
+            'Presentación de informes'
+          ]}
+        ],
+        includes: [
+          { icon: 'videocam', text: 'Sesiones en vivo' },
+          { icon: 'play_circle', text: 'Acceso a grabaciones' },
+          { icon: 'description', text: 'Material de apoyo y plantillas' },
+          { icon: 'workspace_premium', text: 'Certificado digital' },
+          { icon: 'forum', text: 'Grupo de WhatsApp' },
+          { icon: 'quiz', text: 'Examen de certificación' }
+        ],
+        schedules: [
+          { id: 'h1', label: 'Por definir', detail: 'Consultar horarios' }
+        ],
+        icon: 'terrain',
+        badge: 'new',
+        badgeLabel: 'Nuevo',
+        modality: 'En vivo + Grabado',
+        tags: ['Topografía', 'Civil 3D', 'Modelamiento']
+      },
+      'supervision-obra': {
+        temario: [
+          'Rol del supervisor de obra',
+          'Marco legal y contractual',
+          'Control de calidad de materiales',
+          'Cuaderno de obra digital',
+          'Control de avance físico y financiero',
+          'Recepción de obra y liquidación',
+          'Gestión de adicionales y deductivos',
+          'Resolución de controversias',
+          'Supervisión en proyectos públicos (OSCE)',
+          'Caso práctico integral'
+        ],
+        includes: [
+          { icon: 'videocam', text: '10 sesiones en vivo' },
+          { icon: 'play_circle', text: 'Grabaciones disponibles' },
+          { icon: 'description', text: 'Material y normativa' },
+          { icon: 'workspace_premium', text: 'Certificado digital' },
+          { icon: 'forum', text: 'Grupo de WhatsApp' },
+          { icon: 'quiz', text: 'Examen de certificación' }
+        ],
+        schedules: [
+          { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Lunes y miércoles' },
+          { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Martes y jueves' }
+        ],
+        icon: 'engineering',
+        badge: 'pro',
+        badgeLabel: 'Pro',
+        modality: 'En vivo + Grabado',
+        tags: ['Supervisión', 'Control de Calidad', 'Dirección']
+      }
+    };
+
+    // Fallback dinámico: si el curso no está en FALLBACK_DATA pero tiene
+    // "topograf" en su ID o nombre, aplicar este template
+    var FALLBACK_TOPOGRAFIA = {
+      temario: [
+        { titulo: 'Introducción a la Topografía', temas: [
+          'Conceptos fundamentales de topografía',
+          'Equipos e instrumentos topográficos',
+          'Sistemas de coordenadas y georreferenciación'
+        ]},
+        { titulo: 'Levantamiento Topográfico', temas: [
+          'Métodos de levantamiento',
+          'Uso de estación total',
+          'Uso de GPS diferencial',
+          'Procesamiento de datos de campo'
+        ]},
+        { titulo: 'Modelamiento 3D', temas: [
+          'Introducción al modelamiento digital del terreno',
+          'Curvas de nivel y superficies',
+          'Software Civil 3D — Interfaz y herramientas',
+          'Creación de superficies desde puntos'
+        ]},
+        { titulo: 'Diseño Vial y Explanaciones', temas: [
+          'Alineamientos horizontales y verticales',
+          'Secciones transversales',
+          'Cálculo de volúmenes de corte y relleno',
+          'Diseño de rasantes'
+        ]},
+        { titulo: 'Proyecto Final', temas: [
+          'Caso práctico integral',
+          'Generación de planos topográficos',
+          'Presentación de informes'
+        ]}
+      ],
+      includes: [
+        { icon: 'videocam', text: 'Sesiones en vivo' },
+        { icon: 'play_circle', text: 'Acceso a grabaciones' },
+        { icon: 'description', text: 'Material de apoyo y plantillas' },
+        { icon: 'workspace_premium', text: 'Certificado digital' },
+        { icon: 'forum', text: 'Grupo de WhatsApp' },
+        { icon: 'quiz', text: 'Examen de certificación' }
+      ],
+      schedules: [
+        { id: 'h1', label: 'Por definir', detail: 'Consultar horarios' }
+      ],
+      icon: 'terrain',
+      badge: 'new',
+      badgeLabel: 'Nuevo',
+      modality: 'En vivo + Grabado',
+      tags: ['Topografía', 'Civil 3D', 'Modelamiento']
+    };
+
+    function loadCoursesFromFirestore() {
+      return db.collection('courses').get({ source: 'server' }).then(function(snapshot) {
+        console.log('Firestore: ' + snapshot.size + ' cursos cargados');
+        snapshot.forEach(function(doc) {
+          const data = doc.data();
+          // Detectar fallback: por ID exacto o por keyword en nombre/id
+          var fb = FALLBACK_DATA[doc.id] || {};
+          if (!fb.temario && (doc.id + ' ' + (data.name || '')).toLowerCase().indexOf('topograf') !== -1) {
+            fb = FALLBACK_TOPOGRAFIA;
+          }
+          COURSES[doc.id] = {
+            id: doc.id,
+            name: data.name || '',
+            price: data.price || 0,
+            priceLabel: 'S/ ' + (data.price || 'Gratis'),
+            desc: data.desc || '',
+            duration: data.duration || '',
+            sessions: data.sessions || 1,
+            enrolled: data.enrolled || 0,
+            modality: data.modality || fb.modality || 'En vivo',
+            icon: data.icon || fb.icon || 'menu_book',
+            tags: (data.tags && data.tags.length > 0) ? data.tags : (fb.tags || []),
+            badge: data.badge || fb.badge || 'pro',
+            badgeLabel: data.badgeLabel || fb.badgeLabel || 'Curso',
+            zoomLink: data.zoomLink || '',
+            recordingUrl: data.recordingUrl || '',
+            startDate: data.startDate || '',
+            startTime: data.startTime || '',
+            endTime: data.endTime || '',
+            schedules: (data.schedules && data.schedules.length > 0) ? data.schedules : (fb.schedules || []),
+            temario: (data.temario && data.temario.length > 0) ? data.temario : (fb.temario || []),
+            includes: (data.includes && data.includes.length > 0) ? data.includes : (fb.includes || [])
+          };
+        });
+
+        // Si no hay cursos en Firestore, usar fallback completo
+        if (snapshot.size === 0) {
+          Object.keys(FALLBACK_DATA).forEach(function(id) {
+            var fb = FALLBACK_DATA[id];
+            COURSES[id] = {
+              id: id,
+              name: id.replace(/-/g, ' '),
+              price: 0, priceLabel: 'Gratis',
+              desc: '', duration: '', sessions: 1, enrolled: 0,
+              modality: fb.modality, icon: fb.icon,
+              tags: fb.tags, badge: fb.badge, badgeLabel: fb.badgeLabel,
+              zoomLink: '', recordingUrl: '',
+              schedules: fb.schedules, temario: fb.temario, includes: fb.includes
+            };
+          });
+        }
+
+        initCoursePage();
+      }).catch(function(error) {
+        console.error('Error cargando cursos de Firestore:', error);
+        // Si falla Firestore, usar datos de respaldo
+        Object.keys(FALLBACK_DATA).forEach(function(id) {
+          var fb = FALLBACK_DATA[id];
+          COURSES[id] = {
+            id: id, name: id.replace(/-/g, ' '),
+            price: 0, priceLabel: 'Gratis',
+            desc: '', duration: '', sessions: 1, enrolled: 0,
+            modality: fb.modality, icon: fb.icon,
+            tags: fb.tags, badge: fb.badge, badgeLabel: fb.badgeLabel,
+            zoomLink: '', recordingUrl: '',
+            schedules: fb.schedules, temario: fb.temario, includes: fb.includes
+          };
+        });
+        initCoursePage();
+      });
+    }
+
+    function initCoursePage() {
+      course = courseId ? COURSES[courseId] : null;
+
+      // Si no se encontró por ID exacto, buscar por keyword en nombre
+      if (!course && courseId) {
+        var keyword = courseId.replace(/-/g, ' ').toLowerCase();
+        Object.keys(COURSES).forEach(function(key) {
+          if (!course && COURSES[key].name && COURSES[key].name.toLowerCase().indexOf('topograf') !== -1 && keyword.indexOf('topograf') !== -1) {
+            course = COURSES[key];
+          }
+        });
+        // Si aún no se encontró y es topografía, usar fallback
+        if (!course && keyword.indexOf('topograf') !== -1 && FALLBACK_TOPOGRAFIA) {
+          course = {
+            id: courseId,
+            name: 'Topografía en Civil 3D',
+            price: 0, priceLabel: 'Por definir',
+            desc: 'Domina el levantamiento topográfico y el modelamiento digital del terreno con Civil 3D. Aprende diseño vial, cálculo de volúmenes y generación de planos profesionales.',
+            duration: '8 horas', sessions: 4, enrolled: 0,
+            modality: FALLBACK_TOPOGRAFIA.modality,
+            icon: FALLBACK_TOPOGRAFIA.icon,
+            tags: FALLBACK_TOPOGRAFIA.tags,
+            badge: FALLBACK_TOPOGRAFIA.badge,
+            badgeLabel: FALLBACK_TOPOGRAFIA.badgeLabel,
+            zoomLink: '', recordingUrl: '',
+            schedules: FALLBACK_TOPOGRAFIA.schedules || [],
+            temario: FALLBACK_TOPOGRAFIA.temario || [],
+            includes: FALLBACK_TOPOGRAFIA.includes || []
+          };
+        }
+      }
+
+      // Cargar datos de Zoom y grabación desde localStorage
+      if (course) {
+        try {
+          const stored = localStorage.getItem('course_' + courseId);
+          if (stored) {
+            const data = JSON.parse(stored);
+            course.zoomLink = data.zoomLink || course.zoomLink || '';
+            course.recordingUrl = data.recordingUrl || course.recordingUrl || '';
+          }
+        } catch (_) {}
+      }
+
+      if (!course) {
+        document.getElementById('courseMain').innerHTML =
+          '<div style="text-align:center;padding:60px 20px">' +
+          '<span class="material-icons-round" style="font-size:56px;color:#dce3ed">search_off</span>' +
+          '<h2 style="font-size:20px;color:#0f172a;margin:12px 0 6px">Curso no encontrado</h2>' +
+          '<p style="color:#64748b;font-size:14px;margin-bottom:20px">El curso que buscas no existe o fue eliminado.</p>' +
+          '<a href="catalogo.html" class="btn btn-primary" style="width:auto;display:inline-flex">Ver catálogo</a>' +
+          '</div>';
+        document.getElementById('enrollCard').style.display = 'none';
+      } else {
+        renderCourse(course);
+      }
+    }
+
+    // Cargar cursos al iniciar
+    loadCoursesFromFirestore();
+
+    /* ═══════════════════════════════════════════════ */
+
+    function renderCourse(c) {
+        // DEBUG: Mostrar estado de inscripción en consola
+        console.log('[DEBUG] renderCourse:', c.id);
+      // Al renderizar, ocultar ambos estados hasta verificar inscripción
+      document.getElementById('enrolledState').style.display = 'none';
+      document.getElementById('enrollActions').style.display = 'none';
+      document.title = c.name + ' | FQ INGENIEROS';
+      document.getElementById('breadcrumbName').textContent = c.name;
+
+      // Badge: solo un indicador para cursos "próximamente"
+      if (c.id === 'supervision-obra') {
+        document.getElementById('badgeRow').innerHTML = '<span class="cbadge" style="background:#fef3c7;color:#92400e;font-size:16px;padding:7px 18px;display:block;text-align:center;margin-bottom:8px;"><span class="material-icons-round" style="font-size:18px;vertical-align:middle;">upcoming</span> Próximamente</span>';
+      } else {
+        document.getElementById('badgeRow').innerHTML = '<span class="cbadge ' + c.badge + '" style="font-size:16px;padding:7px 18px;">' + c.badgeLabel + '</span>' + (c.price === 0 ? '<span class="cbadge free" style="font-size:16px;padding:7px 18px;">Gratuito</span>' : '');
+      }
+
+      document.getElementById('courseTitle').textContent = c.name;
+      document.getElementById('courseDesc').textContent = c.desc;
+
+      // Meta
+      var metaHtml =
+        '<div class="course-meta-item"><span class="material-icons-round">schedule</span>' + c.duration + '</div>' +
+        '<div class="course-meta-item"><span class="material-icons-round">video_library</span>' + c.sessions + ' sesiones</div>' +
+        '<div class="course-meta-item"><span class="material-icons-round">event_seat</span>Cupos disponibles</div>' +
+        '<div class="course-meta-item"><span class="material-icons-round">videocam</span>' + c.modality + '</div>';
+      if (c.startDate) {
+        var dp = c.startDate.split('-');
+        var meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+        var fechaTexto = parseInt(dp[2]) + ' de ' + meses[parseInt(dp[1])-1] + ', ' + dp[0];
+        metaHtml += '<div class="course-meta-item"><span class="material-icons-round">calendar_month</span>' + fechaTexto + '</div>';
+      }
+      if (c.startTime) {
+        var horarioTexto = c.startTime + (c.endTime ? ' — ' + c.endTime : '');
+        metaHtml += '<div class="course-meta-item"><span class="material-icons-round">access_time</span>' + horarioTexto + '</div>';
+      }
+      document.getElementById('courseMeta').innerHTML = metaHtml;
+
+      // Temario
+      var temHtml = '';
+      if (c.temario && c.temario.length > 0) {
+        var isAccordion = typeof c.temario[0] === 'object' && c.temario[0].titulo;
+        if (isAccordion) {
+          c.temario.forEach(function(mod, i) {
+            var isOpen = i === 0 ? ' open' : '';
+            temHtml += '<div class="temario-module' + isOpen + '">';
+            temHtml += '<button class="temario-header" type="button">';
+            temHtml += '<span class="temario-num">' + (i + 1) + '</span>';
+            temHtml += '<span class="temario-title">' + mod.titulo + '</span>';
+            temHtml += '<span class="material-icons-round temario-toggle">expand_more</span>';
+            temHtml += '</button>';
+            temHtml += '<div class="temario-body"><ul class="temario-topics">';
+            if (mod.temas && mod.temas.length > 0) {
+              mod.temas.forEach(function(t) {
+                temHtml += '<li>' + t + '</li>';
+              });
+            }
+            temHtml += '</ul></div></div>';
+          });
+        } else {
+          c.temario.forEach(function(t, i) {
+            var tema = typeof t === 'string' ? t : (t.titulo || t.name || '');
+            temHtml += '<div class="temario-module">';
+            temHtml += '<div class="temario-header" style="cursor:default">';
+            temHtml += '<span class="temario-num">' + (i + 1) + '</span>';
+            temHtml += '<span class="temario-title">' + tema + '</span>';
+            temHtml += '</div></div>';
+          });
+        }
+      } else {
+        temHtml = '<p style="color:#64748b;font-size:14px;padding:12px 0">Temario no disponible aún.</p>';
+      }
+      document.getElementById('temarioList').innerHTML = temHtml;
+
+      // Toggle accordion
+      document.querySelectorAll('.temario-module button.temario-header').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          this.parentElement.classList.toggle('open');
+        });
+      });
+
+      // Includes
+      var incHtml = '';
+      c.includes.forEach(function(i) {
+        incHtml += '<div class="include-item"><span class="material-icons-round">' + i.icon + '</span>' + i.text + '</div>';
+      });
+      document.getElementById('includesGrid').innerHTML = incHtml;
+
+      // Sidebar price/info (siempre mostrar)
+      document.getElementById('enrollPrice').innerHTML =
+        '<div class="enroll-price">' + c.priceLabel + '</div>' +
+        '<div class="enroll-price-note">' + (c.price === 0 ? 'Sin costo — inscripción libre' : 'Pago único') + '</div>';
+      document.getElementById('enrollInfo').innerHTML =
+        '<div class="enroll-info-item"><span class="material-icons-round">schedule</span>Duración: ' + c.duration + '</div>' +
+        '<div class="enroll-info-item"><span class="material-icons-round">video_library</span>' + c.sessions + ' sesiones</div>' +
+        '<div class="enroll-info-item"><span class="material-icons-round">videocam</span>Modalidad: ' + c.modality + '</div>' +
+        '<div class="enroll-info-item"><span class="material-icons-round">workspace_premium</span>Certificado incluido</div>';
+
+      // Schedules (siempre mostrar si existen)
+      if (c.schedules && c.schedules.length > 0) {
+        var schedHtml = '';
+        c.schedules.forEach(function(s, i) {
+          schedHtml +=
+            '<label class="schedule-opt" onclick="selectSchedule(this)">' +
+            '<input type="radio" name="schedule" value="' + s.id + '"' + (i === 0 ? ' checked' : '') + ' />' +
+            '<div class="schedule-radio"></div>' +
+            '<div class="schedule-opt-text">' + s.label + '<small>' + s.detail + '</small></div>' +
+            '</label>';
+        });
+        document.getElementById('scheduleOptions').innerHTML = schedHtml;
+        document.getElementById('scheduleSection').style.display = '';
+        document.querySelector('#scheduleSection .schedule-label').style.display = '';
+        var firstOpt = document.querySelector('.schedule-opt');
+        if (firstOpt) firstOpt.classList.add('selected');
+      }
+
+      // Botón acción (siempre preparar, pero mostrar solo si corresponde)
+      document.getElementById('enrollActions').innerHTML = '<button class="btn btn-primary" id="btnMatricular" onclick="handleEnroll()"><span class="material-icons-round">how_to_reg</span> Matricularme</button><div class="enroll-hint"><span class="material-icons-round">lock</span> Inscripción segura</div>';
+
+      // Verificar inscripción real en Firestore y localStorage
+      firebase.auth().onAuthStateChanged(function(user) {
+        console.log('[DEBUG] Usuario:', user ? user.uid : null);
+        if (!user || !c) {
+          document.getElementById('enrolledState').style.display = 'none';
+          document.getElementById('enrollActions').style.display = '';
+          return;
+        }
+        var docId = user.uid + '_' + courseId;
+        // Primero, revisar localStorage para experiencia instantánea
+        // Ya no se usa localStorage para mostrar botones, solo Firestore
+        // Siempre consultar Firestore para sincronizar el estado real
+        db.collection('enrollments').doc(docId).onSnapshot(function(doc) {
+          // Usar onSnapshot para reflejar cambios en tiempo real
+          console.log('[DEBUG] Firestore', docId, doc.exists ? doc.data() : null);
+          if (doc.exists && doc.data().status === 'active') {
+            document.getElementById('enrolledState').style.display = '';
+            document.getElementById('enrollActions').style.display = 'none';
+            var fbData = doc.data();
+            if (fbData.schedule && fbData.schedule.label) {
+              document.getElementById('enrolledSchedule').innerHTML =
+                '<span class="material-icons-round">schedule</span> Horario: ' + fbData.schedule.label + ' (' + (fbData.schedule.detail || '') + ')';
+            }
+            try {
+              localStorage.setItem('enrollment_' + user.uid + '_' + courseId, JSON.stringify({
+                enrolled: true,
+                schedule: fbData.schedule || null,
+                fecha: fbData.schedule ? fbData.schedule.detail : null,
+                ts: Date.now()
+              }));
+            } catch (_) {}
+          } else {
+            document.getElementById('enrolledState').style.display = 'none';
+            document.getElementById('enrollActions').style.display = '';
+            try { localStorage.removeItem('enrollment_' + user.uid + '_' + courseId); } catch (_) {}
+          }
+        }, function() {
+          // Si falla, mantener el estado local
+        });
+      });
+    }
+
+    function selectSchedule(el) {
+      document.querySelectorAll('.schedule-opt').forEach(function(o) { o.classList.remove('selected'); });
+      el.classList.add('selected');
+      el.querySelector('input').checked = true;
+    }
+
+    /* ══════════════════════════════════════════════
+       Enrollment handler
+       ══════════════════════════════════════════════ */
+    function handleEnroll() {
+      if (!course) return;
+
+      var user = auth.currentUser;
+      if (!user) {
+        console.warn('[Matrícula] Usuario no autenticado — redirigiendo a login');
+        window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+        return;
+      }
+
+      /* Get selected schedule */
+      var scheduleInput = document.querySelector('input[name="schedule"]:checked');
+      var selectedSchedule = scheduleInput ? scheduleInput.value : null;
+      var scheduleMeta = null;
+      if (selectedSchedule && course.schedules) {
+        course.schedules.forEach(function(s) {
+          if (s.id === selectedSchedule) scheduleMeta = s;
+        });
+      }
+      // Limpiar scheduleMeta: eliminar detail si es undefined (definitivo)
+      var cleanSchedule = null;
+      if (scheduleMeta) {
+        cleanSchedule = { id: scheduleMeta.id, label: scheduleMeta.label };
+        if (typeof scheduleMeta.detail !== 'undefined' && scheduleMeta.detail !== null) {
+          cleanSchedule.detail = scheduleMeta.detail;
+        }
+      }
+
+      /* Validate schedule selection when course has schedules */
+      if (course.schedules && course.schedules.length > 0 && !scheduleMeta) {
+        FQNotify.toast('Selecciona un horario antes de matricularte.', 'warning');
+        console.warn('[Matrícula] Horario no seleccionado. scheduleInput:', scheduleInput, 'value:', selectedSchedule);
+        return;
+      }
+
+      /* ── Block if offline ── */
+      if (!navigator.onLine) {
+        FQNotify.toast('No hay conexión a internet. Conéctate para matricularte.', 'warning');
+        return;
+      }
+
+      var btn = document.getElementById('btnMatricular');
+
+      /* ── Optimistic UI: update immediately ── */
+      document.getElementById('enrollActions').style.display = 'none';
+      document.getElementById('scheduleSection').style.display = 'none';
+      document.getElementById('enrolledState').style.display = '';
+
+      if (scheduleMeta) {
+        var safeDetail = scheduleMeta.detail !== undefined ? scheduleMeta.detail : "";
+        document.getElementById('enrolledSchedule').innerHTML =
+          '<span class="material-icons-round">schedule</span> Horario: ' + scheduleMeta.label + ' (' + safeDetail + ')';
+      }
+      document.getElementById('btnIrCurso').href = '../sesiones/index.html?course=' + course.id;
+
+      FQNotify.toast('¡Te has matriculado correctamente!', 'success', { title: 'Matrícula confirmada' });
+
+      /* ── Persist to localStorage for instant load next time ── */
+      try {
+        var cacheKey = 'enrollment_' + user.uid + '_' + courseId;
+        localStorage.setItem(cacheKey, JSON.stringify({
+          enrolled: true,
+          schedule: scheduleMeta ? { id: scheduleMeta.id, label: scheduleMeta.label, detail: scheduleMeta.detail !== undefined ? scheduleMeta.detail : "" } : null,
+          fecha: scheduleMeta ? (scheduleMeta.detail !== undefined ? scheduleMeta.detail : "") : null,
+          ts: Date.now()
+        }));
+      } catch (_) {}
+
+      /* ── Save to Firestore in background ── */
+      var enrollmentData = {
+        userId: user.uid,
+        userEmail: user.email,
+        courseId: courseId,
+        courseName: course.name,
+        schedule: cleanSchedule,
+        enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
+        status: 'active',
+        progress: 0
+      };
+
+      var docId = user.uid + '_' + courseId;
+      console.log('[Matrícula] Guardando en enrollments/' + docId, enrollmentData);
+
+      db.collection('enrollments').doc(docId).set(enrollmentData)
+        .then(function() {
+          console.log('[Matrícula] ✅ Guardado exitoso');
+          // Forzar recarga de la UI de inscripción para reflejar el estado real
+          setTimeout(function() {
+            if (typeof renderCourse === 'function') renderCourse(course);
+          }, 500);
+        })
+        .catch(function(err) {
+          console.error('[Matrícula] ❌ Error de Firestore:', err);
+          console.error('[Matrícula] Código:', err.code, '| Mensaje:', err.message);
+
+          /* ── Revert optimistic UI ── */
+          document.getElementById('enrolledState').style.display = 'none';
+          document.getElementById('enrollActions').style.display = '';
+          if (course.schedules && course.schedules.length > 0) {
+            document.getElementById('scheduleSection').style.display = '';
+          }
+          FQNotify.btnReset(btn);
+
+          /* Clear localStorage cache */
+          try { localStorage.removeItem('enrollment_' + user.uid + '_' + courseId); } catch (_) {}
+
+          var msg;
+          switch (err.code) {
+            case 'permission-denied':
+              msg = 'No se pudo completar la matrícula. Verifica que las reglas de Firestore incluyan "enrollments".';
+              break;
+            case 'unavailable':
+              msg = 'No se pudo completar la matrícula. Revisa tu conexión a internet.';
+              break;
+            case 'unauthenticated':
+              msg = 'No se pudo completar la matrícula. Tu sesión expiró — recarga la página.';
+              break;
+            default:
+              msg = 'No se pudo completar la matrícula. Intenta nuevamente.';
+          }
+          FQNotify.toast(msg, 'error');
+        });
+    }
+
+    /* ══════════════════════════════════════════════
+       Cancel enrollment handler
+       ══════════════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', function() {
+      var btnCancel = document.getElementById('btnCancelarInscripcion');
+      if (btnCancel) {
+        btnCancel.addEventListener('click', function() {
+          // Mostrar toast de confirmación bonito al costado
+          if (document.getElementById('cancel-toast')) return; // Evitar duplicados
+          var toast = document.createElement('div');
+          toast.id = 'cancel-toast';
+          toast.style.position = 'fixed';
+          toast.style.top = '32px';
+          toast.style.right = '32px';
+          toast.style.zIndex = '9999';
+          toast.style.background = '#fff';
+          toast.style.border = '1.5px solid #f87171';
+          toast.style.boxShadow = '0 2px 12px rgba(0,0,0,.08)';
+          toast.style.padding = '20px 28px 18px 20px';
+          toast.style.borderRadius = '12px';
+          toast.style.display = 'flex';
+          toast.style.flexDirection = 'column';
+          toast.style.alignItems = 'flex-start';
+          toast.innerHTML = '<div style="font-weight:700;font-size:16px;color:#b91c1c;margin-bottom:8px;display:flex;align-items:center;"><span class="material-icons-round" style="margin-right:8px;">help</span>¿Seguro que desea cancelar la inscripción?</div>' +
+            '<div style="font-size:11px;color:#991b1b;margin-bottom:8px;opacity:0.7;line-height:1.3;max-width:260px;">Las malas decisiones se basan en cancelar un curso que te enseñará mucho en la vida y la seguridad.</div>' +
+            '<div style="display:flex;gap:10px;margin-top:6px;">' +
+            '<button id="cancelToastNo" class="btn btn-light" style="padding:6px 18px;">No</button>' +
+            '<button id="cancelToastYes" class="btn btn-danger" style="padding:6px 18px;">Sí, cancelar</button>' +
+            '</div>';
+          document.body.appendChild(toast);
+          document.getElementById('cancelToastNo').onclick = function() {
+            toast.remove();
+          };
+          document.getElementById('cancelToastYes').onclick = function() {
+            toast.remove();
+            var authInstance = window.auth || firebase.auth();
+            var user = authInstance.currentUser;
+            if (!user) {
+              FQNotify.toast('No se pudo cancelar la inscripción. Sesión no encontrada.', 'error');
+              return;
+            }
+            var docId = user.uid + '_' + courseId;
+            db.collection('enrollments').doc(docId).delete().then(function() {
+              try { localStorage.removeItem('enrollment_' + user.uid + '_' + courseId); } catch (_) {}
+              // Refrescar estado desde Firestore para asegurar UI correcta
+              setTimeout(function() {
+                db.collection('enrollments').doc(docId).get().then(function(doc) {
+                  if (!doc.exists) {
+                    document.getElementById('enrolledState').style.display = 'none';
+                    document.getElementById('enrollActions').style.display = '';
+                    if (course.schedules && course.schedules.length > 0) {
+                      document.getElementById('scheduleSection').style.display = '';
+                      // Restaurar opciones de horario
+                      var schedHtml = '';
+                      course.schedules.forEach(function(s, i) {
+                        schedHtml +=
+                          '<label class="schedule-opt" onclick="selectSchedule(this)">' +
+                          '<input type="radio" name="schedule" value="' + s.id + '"' + (i === 0 ? ' checked' : '') + ' />' +
+                          '<div class="schedule-radio"></div>' +
+                          '<div class="schedule-opt-text">' + s.label + '<small>' + (s.detail || '') + '</small></div>' +
+                          '</label>';
+                      });
+                      document.getElementById('scheduleOptions').innerHTML = schedHtml;
+                      var firstOpt = document.querySelector('.schedule-opt');
+                      if (firstOpt) firstOpt.classList.add('selected');
+                    }
+                    document.getElementById('enrollActions').innerHTML = '<button class="btn btn-primary" id="btnMatricular" onclick="handleEnroll()"><span class="material-icons-round">how_to_reg</span> Matricularme</button><div class="enroll-hint"><span class="material-icons-round">lock</span> Inscripción segura</div>';
+                    var btnMatricular = document.getElementById('btnMatricular');
+                    if (btnMatricular) {
+                      btnMatricular.onclick = handleEnroll;
+                    }
+                    FQNotify.toast('Inscripción cancelada correctamente.', 'success');
+                  } else {
+                    FQNotify.toast('No se pudo cancelar la inscripción. Intenta nuevamente.', 'error');
+                  }
+                });
+              }, 500);
+            }).catch(function(err) {
+              FQNotify.toast('No se pudo cancelar la inscripción. Intenta nuevamente.', 'error');
+              console.error('[Cancelación] Error:', err);
+            });
+          };
+        });
+      }
+    });
+    /* ══════════════════════════════════════════════
+       Check enrollment state on auth
+       ══════════════════════════════════════════════ */
+    function showEnrolledUI(scheduleData) {
+      document.getElementById('enrollActions').style.display = 'none';
+      document.getElementById('scheduleSection').style.display = 'none';
+      document.getElementById('enrolledState').style.display = '';
+
+      // Solo mostrar el horario si hay grabación disponible (simulación: solo si course.hasRecording es true)
+      if (course.hasRecording && scheduleData && scheduleData.label) {
+        document.getElementById('enrolledSchedule').innerHTML =
+          '<span class="material-icons-round">schedule</span> Horario: ' + scheduleData.label + ' (' + scheduleData.detail + ')';
+      } else {
+        document.getElementById('enrolledSchedule').innerHTML = '';
+      }
+      document.getElementById('btnIrCurso').href = '../sesiones/index.html?course=' + course.id;
+    }
+
+    (window.auth || firebase.auth()).onAuthStateChanged(function(user) {
+      if (!user || !course) return;
+
+      var cacheKey = 'enrollment_' + user.uid + '_' + courseId;
+
+      /* 1️⃣ Instant: check localStorage first */
+      try {
+        var cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          var data = JSON.parse(cached);
+          showEnrolledUI(data.schedule);
+        }
+      } catch (_) {}
+
+      /* 2️⃣ Background: validate with Firestore */
+      db.collection('enrollments').doc(user.uid + '_' + courseId).get()
+        .then(function(doc) {
+          if (doc.exists && doc.data().status === 'active') {
+            var fbData = doc.data();
+            showEnrolledUI(fbData.schedule);
+
+            /* Sync localStorage with Firestore truth */
+            try {
+              localStorage.setItem(cacheKey, JSON.stringify({
+                enrolled: true,
+                schedule: fbData.schedule || null,
+                fecha: fbData.schedule ? fbData.schedule.detail : null,
+                ts: Date.now()
+              }));
+            } catch (_) {}
+          } else {
+            /* Not enrolled in Firestore — clear stale cache & revert UI */
+            try { localStorage.removeItem(cacheKey); } catch (_) {}
+            document.getElementById('enrolledState').style.display = 'none';
+            document.getElementById('enrollActions').style.display = '';
+            if (course.schedules && course.schedules.length > 0) {
+              document.getElementById('scheduleSection').style.display = '';
+            }
+          }
+        })
+        .catch(function() {
+          /* Offline: trust localStorage cache, don't wipe UI */
+          if (!navigator.onLine) return;
+        });
+    });
+
+    /* ══════════════════════════════════════════════
+       Offline / Online detection
+       ══════════════════════════════════════════════ */
+    function updateOfflineBanner() {
+      var banner = document.getElementById('offlineBanner');
+      var btn = document.getElementById('btnMatricular');
+      if (!navigator.onLine) {
+        if (banner) banner.classList.add('visible');
+        if (btn) btn.disabled = true;
+      } else {
+        if (banner) banner.classList.remove('visible');
+        if (btn && document.getElementById('enrollActions').style.display !== 'none') btn.disabled = false;
+      }
+    }
+
+    window.addEventListener('online', function() {
+      updateOfflineBanner();
+      FQNotify.toast('Conexión restaurada', 'success');
+      /* Re-sync enrollment state */
+      var user = auth.currentUser;
+      if (user && course) {
+        var cacheKey = 'enrollment_' + user.uid + '_' + courseId;
+        db.collection('enrollments').doc(user.uid + '_' + courseId).get()
+          .then(function(doc) {
+            if (doc.exists && doc.data().status === 'active') {
+              var fbData = doc.data();
+              showEnrolledUI(fbData.schedule);
+              try {
+                localStorage.setItem(cacheKey, JSON.stringify({
+                  enrolled: true,
+                  schedule: fbData.schedule || null,
+                  fecha: fbData.schedule ? fbData.schedule.detail : null,
+                  ts: Date.now()
+                }));
+              } catch (_) {}
+            } else {
+              try { localStorage.removeItem(cacheKey); } catch (_) {}
+              document.getElementById('enrolledState').style.display = 'none';
+              document.getElementById('enrollActions').style.display = '';
+              if (course.schedules && course.schedules.length > 0) {
+                document.getElementById('scheduleSection').style.display = '';
+              }
+            }
+          });
+      }
+    });
+
+    window.addEventListener('offline', function() {
+      updateOfflineBanner();
+      FQNotify.toast('Se perdió la conexión a internet', 'warning');
+    });
+
+    updateOfflineBanner();
+  </script>
 </body>
 </html>

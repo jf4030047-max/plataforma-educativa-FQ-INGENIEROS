@@ -1,41 +1,41 @@
 /* ═══════════════════════════════════════════════════════
-	 SISTEMA DE NOTIFICACIONES — FQ INGENIEROS
-	 Componente reutilizable: Toast + Inline Alerts + Buttons
-	 ═══════════════════════════════════════════════════════ */
+   SISTEMA DE NOTIFICACIONES — FQ INGENIEROS
+   Componente reutilizable: Toast + Inline Alerts + Buttons
+   ═══════════════════════════════════════════════════════ */
 
 /* ── Toast Container ────────────────────────────────── */
 .fq-toast-container{
-	position:fixed;top:20px;right:20px;z-index:10000;
-	display:flex;flex-direction:column;gap:10px;pointer-events:none;
+  position:fixed;top:20px;right:20px;z-index:10000;
+  display:flex;flex-direction:column;gap:10px;pointer-events:none;
 }
 
 /* ── Toast Base ─────────────────────────────────────── */
 .fq-toast{
-	pointer-events:auto;display:flex;align-items:center;gap:12px;
-	padding:14px 20px;border-radius:14px;font-size:13px;font-weight:500;
-	min-width:320px;max-width:460px;background:#fff;
-	box-shadow:0 8px 32px rgba(15,23,42,.15);
-	animation:fqToastIn .4s ease;font-family:'Inter',system-ui,sans-serif;
+  pointer-events:auto;display:flex;align-items:center;gap:12px;
+  padding:14px 20px;border-radius:14px;font-size:13px;font-weight:500;
+  min-width:320px;max-width:460px;background:#fff;
+  box-shadow:0 8px 32px rgba(15,23,42,.15);
+  animation:fqToastIn .4s ease;font-family:'Inter',system-ui,sans-serif;
 }
 .fq-toast.removing{animation:fqToastOut .3s ease forwards}
 
 .fq-toast .fq-toast-icon{
-	width:32px;height:32px;border-radius:8px;
-	display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
 .fq-toast .fq-toast-body{flex:1}
 .fq-toast .fq-toast-title{font-weight:700;font-size:14px;margin-bottom:1px}
 .fq-toast .fq-toast-msg{font-size:12px;opacity:.8}
 .fq-toast .fq-toast-close{
-	background:none;border:none;cursor:pointer;opacity:.5;
-	padding:4px;display:grid;place-items:center;border-radius:6px;
+  background:none;border:none;cursor:pointer;opacity:.5;
+  padding:4px;display:grid;place-items:center;border-radius:6px;
 }
 .fq-toast .fq-toast-close:hover{opacity:1;background:rgba(0,0,0,.05)}
 
 /* ── Toast Progress Bar ─────────────────────────────── */
 .fq-toast-progress{
-	position:absolute;bottom:0;left:0;height:3px;border-radius:0 0 14px 14px;
-	animation:fqProgress var(--fq-toast-duration,3s) linear forwards;
+  position:absolute;bottom:0;left:0;height:3px;border-radius:0 0 14px 14px;
+  animation:fqProgress var(--fq-toast-duration,3s) linear forwards;
 }
 
 /* ── Toast Variants ─────────────────────────────────── */
@@ -57,46 +57,46 @@
 
 /* ── Inline Alert Base ──────────────────────────────── */
 .fq-alert{
-	padding:14px 18px;border-radius:12px;font-size:13px;
-	display:none;align-items:flex-start;gap:12px;
-	margin-bottom:18px;line-height:1.5;position:relative;
-	animation:fqAlertSlideIn .3s ease;
+  padding:14px 18px;border-radius:12px;font-size:13px;
+  display:none;align-items:flex-start;gap:12px;
+  margin-bottom:18px;line-height:1.5;position:relative;
+  animation:fqAlertSlideIn .3s ease;
 }
 .fq-alert .fq-alert-icon{
-	width:36px;height:36px;border-radius:10px;
-	display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
 .fq-alert .fq-alert-content{flex:1}
 .fq-alert .fq-alert-title{font-weight:700;font-size:14px;margin-bottom:2px}
 .fq-alert .fq-alert-msg{font-size:13px;opacity:.85}
 .fq-alert .fq-alert-close{
-	position:absolute;top:10px;right:12px;background:none;border:none;
-	cursor:pointer;opacity:.5;padding:0;display:grid;place-items:center;
+  position:absolute;top:10px;right:12px;background:none;border:none;
+  cursor:pointer;opacity:.5;padding:0;display:grid;place-items:center;
 }
 .fq-alert .fq-alert-close:hover{opacity:1}
 
 /* ── Inline Alert Variants ──────────────────────────── */
 .fq-alert.fq-alert-success{
-	display:flex;background:linear-gradient(135deg,#f0fdf4,#dcfce7);
-	color:#15803d;border:1px solid #bbf7d0;box-shadow:0 2px 12px rgba(22,163,74,.1);
+  display:flex;background:linear-gradient(135deg,#f0fdf4,#dcfce7);
+  color:#15803d;border:1px solid #bbf7d0;box-shadow:0 2px 12px rgba(22,163,74,.1);
 }
 .fq-alert.fq-alert-success .fq-alert-icon{background:#dcfce7;color:#16a34a}
 
 .fq-alert.fq-alert-error{
-	display:flex;background:linear-gradient(135deg,#fef2f2,#fee2e2);
-	color:#b91c1c;border:1px solid #fecaca;box-shadow:0 2px 12px rgba(220,38,38,.1);
+  display:flex;background:linear-gradient(135deg,#fef2f2,#fee2e2);
+  color:#b91c1c;border:1px solid #fecaca;box-shadow:0 2px 12px rgba(220,38,38,.1);
 }
 .fq-alert.fq-alert-error .fq-alert-icon{background:#fee2e2;color:#dc2626}
 
 .fq-alert.fq-alert-warning{
-	display:flex;background:linear-gradient(135deg,#fffbeb,#fef3c7);
-	color:#92400e;border:1px solid #fde68a;box-shadow:0 2px 12px rgba(245,158,11,.08);
+  display:flex;background:linear-gradient(135deg,#fffbeb,#fef3c7);
+  color:#92400e;border:1px solid #fde68a;box-shadow:0 2px 12px rgba(245,158,11,.08);
 }
 .fq-alert.fq-alert-warning .fq-alert-icon{background:#fef3c7;color:#f59e0b}
 
 .fq-alert.fq-alert-info{
-	display:flex;background:linear-gradient(135deg,#eff6ff,#dbeafe);
-	color:#1e40af;border:1px solid #bfdbfe;box-shadow:0 2px 12px rgba(30,64,175,.08);
+  display:flex;background:linear-gradient(135deg,#eff6ff,#dbeafe);
+  color:#1e40af;border:1px solid #bfdbfe;box-shadow:0 2px 12px rgba(30,64,175,.08);
 }
 .fq-alert.fq-alert-info .fq-alert-icon{background:#dbeafe;color:#1565c0}
 
@@ -108,6 +108,6 @@
 
 /* ── Responsive ─────────────────────────────────────── */
 @media(max-width:480px){
-	.fq-toast-container{top:12px;right:12px;left:12px}
-	.fq-toast{min-width:0;width:100%}
+  .fq-toast-container{top:12px;right:12px;left:12px}
+  .fq-toast{min-width:0;width:100%}
 }
