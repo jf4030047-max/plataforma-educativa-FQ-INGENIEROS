@@ -14,10 +14,47 @@
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
     .container{width:min(1140px,92%);margin:0 auto}
-    /* ...existing code... */
+    /* Breadcrumb */
+    /* Layout */
+    .course-layout{display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start}
+    /* Main info */
+    .course-main .badge-row{display:flex;gap:8px;margin-bottom:12px}
+    .cbadge{padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+    .cbadge.new{background:#dbeafe;color:#1565c0}
+    .cbadge.top{background:#0f172a;color:#60a5fa}
+    .cbadge.pro{background:#eef2f7;color:#334155}
+    .cbadge.free{background:#d1fae5;color:#065f46}
+    .course-main h1{font-size:clamp(24px,3.5vw,34px);font-weight:800;color:#0f172a;margin-bottom:10px;line-height:1.2}
+    .course-main .desc{font-size:15px;color:#475569;line-height:1.7;margin-bottom:20px}
+    .course-meta{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px}
+    .course-meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:#64748b;font-weight:500}
+    .course-meta-item .material-icons-round{font-size:18px;color:#1565c0}
   </style>
 </head>
 <body>
-  <!-- ...existing code... -->
+  <!-- Top bar -->
+  <header class="top-bar">
+    <div class="container top-bar-inner">
+      <a class="brand" href="../index.html">
+        <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
+      </a>
+      <div class="top-bar-right">
+        <div class="navbar-actions" id="navActions"></div>
+        <a class="back-link" href="catalogo.html"><span class="material-icons-round">arrow_back</span> Cursos</a>
+      </div>
+    </div>
+  </header>
+  <main class="page">
+    <div class="container">
+      <!-- ...resto del contenido original de cursos/curso.html... -->
+    </div>
+  </main>
+  <footer class="page-footer">
+    <div class="container">
+      <p>© 2026 FQ INGENIEROS · <a href="../index.html">Inicio</a> · <a href="../empresa/about.html">Nosotros</a></p>
+    </div>
+  </footer>
+  <!-- ...scripts y lógica original... -->
 </body>
 </html>
