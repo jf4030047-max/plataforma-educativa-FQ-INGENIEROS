@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plataforma Educativa | FQ INGENIEROS</title>
+  <meta name="description" content="Cursos virtuales en vivo y grabados para profesionales. Constancias y certificación por FQ INGENIEROS." />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="assets/css/header.css" />
+</head>
+<body>
+
+  <!-- ═══════════ NAVBAR ═══════════ -->
+  <header class="top-bar">
+    <div class="container top-bar-inner">
+      <a class="brand" href="#hero">
+        <img src="assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
+      </a>
+
+      <nav class="top-bar-nav" id="mainNav">
+        <a href="#cursos">Cursos</a>
+        <a href="#sesiones">Sesiones</a>
+        <a href="#certificados">Certificados</a>
+        <a href="#empresa">Empresa</a>
+      </nav>
+
+      <div class="top-bar-right">
+        <div class="navbar-actions" id="navActions">
+          <a href="auth/login.html" class="btn btn-outline">Iniciar sesión</a>
+          <a href="auth/registro.html" class="btn btn-primary">Registrarse</a>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="Menú">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ...existing code... -->
+  </main>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer class="footer">
+    <div class="container">
+      <!-- ...existing code... -->
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/auth-ui.js"></script>
+  <script src="assets/js/index-dynamic.js?v=20260415b"></script>
+  <script>
+  /* Forzar fecha correcta desde REST API (sin caché) */
+  (function(){
+    var M=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    var D=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+    function fmt(s){var p=s.split('-');var d=new Date(+p[0],+p[1]-1,+p[2]);return D[d.getDay()]+' '+d.getDate()+' de '+M[d.getMonth()]+', '+d.getFullYear();}
+    function v(f){return f?(f.stringValue||f.integerValue||''):'';}
+    var B='https://firestore.googleapis.com/v1/projects/fq-ingenieros-educativa/databases/(default)/documents/courses/';
+    fetch(B+'topografia-civil-3d?t='+Date.now()).then(function(r){return r.json()}).then(function(j){
+      var f=j.fields||{};var el;
+      if(v(f.startDate)&&(el=document.getElementById('topo-date')))el.innerHTML='<span class="material-icons-round">calendar_month</span> '+fmt(v(f.startDate));
+      if(v(f.duration)&&(el=document.getElementById('topo-duration')))el.innerHTML='<span class="material-icons-round">schedule</span> '+v(f.duration)+(v(f.modality)?' · '+v(f.modality):'');
+      if((el=document.getElementById('topo-price'))){var p=v(f.price);el.innerHTML='<span class="material-icons-round">sell</span> '+(p&&p!=='0'?'S/ '+p:'Precio por definir');}
+    }).catch(function(){});
+    fetch(B+'sst-obras-civiles?t='+Date.now()).then(function(r){return r.json()}).then(function(j){
+      var f=j.fields||{};var el;
+      if(v(f.startDate)&&(el=document.getElementById('sst-date')))el.innerHTML='<span class="material-icons-round">calendar_month</span> '+fmt(v(f.startDate));
+      if(v(f.startTime)&&(el=document.getElementById('sst-time'))){var t=v(f.startTime);if(v(f.endTime))t+=' — '+v(f.endTime);el.innerHTML='<span class="material-icons-round">schedule</span> '+t;}
+    }).catch(function(){});
+  })();
+  </script>
+
+  <!-- Eliminados scripts duplicados/conflictivos. La barra de usuario es gestionada solo por assets/js/auth-ui.js -->
+</body>
+  <script>
+    // Forzar precio de topografía desde REST API, sin caché
+    fetch('https://firestore.googleapis.com/v1/projects/fq-ingenieros-educativa/databases/(default)/documents/courses/topografia-civil-3d?t='+Date.now())
+      .then(r=>r.json())
+      .then(j=>{
+        var f=j.fields||{};
+        var el=document.getElementById('price-topografia');
+        var price=f.price&&(f.price.integerValue||f.price.stringValue);
+        if(el) el.textContent=(price&&price!=='0')?'S/ '+price:'Por definir';
+      });
+  </script>
+</html>
