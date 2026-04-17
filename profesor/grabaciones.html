@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grabaciones del Profesor | FQ INGENIEROS</title>
+  <link href="../assets/css/notifications.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f7f9fc; color: #334155; }
+    .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.06); padding: 32px; }
+    h1 { font-size: 22px; margin-bottom: 18px; }
+    label { display: block; margin-top: 18px; font-weight: 600; }
+    input, select { width: 100%; padding: 10px; margin-top: 6px; border-radius: 8px; border: 1.5px solid #dce3ed; font-size: 15px; }
+    button { margin-top: 22px; background: #1565c0; color: #fff; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .video-list { margin-top: 32px; }
+    .video-item { background: #f1f5f9; border-radius: 8px; padding: 12px; margin-bottom: 14px; }
+    .video-item video { width: 100%; border-radius: 8px; }
+    .video-meta { font-size: 13px; color: #64748b; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Subir grabación de clase</h1>
+    <form id="uploadForm">
+      <label for="videoFile">Archivo de video (mp4, webm, mov):</label>
+      <input type="file" id="videoFile" accept="video/*" required />
+      <label for="courseSelect">Asignar a curso:</label>
+      <select id="courseSelect" required></select>
+      <button type="submit">Subir grabación</button>
+    </form>
+    <div class="video-list" id="videoList"></div>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/auth-ui.js"></script>
+  <script>
+    // Cargar cursos para el select
+    const courseSelect = document.getElementById('courseSelect');
+    db.collection('courses').get().then(snapshot => {
+      snapshot.forEach(doc => {
+        const opt = document.createElement('option');
+        opt.value = doc.id;
+        opt.textContent = doc.data().name || doc.id;
+        courseSelect.appendChild(opt);
+      });
+    });
+
+    // Subida de video
+    document.getElementById('uploadForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const file = document.getElementById('videoFile').files[0];
+      const courseId = courseSelect.value;
+      if (!file || !courseId) return;
+      const user = auth.currentUser;
+      if (!user) return alert('Debes iniciar sesión.');
+      const storageRef = firebase.storage().ref('recordings/' + Date.now() + '_' + file.name);
+      const uploadTask = storageRef.put(file);
+      uploadTask.on('state_changed', null, err => alert('Error: ' + err), async () => {
+        const url = await uploadTask.snapshot.ref.getDownloadURL();
+        await db.collection('recordings').add({
+          url,
+          name: file.name,
+          courseId,
+          userId: user.uid,
+          uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert('Grabación subida correctamente.');
+        loadRecordings();
+      });
+    };
+
+    // Mostrar grabaciones (solo propias)
+    async function loadRecordings() {
+      const user = auth.currentUser;
+      if (!user) return;
+      let query = db.collection('recordings').where('userId', '==', user.uid);
+      query.orderBy('uploadedAt', 'desc').get().then(snapshot => {
+        const list = document.getElementById('videoList');
+        list.innerHTML = '';
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const div = document.createElement('div');
+          div.className = 'video-item';
+          div.innerHTML = `<video controls src="${data.url}"></video><div class="video-meta">${data.name} | Curso: ${data.courseId}</div>`;
+          list.appendChild(div);
+        });
+      });
+    }
+    firebase.auth().onAuthStateChanged(loadRecordings);
+  </script>
+</body>
+</html>

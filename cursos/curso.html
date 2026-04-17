@@ -166,6 +166,12 @@
             <h2><span class="material-icons-round">verified</span> ¿Qué incluye?</h2>
             <div class="includes-grid" id="includesGrid"></div>
           </div>
+
+          <!-- Grabación de la clase (si existe) -->
+          <div class="section" id="recordingSection" style="display:none">
+            <h2><span class="material-icons-round">play_circle</span> Grabación de la clase</h2>
+            <video id="courseRecording" controls style="width:100%;max-width:700px;border-radius:10px"></video>
+          </div>
         </div>
 
         <!-- Sidebar enrollment -->
@@ -223,6 +229,36 @@
   <script src="../assets/js/firebase-config.js"></script>
   <script src="../assets/js/auth-ui.js"></script>
   <script src="../assets/js/notifications.js"></script>
+
+  <script>
+    // Mostrar grabación si existe en Firestore
+    function showCourseRecording(courseId) {
+      const section = document.getElementById('recordingSection');
+      const video = document.getElementById('courseRecording');
+      db.collection('recordings')
+        .where('courseId', '==', courseId)
+        .orderBy('uploadedAt', 'desc')
+        .limit(1)
+        .get()
+        .then(snapshot => {
+          if (!snapshot.empty) {
+            const data = snapshot.docs[0].data();
+            video.src = data.url;
+            section.style.display = '';
+          } else {
+            section.style.display = 'none';
+          }
+        });
+    }
+    // Llamar después de renderizar el curso
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        if (typeof courseId !== 'undefined' && courseId) {
+          showCourseRecording(courseId);
+        }
+      }, 1200); // Espera a que cargue Firestore y el curso
+    });
+  </script>
 
   <!-- Usar solo la instancia global de auth/db de firebase-config.js -->
 
@@ -510,7 +546,7 @@
             name: 'Topografía en Civil 3D',
             price: 0, priceLabel: 'Por definir',
             desc: 'Domina el levantamiento topográfico y el modelamiento digital del terreno con Civil 3D. Aprende diseño vial, cálculo de volúmenes y generación de planos profesionales.',
-            duration: '8 horas', sessions: 8, enrolled: 0,
+            duration: '8 horas', sessions: 4, enrolled: 0,
             modality: FALLBACK_TOPOGRAFIA.modality,
             icon: FALLBACK_TOPOGRAFIA.icon,
             tags: FALLBACK_TOPOGRAFIA.tags,
