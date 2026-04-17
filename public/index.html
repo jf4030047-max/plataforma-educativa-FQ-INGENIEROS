@@ -44,8 +44,265 @@
     </div>
   </header>
 
+
   <main>
-    <!-- ...existing code... -->
+
+    <!-- ═══════════ HERO ═══════════ -->
+    <section class="hero" id="hero">
+      <div class="hero-bg"></div>
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <span class="chip chip-blue"><span class="material-icons-round">school</span> Capacitación profesional</span>
+          <h1>Fortalece tu perfil profesional con <em>FQ Ingenieros</em></h1>
+          <p class="hero-desc">
+            Accede a cursos especializados, sesiones en vivo y grabadas, obtén tu constancia de
+            participación automáticamente y certifícate rindiendo un examen.
+          </p>
+          <div class="hero-btns">
+            <a href="cursos/catalogo.html" class="btn btn-primary btn-lg">
+              <span class="material-icons-round">play_circle</span> Explorar cursos
+            </a>
+            <a href="auth/registro.html" class="btn btn-outline btn-lg">Crear cuenta gratis</a>
+          </div>
+          <div class="hero-stats">
+            <div><strong>más de 10</strong><span>Profesionales</span></div>
+            <div><strong>más de 10</strong><span>Cursos</span></div>
+            <div><strong>98%</strong><span>Satisfacción</span></div>
+          </div>
+          <div class="hero-video" style="margin-top:2rem;text-align:center">
+            <video controls style="max-width:100%;border-radius:1rem;box-shadow:0 2px 16px #0002">
+              <source src="Guion gráfico 2.mp4" type="video/mp4">
+              Tu navegador no soporta video HTML5.
+            </video>
+          </div>
+        </div>
+
+        <aside class="hero-card">
+          <div class="hc-badge"><span class="material-icons-round">bolt</span> Curso actual</div>
+          <h3><a href="cursos/curso.html?id=sst-obras-civiles" style="color:inherit;text-decoration:none">Seguridad y Salud en el Trabajo en Obras Civiles</a></h3>
+          <ul class="hc-details">
+            <li id="sst-date"><span class="material-icons-round">calendar_month</span> jueves 23 de abril, 2026</li>
+            <li id="sst-time"><span class="material-icons-round">schedule</span> 5:00 p.m. — 6:00 p.m. / 7:00 p.m. — 8:00 p.m.</li>
+            <li><span class="material-icons-round">videocam</span> Zoom en vivo + Grabación</li>
+            <li><span class="material-icons-round">workspace_premium</span> Constancia incluida</li>
+          </ul>
+          <div class="course-action" data-course="sst-obras-civiles" id="current-course-action"></div>
+
+          <div class="hc-divider"></div>
+
+          <div class="hc-badge"><span class="material-icons-round">terrain</span> Nuevo curso</div>
+          <h3><a href="cursos/curso.html?id=topografia-civil-3d" style="color:inherit;text-decoration:none">Topografía en Civil 3D</a></h3>
+          <ul class="hc-details">
+            <li id="topo-date"><span class="material-icons-round">calendar_month</span> sábado 9 de mayo, 2026</li>
+            <li id="topo-duration"><span class="material-icons-round">schedule</span> 8 horas · En vivo + Grabado</li>
+            <li id="topo-price"><span class="material-icons-round">sell</span> Precio por definir</li>
+          </ul>
+          <div class="course-action" data-course="topografia-civil-3d"></div>
+
+          <div class="hc-divider"></div>
+
+          <div class="hc-badge upcoming"><span class="material-icons-round">upcoming</span> Próximos cursos</div>
+          <ul class="hc-upcoming">
+            <li>
+              <span class="material-icons-round">arrow_right</span>
+              <div>
+                <strong>Supervisión de Obra</strong>
+                <span>Próximamente · 16 horas</span>
+              </div>
+            </li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ═══════════ CURSOS ═══════════ -->
+    <section id="cursos" class="section">
+      <div class="container">
+        <div class="section-head">
+          <span class="chip chip-dark"><span class="material-icons-round">menu_book</span> Catálogo</span>
+          <h2>Cursos disponibles</h2>
+          <p class="section-sub">Programas diseñados para profesionales del sector construcción e ingeniería.</p>
+        </div>
+
+        <div class="grid-3">
+          <article class="course-card">
+            <div class="cc-top">
+              <span class="badge badge-blue">Nuevo</span>
+              <span class="cc-price" id="price-sst-obras">Gratis</span>
+            </div>
+            <div style="text-align:center;margin-bottom:0.5rem">
+              <img src="_cbf93f1f-98f4-462b-afa8-aa378cc5b584.jfif" alt="Seguridad y Salud en el Trabajo" style="max-width:180px;height:auto;border-radius:1rem;box-shadow:0 2px 16px #0002">
+            </div>
+            <h3><a href="cursos/curso.html?id=sst-obras-civiles">Seguridad y Salud en el Trabajo en Obras Civiles</a></h3>
+            <p>Conoce los fundamentos de la Seguridad y Salud en el Trabajo aplicados a obras civiles, incluyendo marco legal peruano, identificación de peligros y riesgos, investigación de incidentes y elaboración de análisis de riesgos según normativa vigente.</p>
+            <div class="cc-meta">
+              <span><span class="material-icons-round">schedule</span> 1 hora</span>
+              <span><span class="material-icons-round">event_seat</span> Cupos disponibles</span>
+              <span><span class="material-icons-round">videocam</span> En vivo + Grabado</span>
+            </div>
+            <div class="course-action" data-course="sst-obras-civiles"></div>
+          </article>
+
+          <article class="course-card">
+            <div class="cc-top">
+              <span class="badge badge-accent">Nuevo</span>
+              <span class="cc-price" id="price-topografia">Por definir</span>
+            </div>
+            <div style="text-align:center;margin-bottom:0.5rem">
+              <img src="_ca1bc5d1-4cda-4d5a-b5a0-6631012b8b6f.jfif" alt="Topografía en Civil 3D" style="max-width:180px;height:auto;border-radius:1rem;box-shadow:0 2px 16px #0002">
+            </div>
+            <h3><a href="cursos/curso.html?id=topografia-civil-3d">Topografía en Civil 3D</a></h3>
+          <p>Domina el levantamiento topográfico y el modelamiento digital del terreno con Civil 3D. Aprende diseño vial, cálculo de volúmenes y generación de planos profesionales.</p>
+            <div class="cc-meta">
+              <span><span class="material-icons-round">schedule</span> 8 horas</span>
+              <span><span class="material-icons-round">event_seat</span> Cupos disponibles</span>
+              <span><span class="material-icons-round">videocam</span> En vivo + Grabado</span>
+            </div>
+            <div class="course-action" data-course="topografia-civil-3d"></div>
+          </article>
+
+          <article class="course-card">
+            <div class="cc-top">
+              <span class="badge badge-silver">Pro</span>
+              <span class="cc-price" id="price-supervision">S/ 80</span>
+            </div>
+            <h3><a href="cursos/curso.html?id=supervision-obra">Supervisión de Obra</a></h3>
+            <p>Desarrolla competencias en dirección técnica, control de calidad, gestión de cuaderno de obra y aplicación de buenas prácticas de supervisión. Enfocado en proyectos civiles y normativas actuales.</p>
+            <div class="cc-meta">
+              <span><span class="material-icons-round">schedule</span> 16 horas</span>
+              <span><span class="material-icons-round">event_seat</span> Cupos disponibles</span>
+              <span><span class="material-icons-round">videocam</span> En vivo + Grabado</span>
+            </div>
+            <div class="course-action" data-course="supervision-obra"></div>
+          </article>
+        </div>
+
+        <div class="section-action">
+          <a href="cursos/catalogo.html" class="btn btn-outline">Ver todos los cursos <span class="material-icons-round">arrow_forward</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ SESIONES ═══════════ -->
+    <section id="sesiones" class="section section-alt">
+      <div class="container">
+        <div class="section-head">
+          <span class="chip chip-dark"><span class="material-icons-round">live_tv</span> Aprendizaje</span>
+          <h2>Sesiones en vivo y grabadas</h2>
+          <p class="section-sub">Interactúa en tiempo real o estudia a tu propio ritmo con la biblioteca completa.</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="feature-panel">
+            <div class="fp-icon live"><span class="material-icons-round">sensors</span></div>
+            <h3>Clases en vivo</h3>
+            <p>Sesiones por Zoom con interacción directa, preguntas al expositor y ejercicios prácticos en grupo.</p>
+            <ul class="fp-list">
+              <li><span class="material-icons-round">check_circle</span> Horarios flexibles</li>
+              <li><span class="material-icons-round">check_circle</span> Preguntas en tiempo real</li>
+              <li><span class="material-icons-round">check_circle</span> Material descargable</li>
+            </ul>
+            <a href="sesiones/index.html" class="btn btn-outline btn-sm">Ver agenda <span class="material-icons-round">arrow_forward</span></a>
+          </div>
+
+          <div class="feature-panel">
+            <div class="fp-icon recorded"><span class="material-icons-round">play_circle</span></div>
+            <h3>Clases grabadas</h3>
+            <p>Accede a la biblioteca de sesiones anteriores y repasa los temas cuando lo necesites, sin límite.</p>
+            <ul class="fp-list">
+              <li><span class="material-icons-round">check_circle</span> Acceso ilimitado</li>
+              <li><span class="material-icons-round">check_circle</span> Avanza a tu ritmo</li>
+              <li><span class="material-icons-round">check_circle</span> Calidad HD</li>
+            </ul>
+            <a href="sesiones/index.html" class="btn btn-outline btn-sm">Ver biblioteca <span class="material-icons-round">arrow_forward</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ CERTIFICADOS ═══════════ -->
+    <section id="certificados" class="section">
+      <div class="container">
+        <div class="section-head">
+          <span class="chip chip-dark"><span class="material-icons-round">workspace_premium</span> Certificación</span>
+          <h2>Constancias y certificados</h2>
+          <p class="section-sub">Tu constancia de participación es automática. Para el certificado, sigue estos 3 pasos.</p>
+        </div>
+
+        <div class="steps-row">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-icon"><span class="material-icons-round">cast_for_education</span></div>
+            <h4>Asiste al curso</h4>
+            <p>Al completar tu participación, recibirás automáticamente tu constancia digital.</p>
+          </div>
+          <div class="step-connector"><span class="material-icons-round">arrow_forward</span></div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-icon"><span class="material-icons-round">quiz</span></div>
+            <h4>Rinde el examen</h4>
+            <p>Aprueba la evaluación en línea para demostrar tus conocimientos adquiridos.</p>
+          </div>
+          <div class="step-connector"><span class="material-icons-round">arrow_forward</span></div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-icon"><span class="material-icons-round">payments</span></div>
+            <h4>Registra el pago</h4>
+            <p>Gestiona el pago del certificado y descárgalo de forma inmediata.</p>
+          </div>
+        </div>
+
+        <div class="section-action">
+          <a href="certificado/examen.html" class="btn btn-primary btn-lg"><span class="material-icons-round">quiz</span> Dar examen</a>
+          <a href="certificado/pago.html" class="btn btn-accent btn-lg"><span class="material-icons-round">payments</span> Gestionar pago</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ EMPRESA ═══════════ -->
+    <section id="empresa" class="section section-alt">
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-content">
+            <span class="chip chip-dark"><span class="material-icons-round">domain</span> Nosotros</span>
+            <h2>Sobre FQ Ingenieros</h2>
+            <p>
+              FQ Ingenieros es una empresa dedicada a la ingeniería, saneamiento y construcción,
+              que brinda soluciones técnicas eficientes, sostenibles y de alta calidad para el
+              sector público y privado.
+            </p>
+            <p>
+              Desarrollamos proyectos de agua potable, saneamiento e infraestructura, respaldados
+              por criterios técnicos especializados, cumplimiento normativo y el uso de equipos
+              topográficos y de laboratorio de suelos. Acompañamos cada proyecto desde el diseño
+              hasta la ejecución, contribuyendo al desarrollo sostenible de las comunidades.
+            </p>
+            <div class="about-highlights">
+              <div><span class="material-icons-round">water_drop</span><strong>Ingeniería y Saneamiento</strong></div>
+              <div><span class="material-icons-round">construction</span><strong>Construcción y Obras</strong></div>
+              <div><span class="material-icons-round">science</span><strong>Laboratorio de Suelos</strong></div>
+            </div>
+            <a href="empresa/about.html" class="btn btn-outline">Conocer más <span class="material-icons-round">arrow_forward</span></a>
+          </div>
+          <div class="about-visual">
+            <img src="assets/img/logo-fq.png" alt="FQ Ingenieros" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ CTA FINAL ═══════════ -->
+    <section class="section cta-section">
+      <div class="container text-center">
+        <h2>¿Listo para dar el siguiente paso?</h2>
+        <p class="section-sub" style="margin:12px auto 28px;">Únete a cientos de profesionales que ya confían en FQ Ingenieros para crecer.</p>
+        <div class="section-action">
+          <a href="auth/registro.html" class="btn btn-primary btn-xl">Crear mi cuenta gratis</a>
+          <a href="cursos/catalogo.html" class="btn btn-outline btn-xl">Explorar cursos</a>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- ═══════════ FOOTER ═══════════ -->
