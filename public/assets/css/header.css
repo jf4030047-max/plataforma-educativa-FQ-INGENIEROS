@@ -1,0 +1,8 @@
+/* ══════════════════════════════════════════════
+	FQ INGENIEROS — Shared Header
+	Consistent top-bar across all pages
+	══════════════════════════════════════════════ */
+
+.container { width: min(1140px, 92%); margin: 0 auto; }
+
+/* ...existing code... */
