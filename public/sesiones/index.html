@@ -62,7 +62,102 @@
   <script src="../assets/js/certificate-generator.js"></script>
 
   <script>
-    /* ...todo el JS funcional del archivo original... */
+    /* ══════════════════════════════════════════════
+       Course data - loaded from Firestore
+       ══════════════════════════════════════════════ */
+    var COURSES = {};
+    var SCHEDULES = {};
+
+    var courseId = new URLSearchParams(window.location.search).get('course');
+
+    function showError(msg, icon) {
+      var contentEl = document.getElementById('content');
+      contentEl.innerHTML = '<div class="state-box">' +
+        '<span class="material-icons-round">' + (icon || 'error_outline') + '</span>' +
+        '<h2>Error</h2>' +
+        '<p>' + msg + '</p>' +
+        '<a href="../dashboard/index.html" class="btn btn-primary">Ir al dashboard</a>' +
+        '</div>';
+    }
+
+    // Load courses from Firestore (shared by public agenda and private view)
+    function loadCoursesFromFirestore() {
+      return db.collection('courses').get().then(function(snapshot) {
+        snapshot.forEach(function(doc) {
+          const data = doc.data();
+          COURSES[doc.id] = {
+            id: doc.id,
+            name: data.name || '',
+            icon: data.icon || 'menu_book',
+            duration: data.duration || '',
+            sessions: data.sessions || 1,
+            modality: data.modality || 'En vivo',
+            price: data.price || 0,
+            desc: data.desc || '',
+            sessionDate: data.sessionDate || null,
+            scheduleTime: data.scheduleTime || {},
+            zoomLink: data.zoomLink || '',
+            recordingUrl: data.recordingUrl || '',
+            startDate: data.startDate || '',
+            startTime: data.startTime || '',
+            endTime: data.endTime || '',
+            temario: data.temario || [],
+            schedules: data.schedules || []
+          };
+          if (data.schedules && data.schedules.length > 0) {
+            SCHEDULES[doc.id] = data.schedules;
+          }
+        });
+      });
+    }
+
+    auth.onAuthStateChanged(function(user) {
+      var contentEl = document.getElementById('content');
+
+      if (!user) {
+        showError('Debes iniciar sesión para acceder al contenido de tu curso.', 'lock');
+        return;
+      }
+
+      loadCoursesFromFirestore().then(function() {
+        if (!courseId || !COURSES[courseId]) {
+          showError('El curso solicitado no existe o el enlace es incorrecto.', 'search_off');
+          return;
+        }
+
+        var cacheKey = 'session_enrollment_' + user.uid + '_' + courseId;
+
+        try {
+          var cached = localStorage.getItem(cacheKey);
+          if (cached) {
+            var cachedData = JSON.parse(cached);
+            if (cachedData.status === 'active') {
+              renderPanel(COURSES[courseId], cachedData);
+            }
+          }
+        } catch (_) {}
+
+        db.collection('enrollments').doc(user.uid + '_' + courseId).get()
+          .then(function(doc) {
+            if (!doc.exists || doc.data().status !== 'active') {
+              try { localStorage.removeItem(cacheKey); } catch (_) {}
+              showError('No estás matriculado en este curso. Matricúlate para acceder.', 'block');
+              return;
+            }
+
+            var fbData = doc.data();
+            cacheEnrollment(user.uid, fbData);
+            renderPanel(COURSES[courseId], fbData);
+          })
+          .catch(function(err) {
+            showError('No pudimos verificar tu matrícula. Intenta recargar la página.<br><small>' + (err && err.message ? err.message : '') + '</small>', 'error_outline');
+          });
+      }).catch(function(err) {
+        showError('No se pudo cargar la información del curso. Intenta recargar la página.<br><small>' + (err && err.message ? err.message : '') + '</small>', 'error_outline');
+      });
+    });
+
+    // ...el resto del JS funcional original (helpers, renderPanel, etc.)...
   </script>
 </body>
 </html>
