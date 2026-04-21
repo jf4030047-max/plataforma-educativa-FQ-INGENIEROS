@@ -169,3 +169,5 @@ document.addEventListener('DOMContentLoaded', function () {
     await renderCourseActions(user);
   });
 });
+
+// Cierre de la función syncCoursePrices y del bloque principal

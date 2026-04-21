@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -98,6 +97,346 @@
 		@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{display:none}.stats-grid{grid-template-columns:1fr}.card-grid{grid-template-columns:1fr}}
 		@media(max-width:600px){.content{padding:20px 16px}.top-bar{padding:0 16px}}
 	</style>
+	<!-- Firebase SDK -->
+	<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+	<script src="../assets/js/firebase-config.js"></script>
+	<script src="../assets/js/notifications.js"></script>
+	<script>
+	// Protección: solo usuarios autenticados pueden ver esta página
+	// Redirige a login si no hay sesión
+	const LOGIN_URL = '../auth/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+	document.addEventListener('DOMContentLoaded', function() {
+	  firebase.auth().onAuthStateChanged(function(user) {
+	    if (!user) {
+	      window.location.href = LOGIN_URL;
+	    }
+	  });
+	});
+	</script>
 </head>
 <body>
-	<!-- ...existing code... -->
+	<div class="layout">
+		<aside class="sidebar">
+			<div class="sidebar-brand">
+				<img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+				<div>
+					<script>
+				// ═══ CONFIG: Claves por curso ═══
+				var PROF_CODES = {
+					'20': { name: 'Profesor SST', keywords: ['seguridad', 'sst', 'salud'] },
+					'21': { name: 'Profesor Topografía', keywords: ['topograf'] },
+					'22': { name: 'Profesor Supervisión', keywords: ['supervis'] },
+					'23': { name: 'Profesor Topografía', keywords: ['topograf'] }
+				};
+				var currentProf = null;
+				var coursesData = [];
+				var usersData = [];
+				var examsData = [];
+				var materialsData = [];
+
+				function courseMatchesProf(course) {
+					if (!currentProf) return true;
+					var name = ((course.name || '') + ' ' + (course.id || '')).toLowerCase();
+					return currentProf.keywords.some(function(kw) {
+						return name.indexOf(kw) !== -1;
+					});
+				}
+				function myCourses() {
+					if (!currentProf) return coursesData;
+					return coursesData.filter(courseMatchesProf);
+				}
+				function verifyCode() {
+					var code = document.getElementById('accessCode').value.trim();
+					var prof = PROF_CODES[code];
+					if (prof) {
+						currentProf = prof;
+						sessionStorage.setItem('prof_auth', code);
+						document.getElementById('loginGate').style.display = 'none';
+						document.getElementById('profLayout').style.display = 'grid';
+						document.getElementById('profNameBadge').textContent = prof.name;
+						initProfPanel();
+					} else {
+						document.getElementById('loginError').style.display = 'block';
+						document.getElementById('accessCode').value = '';
+						document.getElementById('accessCode').focus();
+					}
+				}
+				var savedCode = sessionStorage.getItem('prof_auth');
+				if (savedCode && PROF_CODES[savedCode]) {
+					currentProf = PROF_CODES[savedCode];
+					document.getElementById('loginGate').style.display = 'none';
+					document.getElementById('profLayout').style.display = 'grid';
+					window.addEventListener('DOMContentLoaded', function() {
+						document.getElementById('profNameBadge').textContent = currentProf.name;
+						setTimeout(initProfPanel, 300);
+					});
+				}
+				function logoutProf() {
+					sessionStorage.removeItem('prof_auth');
+					window.location.reload();
+				}
+				function showPanel(name, el) {
+					document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+					document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+					document.getElementById('panel-' + name).classList.add('active');
+					if (el) el.classList.add('active');
+				}
+
+				// ═══ INIT: FIRESTORE LISTENERS ═══
+				var listenersActive = false;
+				function initProfPanel() {
+					if (listenersActive) return;
+					listenersActive = true;
+					db.collection('courses').onSnapshot(function(snapshot) {
+						coursesData = [];
+						snapshot.forEach(function(doc) {
+							coursesData.push({ id: doc.id, ...doc.data() });
+						});
+						renderDashboard();
+						renderZoomCards();
+						renderTemarioCards();
+						renderMaterialCourseSelect();
+						renderMaterials();
+					});
+					db.collection('users').onSnapshot(function(snapshot) {
+						usersData = [];
+						snapshot.forEach(function(doc) {
+							usersData.push({ id: doc.id, ...doc.data() });
+						});
+						renderDashboard();
+						renderAlumnos();
+					});
+					db.collection('exams').onSnapshot(function(snapshot) {
+						examsData = [];
+						snapshot.forEach(function(doc) {
+							examsData.push({ id: doc.id, ...doc.data() });
+						});
+						renderDashboard();
+						renderExams();
+					});
+					db.collection('materials').onSnapshot(function(snapshot) {
+						materialsData = [];
+						snapshot.forEach(function(doc) {
+							materialsData.push({ id: doc.id, ...doc.data() });
+						});
+						renderMaterials();
+					});
+				}
+
+				// ...resto del JS original copiado (helpers, renderDashboard, renderAlumnos, renderZoomCards, etc)...
+		.sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 22px;border-bottom:1px solid rgba(255,255,255,.08)}
+		.sidebar-brand img{width:36px;height:36px;border-radius:8px;object-fit:cover}
+		.sidebar-brand strong{font-size:13px;color:#fff}
+		.sidebar-brand span{font-size:10px;color:#f59e0b;letter-spacing:1px;text-transform:uppercase;display:block;font-weight:600}
+		.sidebar-nav{flex:1;padding:16px 12px}
+		.nav-label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding:12px 10px 6px;margin-top:8px}
+		.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s;cursor:pointer;margin-bottom:2px}
+		.nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+		.nav-item.active{background:#d97706;color:#fff}
+		.nav-item .material-icons-round{font-size:20px}
+		.nav-item .badge-count{margin-left:auto;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;min-width:20px;text-align:center}
+		.sidebar-footer{padding:16px 22px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:#64748b}
+		.sidebar-footer a{color:#f59e0b;text-decoration:none}
+		.main{padding:0;overflow-y:auto;max-height:100vh}
+		.top-bar{background:#fff;border-bottom:1px solid #dce3ed;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:10}
+		.top-bar h2{font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px}
+		.top-bar-actions{display:flex;align-items:center;gap:14px}
+		.prof-badge{background:#fffbeb;color:#d97706;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
+		.btn-logout{background:none;border:1.5px solid #dce3ed;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;color:#334155;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;font-family:inherit}
+		.btn-logout:hover{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+		.content{padding:28px 32px}
+		.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:32px}
+		.stat-card{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:22px;display:flex;align-items:center;gap:16px;transition:box-shadow .2s}
+		.stat-card:hover{box-shadow:0 4px 16px rgba(15,23,42,.08)}
+		.stat-icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center}
+		.stat-icon .material-icons-round{font-size:24px;color:#fff}
+		.stat-icon.amber{background:linear-gradient(135deg,#d97706,#f59e0b)}
+		.stat-icon.blue{background:linear-gradient(135deg,#1565c0,#1e88e5)}
+		.stat-icon.green{background:linear-gradient(135deg,#16a34a,#22c55e)}
+		.stat-info strong{display:block;font-size:28px;font-weight:800;color:#0f172a}
+		.stat-info span{font-size:13px;color:#64748b}
+		.panel{display:none}
+		.panel.active{display:block}
+		.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+		.panel-header h3{font-size:20px;font-weight:700;color:#0f172a}
+		.table-wrap{background:#fff;border:1px solid #dce3ed;border-radius:14px;overflow:hidden}
+		table{width:100%;border-collapse:collapse}
+		thead{background:#f7f9fc}
+		th{text-align:left;padding:12px 16px;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #dce3ed}
+		td{padding:12px 16px;font-size:14px;color:#334155;border-bottom:1px solid #eef2f7}
+		tr:last-child td{border-bottom:none}
+		tr:hover td{background:#f7f9fc}
+		.user-cell{display:flex;align-items:center;gap:10px}
+		.user-avatar{width:34px;height:34px;border-radius:50%;background:#d97706;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:700;flex-shrink:0}
+		.user-name{font-weight:600;color:#0f172a}
+		.user-email{font-size:12px;color:#64748b}
+		.status-badge{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+		.status-badge.passed{background:#f0fdf4;color:#16a34a}
+		.status-badge.failed{background:#fef2f2;color:#dc2626}
+		.status-badge.pending{background:#fffbeb;color:#d97706}
+		.course-card{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:22px;margin-bottom:18px}
+		.course-card h4{font-size:17px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+		.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+		.btn-sm{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .2s;font-family:inherit}
+		.btn-amber{background:#d97706;color:#fff}
+		.btn-amber:hover{background:#b45309}
+		.btn-blue{background:#1565c0;color:#fff}
+		.btn-blue:hover{background:#1e88e5}
+		.btn-outline-sm{background:transparent;border:1.5px solid #dce3ed;color:#334155}
+		.btn-outline-sm:hover{background:#eff6ff;border-color:#1565c0;color:#1565c0}
+		.action-btn{background:none;border:1px solid #dce3ed;border-radius:8px;padding:5px 8px;cursor:pointer;color:#64748b;transition:all .2s;display:inline-flex;align-items:center;gap:4px;font-size:12px;font-family:inherit}
+		.action-btn:hover{background:#eff6ff;border-color:#1565c0;color:#1565c0}
+		.search-box{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #dce3ed;border-radius:10px;padding:8px 14px;width:280px;transition:border-color .2s}
+		.search-box:focus-within{border-color:#d97706}
+		.search-box input{border:none;outline:none;font-size:14px;font-family:inherit;width:100%;color:#0f172a;background:transparent}
+		.search-box .material-icons-round{font-size:20px;color:#64748b}
+		.empty-state{text-align:center;padding:48px 20px;color:#64748b}
+		.empty-state .material-icons-round{font-size:48px;color:#dce3ed;margin-bottom:12px}
+		.material-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border:1px solid #dce3ed;border-radius:10px;margin-bottom:8px}
+		.material-item .material-icons-round{font-size:22px;color:#d97706}
+		.material-item .mat-info{flex:1}
+		.material-item .mat-name{font-weight:600;font-size:14px;color:#0f172a}
+		.material-item .mat-url{font-size:12px;color:#64748b;word-break:break-all}
+		.login-gate{position:fixed;inset:0;z-index:200;background:#f7f9fc;display:flex;align-items:center;justify-content:center;padding:20px}
+		.login-card{background:#fff;border-radius:18px;width:100%;max-width:420px;padding:40px;box-shadow:0 8px 32px rgba(15,23,42,.10);text-align:center}
+		.login-card h2{font-size:22px;font-weight:800;color:#0f172a;margin:16px 0 6px}
+		.login-card p{font-size:14px;color:#64748b;margin-bottom:24px;line-height:1.5}
+		.code-input{width:200px;padding:14px 20px;border:2px solid #dce3ed;border-radius:12px;font-size:24px;font-weight:700;text-align:center;letter-spacing:8px;font-family:inherit;transition:border-color .2s}
+		.code-input:focus{outline:none;border-color:#d97706}
+		.login-error{color:#dc2626;font-size:13px;margin-top:10px;display:none}
+		@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{display:none}.stats-grid{grid-template-columns:1fr}.card-grid{grid-template-columns:1fr}}
+		@media(max-width:600px){.content{padding:20px 16px}.top-bar{padding:0 16px}}
+	</style>
+	<!-- Firebase SDK -->
+	<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+	<script src="../assets/js/firebase-config.js"></script>
+	<script src="../assets/js/notifications.js"></script>
+	<script>
+	// Protección: solo usuarios autenticados pueden ver esta página
+	// Redirige a login si no hay sesión
+	const LOGIN_URL = '../auth/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+	document.addEventListener('DOMContentLoaded', function() {
+	  firebase.auth().onAuthStateChanged(function(user) {
+	    if (!user) {
+	      window.location.href = LOGIN_URL;
+	    }
+	  });
+	});
+	</script>
+</head>
+<body>
+	<div class="layout">
+		<aside class="sidebar">
+			<div class="sidebar-brand">
+				<img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+				<div>
+					<strong>FQ INGENIEROS</strong>
+					<span>Profesor</span>
+				</div>
+			</div>
+			<nav class="sidebar-nav">
+				<div class="nav-label">Menú</div>
+				<a class="nav-item active" href="#"><span class="material-icons-round">dashboard</span> Panel</a>
+				<a class="nav-item" href="#"><span class="material-icons-round">class</span> Mis Cursos</a>
+				<a class="nav-item" href="#"><span class="material-icons-round">event</span> Sesiones</a>
+				<a class="nav-item" href="#"><span class="material-icons-round">logout</span> <span onclick="logout()">Cerrar sesión</span></a>
+			</nav>
+			<div class="sidebar-footer">© 2026 FQ INGENIEROS</div>
+		</aside>
+		<main class="main">
+			<div class="top-bar">
+				<h2><span class="material-icons-round">dashboard</span> Panel del Profesor</h2>
+				<div class="top-bar-actions">
+					<span class="prof-badge"><span class="material-icons-round">verified_user</span> Profesor</span>
+				</div>
+			</div>
+			<div class="content">
+				<div class="stats-grid">
+					<div class="stat-card">
+						<div class="stat-icon amber"><span class="material-icons-round">class</span></div>
+						<div class="stat-info"><strong>0</strong><span>Cursos asignados</span></div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-icon blue"><span class="material-icons-round">event</span></div>
+						<div class="stat-info"><strong>0</strong><span>Sesiones próximas</span></div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-icon green"><span class="material-icons-round">check_circle</span></div>
+						<div class="stat-info"><strong>0</strong><span>Alumnos activos</span></div>
+					</div>
+				</div>
+				<div class="panel active">
+					<div class="panel-header">
+						<h3>Bienvenido al panel de profesor</h3>
+					</div>
+					<div class="empty-state">
+						<span class="material-icons-round">school</span>
+						<p>Aquí verás tus cursos, sesiones y alumnos asignados.</p>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</body>
+<script>
+// ═══ CONFIG: Claves por curso ═══
+var PROF_CODES = {
+	'20': { name: 'Profesor SST', keywords: ['seguridad', 'sst', 'salud'] },
+	'21': { name: 'Profesor Topografía', keywords: ['topograf'] },
+	'22': { name: 'Profesor Supervisión', keywords: ['supervis'] },
+	'23': { name: 'Profesor Topografía', keywords: ['topograf'] }
+};
+var currentProf = null;
+var coursesData = [];
+var usersData = [];
+var examsData = [];
+var materialsData = [];
+
+function courseMatchesProf(course) {
+	if (!currentProf) return true;
+	var name = ((course.name || '') + ' ' + (course.id || '')).toLowerCase();
+	return currentProf.keywords.some(function(kw) {
+		return name.indexOf(kw) !== -1;
+	});
+}
+function myCourses() {
+	if (!currentProf) return coursesData;
+	return coursesData.filter(courseMatchesProf);
+}
+function verifyCode() {
+	var code = document.getElementById('accessCode').value.trim();
+	var prof = PROF_CODES[code];
+	if (prof) {
+		currentProf = prof;
+		sessionStorage.setItem('prof_auth', code);
+		document.getElementById('loginGate').style.display = 'none';
+		document.getElementById('profLayout').style.display = 'grid';
+		document.getElementById('profNameBadge').textContent = prof.name;
+		initProfPanel();
+	} else {
+		document.getElementById('loginError').style.display = 'block';
+		document.getElementById('accessCode').value = '';
+		document.getElementById('accessCode').focus();
+	}
+}
+var savedCode = sessionStorage.getItem('prof_auth');
+if (savedCode && PROF_CODES[savedCode]) {
+	currentProf = PROF_CODES[savedCode];
+	document.getElementById('loginGate').style.display = 'none';
+	document.getElementById('profLayout').style.display = 'grid';
+	window.addEventListener('DOMContentLoaded', function() {
+		document.getElementById('profNameBadge').textContent = currentProf.name;
+		setTimeout(initProfPanel, 300);
+	});
+}
+function logoutProf() {
+	sessionStorage.removeItem('prof_auth');
+	window.location.reload();
+}
+// ...restaurar aquí el resto del JS original: listeners, renderDashboard, renderAlumnos, renderZoomCards, etc...
+</script>
+</body>

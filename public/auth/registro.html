@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link href="../assets/css/notifications.css" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/header.css" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh;display:flex;flex-direction:column}
+    .page{flex:1;display:flex;align-items:center;justify-content:center;padding:36px 16px}
+    .card{background:#fff;border:1px solid #dce3ed;border-radius:18px;width:100%;max-width:420px;padding:40px 36px;box-shadow:0 4px 24px rgba(15,23,42,.06)}
+    .card-header{text-align:center;margin-bottom:28px}
+    .card-header .icon{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#1565c0,#1e88e5);display:inline-grid;place-items:center;margin-bottom:14px}
+    .card-header .icon .material-icons-round{font-size:28px;color:#fff}
+    .card-header h1{font-size:24px;font-weight:800;color:#0f172a;margin-bottom:6px}
+    .card-header p{font-size:14px;color:#64748b}
+    .form-group{margin-bottom:18px}
+    .form-label{display:block;margin-bottom:5px;font-size:13px;font-weight:600;color:#334155}
+    .form-control{
+      width:100%;padding:11px 13px;background:#f7f9fc;
+      border:1.5px solid #dce3ed;border-radius:10px;
+      color:#0f172a;font-size:14px;font-family:inherit;transition:border-color .2s;
+    }
+    .form-control:focus{outline:none;border-color:#1e88e5;box-shadow:0 0 0 3px rgba(30,136,229,.1);background:#fff}
+    .password-wrap{position:relative}
+    .password-wrap .form-control{padding-right:44px}
+    .toggle-pw{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#64748b;display:grid;place-items:center}
+    .toggle-pw:hover{color:#1565c0}
+    .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border-radius:10px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all .2s;font-family:inherit}
+    .btn-primary{background:#1565c0;color:#fff}
+    .btn-primary:hover{background:#1e88e5;box-shadow:0 4px 18px rgba(21,101,192,.3)}
+    .divider{display:flex;align-items:center;gap:12px;margin:22px 0;font-size:12px;color:#64748b}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:#dce3ed}
+    .social-buttons{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
+    .btn-social{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px 14px;border-radius:10px;font-size:14px;font-weight:600;border:1.5px solid #dce3ed;cursor:pointer;transition:all .2s;font-family:inherit;background:#fff;color:#334155}
+    .btn-social:hover{border-color:#94a3b8;box-shadow:0 2px 8px rgba(15,23,42,.08)}
+    .btn-social svg{width:20px;height:20px;flex-shrink:0}
+    .btn-social.btn-google:hover{border-color:#4285f4;background:#f8faff}
+    .card-footer{text-align:center;font-size:13px;color:#64748b}
+    .card-footer a{color:#1565c0;text-decoration:none;font-weight:600}
+    .card-footer a:hover{text-decoration:underline}
+    .page-footer{text-align:center;padding:18px;color:#64748b;font-size:12px;border-top:1px solid #dce3ed}
+    @media(max-width:480px){.card{padding:28px 20px}}
+  </style>
+</head>
+<body>
+  <script>
+    // Redirigir automáticamente si ya hay sesión activa
+    document.addEventListener('DOMContentLoaded', function() {
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          window.location.href = '../index.html';
+        }
+      });
+    });
+  </script>
+  <header class="top-bar">
+    <div class="container top-bar-inner">
+      <a class="brand" href="../index.html">
+        <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
+      </a>
+      <div class="top-bar-right">
+        <a class="back-link" href="../index.html"><span class="material-icons-round">arrow_back</span> Inicio</a>
+      </div>
+    </div>
+  </header>
+  <main class="page">
+    <div class="card">
+      <div class="card-header">
+        <div class="icon"><span class="material-icons-round">person_add</span></div>
+        <h1>Crear cuenta</h1>
+        <p>Regístrate manualmente con tu correo</p>
+      </div>
+      <form id="registerForm">
+        <div class="form-group">
+          <label class="form-label" for="nombres">Nombres</label>
+          <input class="form-control" type="text" id="nombres" required autocomplete="given-name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="apellidos">Apellidos</label>
+          <input class="form-control" type="text" id="apellidos" required autocomplete="family-name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="dni">DNI</label>
+          <input class="form-control" type="text" id="dni" required maxlength="15" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="telefono">Teléfono</label>
+          <input class="form-control" type="tel" id="telefono" required maxlength="20" autocomplete="tel" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="direccion">Dirección</label>
+          <input class="form-control" type="text" id="direccion" required maxlength="120" autocomplete="street-address" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Correo electrónico</label>
+          <input class="form-control" type="email" id="email" required autocomplete="email" />
+        </div>
+        <button class="btn btn-primary" type="submit">Registrarse</button>
+      </form>
+      <div id="registerError" class="alert alert-error" style="display:none;margin-top:12px"></div>
+      <div class="card-footer" style="margin-top:18px">
+        ¿Ya tienes cuenta? <a id="linkLogin" href="login.html">Iniciar sesión</a>
+      </div>
+    </div>
+  </main>
+</footer>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          window.location.href = '../index.html';
+        }
+      });
+      var form = document.getElementById('registerForm');
+      var errorDiv = document.getElementById('registerError');
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        errorDiv.style.display = 'none';
+        var nombres = document.getElementById('nombres').value.trim();
+        var apellidos = document.getElementById('apellidos').value.trim();
+        var dni = document.getElementById('dni').value.trim();
+        var telefono = document.getElementById('telefono').value.trim();
+        var direccion = document.getElementById('direccion').value.trim();
+        var email = document.getElementById('email').value.trim();
+        var password = document.getElementById('password').value;
+        function generarPasswordAleatoria(length) {
+          var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+';
+          var pass = '';
+          for (var i = 0; i < length; i++) {
+            pass += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+          return pass;
+        }
+        if (!nombres || !apellidos || !dni || !telefono || !direccion || !email) return;
+        var password = generarPasswordAleatoria(12);
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+          .then(function(userCredential) {
+            var user = userCredential.user;
+            return user.updateProfile({ displayName: nombres + ' ' + apellidos }).then(function() {
+              // Guardar datos adicionales en Firestore
+              return firebase.firestore().collection('users').doc(user.uid).set({
+                nombres: nombres,
+                apellidos: apellidos,
+                dni: dni,
+                telefono: telefono,
+                direccion: direccion,
+                email: email,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+              });
+            });
+          })
+          .then(function() {
+            window.location.href = '../index.html';
+          })
+          .catch(function(error) {
+            errorDiv.textContent = error.message;
+            errorDiv.style.display = 'flex';
+          });
+      });
+    });
+  </script>
+</body>
+</html>
