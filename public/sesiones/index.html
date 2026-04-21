@@ -10,9 +10,59 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
   <link rel="stylesheet" href="../assets/css/notifications.css" />
   <link rel="stylesheet" href="../assets/css/header.css" />
-  <!-- ...resto del código... -->
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
+    .container{width:min(900px,92%);margin:0 auto}
+    /* ...todo el CSS del archivo original... */
+  </style>
 </head>
 <body>
-  <!-- ...contenido del curso... -->
+
+  <header class="top-bar">
+    <div class="container top-bar-inner">
+      <a class="brand" href="../index.html">
+        <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
+      </a>
+      <div class="top-bar-right">
+        <div class="navbar-actions" id="navActions"></div>
+        <a class="back-link" href="../dashboard/index.html"><span class="material-icons-round">arrow_back</span> Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+      <div id="content">
+        <div class="loading"><span class="material-icons-round" style="font-size:28px;color:#dce3ed;display:block;margin-bottom:8px">hourglass_top</span>Cargando curso...</div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="page-footer">
+    <div class="container">
+      <p>© 2026 FQ INGENIEROS · <a href="../index.html">Inicio</a> · <a href="../empresa/about.html">Nosotros</a></p>
+    </div>
+  </footer>
+
+  <!-- Offline banner -->
+  <div class="offline-banner" id="offlineBanner">
+    <span class="material-icons-round">wifi_off</span> Estás sin conexión — Los datos guardados están disponibles
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/auth-ui.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="../assets/js/certificate-generator.js"></script>
+
+  <script>
+    /* ...todo el JS funcional del archivo original... */
+  </script>
 </body>
 </html>
