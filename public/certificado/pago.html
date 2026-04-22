@@ -229,7 +229,7 @@
   var courseParam = new URLSearchParams(window.location.search).get('course') || '';
   var examLink = document.getElementById('examLink');
   if (examLink) examLink.href = '../certificado/examen.html' + (courseParam ? '?course=' + courseParam : '');
-  // --- Dynamic Payment Data ---
+  // --- Dynamic Payment Data y precio por curso ---
   let paymentData = {
     holder: 'FQ INGENIEROS E.I.R.L.',
     amount: '20.00',
@@ -240,17 +240,36 @@
       'Transferencia interbancaria': '002-35517292103404662'
     }
   };
-  function fetchPaymentData() {
+  let coursePrice = null;
+  function fetchPaymentDataAndCoursePrice() {
     if (typeof firebase === 'undefined' || !firebase.firestore) return;
     var db = firebase.firestore();
+    // 1. Obtener datos generales de pago
     db.collection('settings').doc('paymentData').get().then(function(doc) {
       if (doc.exists) {
         var d = doc.data();
         paymentData.holder = d.holder || paymentData.holder;
-        paymentData.amount = d.amount || paymentData.amount;
         paymentData.accounts = d.accounts || paymentData.accounts;
       }
-      updatePaymentUI('Yape');
+      // 2. Obtener precio del curso si hay parámetro
+      var courseParam = new URLSearchParams(window.location.search).get('course');
+      if (courseParam) {
+        db.collection('courses').doc(courseParam).get().then(function(cdoc) {
+          if (cdoc.exists && cdoc.data().price) {
+            coursePrice = cdoc.data().price;
+            paymentData.amount = coursePrice;
+          } else {
+            coursePrice = paymentData.amount;
+          }
+          updatePaymentUI('Yape');
+        }).catch(function(){
+          coursePrice = paymentData.amount;
+          updatePaymentUI('Yape');
+        });
+      } else {
+        coursePrice = paymentData.amount;
+        updatePaymentUI('Yape');
+      }
     }).catch(function() {
       updatePaymentUI('Yape');
     });
@@ -260,7 +279,10 @@
     document.getElementById('summaryMethod').textContent = method;
     document.getElementById('accountHolder').textContent = paymentData.holder;
     document.getElementById('accountNumber').textContent = paymentData.accounts[method] || '—';
-    document.getElementById('certAmount').textContent = 'S/ ' + paymentData.amount;
+    document.getElementById('certAmount').textContent = 'S/ ' + (coursePrice || paymentData.amount);
+    // Actualizar resumen
+    var summaryTotal = document.querySelector('.summary-total .sv');
+    if (summaryTotal) summaryTotal.textContent = 'S/ ' + (coursePrice || paymentData.amount);
   }
   function selectMethod(el, name) {
     document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
@@ -268,7 +290,7 @@
     updatePaymentUI(name);
   }
   document.addEventListener('DOMContentLoaded', function() {
-    fetchPaymentData();
+    fetchPaymentDataAndCoursePrice();
   });
   function submitPayment(e) {
     e.preventDefault();
@@ -285,7 +307,7 @@
       course: form.querySelector('select').value,
       operationNumber: form.querySelectorAll('input[type="text"]')[1].value.trim(),
       method: document.getElementById('selectedMethod').textContent,
-      amount: 20,
+      amount: coursePrice || paymentData.amount,
       status: 'pending',
       submittedAt: new Date().toISOString()
     };
