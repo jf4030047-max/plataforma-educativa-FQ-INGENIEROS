@@ -171,7 +171,7 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Curso</label>
-                <input type="text" class="form-control" id="courseNameInput" readonly required />
+                <select class="form-control" id="courseSelect" required></select>
               </div>
               <div class="form-group">
                 <label class="form-label">Número de operación / referencia</label>
@@ -237,6 +237,7 @@
     }
   };
   let coursePrice = null;
+  let coursesList = [];
   function fetchPaymentDataAndCoursePrice() {
     if (typeof firebase === 'undefined' || !firebase.firestore) return;
     var db = firebase.firestore();
@@ -247,32 +248,41 @@
         paymentData.holder = d.holder || paymentData.holder;
         paymentData.accounts = d.accounts || paymentData.accounts;
       }
-      // 2. Obtener precio y nombre del curso si hay parámetro
-      var courseParam = new URLSearchParams(window.location.search).get('course');
-      if (courseParam) {
-        db.collection('courses').doc(courseParam).get().then(function(cdoc) {
-          if (cdoc.exists) {
-            var cdata = cdoc.data();
-            coursePrice = cdata.price || paymentData.amount;
-            paymentData.amount = coursePrice;
-            // Mostrar nombre del curso en el input
-            var courseNameInput = document.getElementById('courseNameInput');
-            if (courseNameInput) courseNameInput.value = cdata.name || courseParam;
-          } else {
-            coursePrice = paymentData.amount;
-          }
-          updatePaymentUI('Yape');
-        }).catch(function(){
-          coursePrice = paymentData.amount;
-          updatePaymentUI('Yape');
-        });
-      } else {
-        coursePrice = paymentData.amount;
-        updatePaymentUI('Yape');
-      }
-    }).catch(function() {
-      updatePaymentUI('Yape');
+      // 2. Obtener lista de cursos
+      db.collection('courses').get().then(function(snapshot) {
+        coursesList = [];
+        var courseSelect = document.getElementById('courseSelect');
+        if (courseSelect) {
+          courseSelect.innerHTML = '';
+          snapshot.forEach(function(doc) {
+            var c = doc.data();
+            coursesList.push({ id: doc.id, name: c.name, price: c.price });
+            var opt = document.createElement('option');
+            opt.value = doc.id;
+            opt.textContent = c.name + (c.price ? ' (S/ ' + c.price + ')' : '');
+            courseSelect.appendChild(opt);
+          });
+        }
+        // Seleccionar curso por parámetro si existe
+        var courseParam = new URLSearchParams(window.location.search).get('course');
+        if (courseParam && courseSelect) {
+          courseSelect.value = courseParam;
+        }
+        updateCoursePriceAndUI();
+        // Cambiar precio al cambiar curso
+        if (courseSelect) {
+          courseSelect.onchange = updateCoursePriceAndUI;
+        }
+      });
     });
+  }
+
+  function updateCoursePriceAndUI() {
+    var courseSelect = document.getElementById('courseSelect');
+    var selectedId = courseSelect ? courseSelect.value : null;
+    var selectedCourse = coursesList.find(c => c.id === selectedId);
+    coursePrice = selectedCourse && selectedCourse.price ? selectedCourse.price : paymentData.amount;
+    updatePaymentUI('Yape');
   }
   function updatePaymentUI(method) {
     document.getElementById('selectedMethod').textContent = method;
@@ -300,13 +310,16 @@
     if (!user) { alert('Debes iniciar sesión.'); return; }
     var courseParam = new URLSearchParams(window.location.search).get('course') || '';
     var form = document.getElementById('payForm');
+    var courseSelect = document.getElementById('courseSelect');
+    var selectedId = courseSelect ? courseSelect.value : '';
+    var selectedCourse = coursesList.find(c => c.id === selectedId);
     var formData = {
       userId: user.uid,
       userEmail: user.email || '',
-      courseId: courseParam,
+      courseId: selectedId,
       fullName: form.querySelector('input[type="text"]').value.trim(),
       email: form.querySelector('input[type="email"]').value.trim(),
-      course: document.getElementById('courseNameInput').value,
+      course: selectedCourse ? selectedCourse.name : '',
       operationNumber: form.querySelectorAll('input[type="text"]')[1].value.trim(),
       method: document.getElementById('selectedMethod').textContent,
       amount: coursePrice || paymentData.amount,
