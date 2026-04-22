@@ -82,13 +82,25 @@
   <footer class="page-footer">
     Plataforma Educativa FQ INGENIEROS &copy; 2026
   </footer>
+  <div id="authLoading" style="display:flex;align-items:center;justify-content:center;position:fixed;inset:0;background:#f7f9fc;z-index:9999;font-size:18px;color:#1565c0;font-weight:600">Cargando autenticación...</div>
   <script src="../../assets/js/firebase-config.js"></script>
   <script>
+    // Fallback: mostrar botón de login si tarda mucho
+    let authTimeout = setTimeout(function() {
+      var loading = document.getElementById('authLoading');
+      if (loading) loading.innerHTML = 'No se pudo conectar.<br><a href="../../auth/login.html" style="color:#fff;background:#1565c0;padding:10px 18px;border-radius:8px;display:inline-block;margin-top:18px;text-decoration:none">Ir a iniciar sesión</a>';
+    }, 6000);
     // Redirección a login si no está autenticado
-    auth.onAuthStateChanged(function(user) {
-      if (!user) {
-        window.location.href = '../../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
-      }
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof auth === 'undefined') return;
+      auth.onAuthStateChanged(function(user) {
+        clearTimeout(authTimeout);
+        var loading = document.getElementById('authLoading');
+        if (loading) loading.remove();
+        if (!user) {
+          window.location.href = '../../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+        }
+      });
     });
   </script>
   <script src="admin-panel.js"></script>
