@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Pago | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/header.css" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
+    .container{width:min(1140px,92%);margin:0 auto}
+    /* ...todo el CSS del archivo original... */
+  </style>
+</head>
+<body>
+<header class="top-bar">
+  <div class="container top-bar-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+      <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
+    </a>
+    <div class="top-bar-right">
+      <div class="navbar-actions" id="navActions"></div>
+      <a class="back-link" href="../index.html"><span class="material-icons-round">arrow_back</span> Inicio</a>
+        <a class="back-link" href="../index.html" style="margin-left:16px;font-weight:bold;color:#1565c0;text-decoration:underline;">Ir al inicio de la plataforma</a>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="container">
+    <div class="page-header">
+      <h1>Gestión de pago</h1>
+      <p>Selecciona tu método de pago preferido, registra tu comprobante y obtén tu certificado digital.</p>
+    </div>
+    <div class="pay-grid">
+      <div>
+        <!-- MÉTODOS DE PAGO -->
+        <section class="methods-section">
+          <h2><span class="material-icons-round" style="vertical-align:middle;margin-right:6px">account_balance_wallet</span> Elige tu método de pago</h2>
+          <div class="method-grid">
+            <div class="method-card mc-yape selected" onclick="selectMethod(this, 'Yape')">
+              <div class="mc-icon"><span class="material-icons-round">phone_android</span></div>
+              <h4>Yape</h4>
+              <p>Paga desde tu app Yape al número registrado.</p>
+            </div>
+            <div class="method-card mc-plin" onclick="selectMethod(this, 'Plin')">
+              <div class="mc-icon"><span class="material-icons-round">phone_android</span></div>
+              <h4>Plin</h4>
+              <p>Envía tu pago por Plin desde cualquier banco asociado.</p>
+            </div>
+            <div class="method-card mc-bcp" onclick="selectMethod(this, 'BCP')">
+              <div class="mc-icon"><span class="material-icons-round">account_balance</span></div>
+              <h4>BCP — Banco de Crédito</h4>
+              <p>Transferencia o depósito a cuenta BCP.</p>
+            </div>
+            <div class="method-card mc-transfer" onclick="selectMethod(this, 'Transferencia interbancaria')">
+              <div class="mc-icon"><span class="material-icons-round">swap_horiz</span></div>
+              <h4>Transferencia interbancaria</h4>
+              <p>Desde cualquier otro banco usando el CCI.</p>
+            </div>
+          </div>
+        </section>
+        <!-- DATOS DE PAGO -->
+        <section class="pay-info" id="payInfo">
+          <h2><span class="material-icons-round" style="vertical-align:middle;margin-right:6px">info</span> Datos para el pago</h2>
+          <div class="info-box">
+            <div class="info-row"><span class="label">Método seleccionado</span><span class="value highlight" id="selectedMethod">Yape</span></div>
+            <div class="info-row"><span class="label">Titular</span><span class="value" id="accountHolder">FQ INGENIEROS E.I.R.L.</span></div>
+            <div class="info-row"><span class="label">Número / Cuenta</span><span class="value" id="accountNumber">958 003 888</span></div>
+            <div class="info-row"><span class="label">Monto del certificado</span><span class="value highlight" id="certAmount">S/ 20.00</span></div>
+            <div class="info-row"><span class="label">Concepto</span><span class="value">Certificado de curso</span></div>
+          </div>
+        </section>
+        <!-- FORMULARIO COMPROBANTE -->
+        <section class="pay-info" style="margin-top:28px">
+          <h2><span class="material-icons-round" style="vertical-align:middle;margin-right:6px">upload_file</span> Registrar comprobante</h2>
+          <div class="info-box">
+            <div class="alert alert-info">
+              <span class="material-icons-round">info</span>
+              <span>Después de realizar el pago, completa los datos y sube tu comprobante para validar la emisión de tu certificado.</span>
+            </div>
+            <form id="payForm" onsubmit="submitPayment(event)">
+              <div class="form-group">
+                <label class="form-label">Nombre completo</label>
+                <input type="text" class="form-control" placeholder="Ej: Juan Pérez García" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" placeholder="correo@ejemplo.com" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Curso</label>
+                <select class="form-control">
+                  <option>Seguridad y Salud en el Trabajo en Obras Civiles</option>
+                  <option>Topografía en Civil 3D</option>
+                  <option>Supervisión de Obra</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Número de operación / referencia</label>
+                <input type="text" class="form-control" placeholder="Ej: 00123456" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Comprobante de pago (imagen)</label>
+                <input type="file" class="form-control" accept="image/*,.pdf" required />
+                <p class="form-hint">Sube una captura o foto del comprobante (JPG, PNG o PDF).</p>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Observaciones (opcional)</label>
+                <textarea class="form-control" placeholder="Algún dato adicional..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                <span class="material-icons-round">send</span> Enviar comprobante
+              </button>
+            </form>
+          </div>
+        </section>
+      </div>
+      <!-- SIDEBAR RESUMEN -->
+      <aside class="summary-card">
+        <h3><span class="material-icons-round">receipt_long</span> Resumen</h3>
+        <div class="summary-item"><span class="sl">Certificado</span><span class="sv">S/ 20.00</span></div>
+        <div class="summary-item"><span class="sl">Método</span><span class="sv" id="summaryMethod">Yape</span></div>
+        <div class="summary-item"><span class="sl">Estado</span><span class="sv" style="color:#1565c0" id="summaryStatus">Pendiente</span></div>
+        <div class="summary-total"><span class="sl">Total a pagar</span><span class="sv">S/ 20.00</span></div>
+        <hr class="divider"/>
+        <div style="font-size:13px;color:#64748b;line-height:1.6">
+          <p><strong style="color:#0f172a">Pasos:</strong></p>
+          <p>1. Elige método de pago</p>
+          <p>2. Realiza el pago con los datos mostrados</p>
+          <p>3. Registra tu comprobante</p>
+          <p>4. Espera confirmación (máx. 24 hrs)</p>
+          <p>5. Descarga tu certificado</p>
+        </div>
+        <hr class="divider"/>
+        <a href="#" class="btn btn-outline" id="examLink"><span class="material-icons-round">quiz</span> ¿Aún no diste el examen?</a>
+      </aside>
+    </div>
+  </div>
+</main>
+<footer class="page-footer">
+  <div class="container">
+    <p>© 2026 FQ INGENIEROS · <a href="../index.html">Inicio</a> · <a href="../empresa/about.html">Nosotros</a></p>
+  </div>
+</footer>
+<script>
+  /* Set exam link dynamically */
+  var courseParam = new URLSearchParams(window.location.search).get('course') || '';
+  var examLink = document.getElementById('examLink');
+  if (examLink) examLink.href = '../certificado/examen.html' + (courseParam ? '?course=' + courseParam : '');
+  // --- Dynamic Payment Data ---
+  let paymentData = {
+    holder: 'FQ INGENIEROS E.I.R.L.',
+    amount: '20.00',
+    accounts: {
+      'Yape': '958 003 888',
+      'Plin': '958 003 888',
+      'BCP': '355-72921034-0-46',
+      'Transferencia interbancaria': '002-35517292103404662'
+    }
+  };
+  function fetchPaymentData() {
+    if (typeof firebase === 'undefined' || !firebase.firestore) return;
+    var db = firebase.firestore();
+    db.collection('settings').doc('paymentData').get().then(function(doc) {
+      if (doc.exists) {
+        var d = doc.data();
+        paymentData.holder = d.holder || paymentData.holder;
+        paymentData.amount = d.amount || paymentData.amount;
+        paymentData.accounts = d.accounts || paymentData.accounts;
+      }
+      updatePaymentUI('Yape');
+    }).catch(function() {
+      updatePaymentUI('Yape');
+    });
+  }
+  function updatePaymentUI(method) {
+    document.getElementById('selectedMethod').textContent = method;
+    document.getElementById('summaryMethod').textContent = method;
+    document.getElementById('accountHolder').textContent = paymentData.holder;
+    document.getElementById('accountNumber').textContent = paymentData.accounts[method] || '—';
+    document.getElementById('certAmount').textContent = 'S/ ' + paymentData.amount;
+  }
+  function selectMethod(el, name) {
+    document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    updatePaymentUI(name);
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchPaymentData();
+  });
+  function submitPayment(e) {
+    e.preventDefault();
+    var user = auth.currentUser;
+    if (!user) { alert('Debes iniciar sesión.'); return; }
+    var courseParam = new URLSearchParams(window.location.search).get('course') || '';
+    var form = document.getElementById('payForm');
+    var formData = {
+      userId: user.uid,
+      userEmail: user.email || '',
+      courseId: courseParam,
+      fullName: form.querySelector('input[type="text"]').value.trim(),
+      email: form.querySelector('input[type="email"]').value.trim(),
+      course: form.querySelector('select').value,
+      operationNumber: form.querySelectorAll('input[type="text"]')[1].value.trim(),
+      method: document.getElementById('selectedMethod').textContent,
+      amount: 20,
+      status: 'pending',
+      submittedAt: new Date().toISOString()
+    };
+    var btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-icons-round">hourglass_top</span> Enviando...';
+    db.collection('payments').add(formData).then(function() {
+      document.getElementById('summaryStatus').textContent = 'Enviado';
+      document.getElementById('summaryStatus').style.color = '#81c784';
+      btn.innerHTML = '<span class="material-icons-round">check_circle</span> ¡Comprobante enviado!';
+      btn.style.background = '#16a34a';
+      alert('¡Comprobante enviado correctamente! Revisaremos tu pago en un máximo de 24 horas y te notificaremos.');
+    }).catch(function(err) {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="material-icons-round">send</span> Enviar comprobante';
+      alert('Error al enviar: ' + err.message);
+    });
+  }
+</script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="../assets/js/firebase-config.js"></script>
+<script src="../assets/js/auth-ui.js"></script>
+<script>
+  /* Auth guard — redirect to login if not authenticated */
+  auth.onAuthStateChanged(function(user) {
+    if (!user) {
+      window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+    }
+  });
+</script>
+</body>
+</html>
