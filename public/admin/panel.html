@@ -37,9 +37,26 @@
   </style>
 </head>
 <body>
-  <!-- Diagnóstico visual de errores de carga -->
-  <div id="authLoading" style="display:flex;align-items:center;justify-content:center;position:fixed;inset:0;background:#f7f9fc;z-index:9999;font-size:18px;color:#1565c0;font-weight:600">Cargando autenticación...</div>
+  <div id="authLoading" style="display:flex;align-items:center;justify-content:center;position:fixed;inset:0;background:#f7f9fc;z-index:9999;font-size:18px;color:#1565c0;font-weight:600">El panel está cargando. Si ves esto por mucho tiempo, contacta soporte.</div>
   <div id="diagnosticError" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(255,255,255,0.98);color:#b91c1c;font-size:17px;font-weight:700;align-items:center;justify-content:center;text-align:center;padding:40px"></div>
+  <main class="container page">
+    <div class="panel-layout">
+      <div class="panel-main">
+        <div class="badge-row">
+          <span class="cbadge active">Admin</span>
+        </div>
+        <h1>Panel de administración</h1>
+        <div class="desc">Gestiona los cursos y precios de la plataforma.</div>
+        <div id="panelContent">Si ves este mensaje, el HTML está cargando correctamente.</div>
+      </div>
+      <div class="panel-meta">
+        <div class="panel-meta-item"><span class="material-icons-round">verified_user</span>Acceso restringido</div>
+      </div>
+    </div>
+  </main>
+  <footer class="page-footer">
+    Plataforma Educativa FQ INGENIEROS &copy; 2026
+  </footer>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -59,51 +76,6 @@
         diag.innerHTML = 'Error de promesa:<br>' + (e.reason && e.reason.message ? e.reason.message : e.reason || 'Error desconocido') + '<br><br><span style="font-size:14px;font-weight:400;color:#64748b">Revisa la consola del navegador para más detalles.</span>';
       }
     });
-    // Fallback: mostrar botón de login si tarda mucho
-    let authTimeout = setTimeout(function() {
-      var loading = document.getElementById('authLoading');
-      if (loading) loading.innerHTML = 'No se pudo conectar.<br><a href="../../auth/login.html" style="color:#fff;background:#1565c0;padding:10px 18px;border-radius:8px;display:inline-block;margin-top:18px;text-decoration:none">Ir a iniciar sesión</a>';
-    }, 6000);
-    // Redirección a login si no está autenticado
-    document.addEventListener('DOMContentLoaded', function() {
-      if (typeof auth === 'undefined') return;
-      auth.onAuthStateChanged(function(user) {
-        clearTimeout(authTimeout);
-        var loading = document.getElementById('authLoading');
-        if (loading) loading.remove();
-        if (!user) {
-          window.location.href = '../../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
-        }
-      });
-    });
-  </script>
-  <script src="admin-panel.js"></script>
-      </div>
-    </div>
-  </main>
-  <footer class="page-footer">
-    Plataforma Educativa FQ INGENIEROS &copy; 2026
-  </footer>
-  <div id="authLoading" style="display:flex;align-items:center;justify-content:center;position:fixed;inset:0;background:#f7f9fc;z-index:9999;font-size:18px;color:#1565c0;font-weight:600">Cargando autenticación...</div>
-  <div id="diagnosticError" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(255,255,255,0.98);color:#b91c1c;font-size:17px;font-weight:700;align-items:center;justify-content:center;text-align:center;padding:40px"></div>
-  <script>
-    window.addEventListener('error', function(e) {
-      var diag = document.getElementById('diagnosticError');
-      if (diag) {
-        diag.style.display = 'flex';
-        diag.innerHTML = 'Error de carga:<br>' + (e.message || e.error || e.filename || 'Error desconocido') + '<br><br><span style="font-size:14px;font-weight:400;color:#64748b">Revisa la consola del navegador para más detalles.</span>';
-      }
-    });
-    window.addEventListener('unhandledrejection', function(e) {
-      var diag = document.getElementById('diagnosticError');
-      if (diag) {
-        diag.style.display = 'flex';
-        diag.innerHTML = 'Error de promesa:<br>' + (e.reason && e.reason.message ? e.reason.message : e.reason || 'Error desconocido') + '<br><br><span style="font-size:14px;font-weight:400;color:#64748b">Revisa la consola del navegador para más detalles.</span>';
-      }
-    });
-  </script>
-  <script src="../../assets/js/firebase-config.js"></script>
-  <script>
     // Fallback: mostrar botón de login si tarda mucho
     let authTimeout = setTimeout(function() {
       var loading = document.getElementById('authLoading');
