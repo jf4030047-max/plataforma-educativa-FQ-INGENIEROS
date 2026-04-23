@@ -39,27 +39,19 @@
 <body>
   <div id="authLoading" style="display:flex;align-items:center;justify-content:center;position:fixed;inset:0;background:#f7f9fc;z-index:9999;font-size:18px;color:#1565c0;font-weight:600">El panel está cargando. Si ves esto por mucho tiempo, contacta soporte.</div>
   <div id="diagnosticError" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(255,255,255,0.98);color:#b91c1c;font-size:17px;font-weight:700;align-items:center;justify-content:center;text-align:center;padding:40px"></div>
-  <header class="admin-header">
-    <div class="admin-header-inner">
-      <a href="/" class="brand"><img src="/assets/img/logo.png" alt="Logo" style="height:38px;width:38px;border-radius:8px;object-fit:cover;margin-right:10px;"><strong>FQ INGENIEROS</strong></a>
-      <span class="admin-title">Panel de Administración</span>
-      <span class="admin-user"><span class="material-icons-round">verified_user</span> Admin</span>
-    </div>
-  </header>
   <main class="container page">
-    <div class="admin-panel-cards">
-      <section class="admin-card">
-        <h2><span class="material-icons-round">library_books</span> Gestión de Cursos</h2>
-        <div id="panelContent" class="admin-card-content">Cargando...</div>
-      </section>
-      <section class="admin-card admin-card-info">
-        <h2><span class="material-icons-round">info</span> Información</h2>
-        <ul class="admin-info-list">
-          <li>Acceso restringido solo a administradores.</li>
-          <li>Desde aquí puedes crear, editar y ver los cursos activos.</li>
-          <li>Recuerda mantener los precios actualizados.</li>
-        </ul>
-      </section>
+    <div class="panel-layout">
+      <div class="panel-main">
+        <div class="badge-row">
+          <span class="cbadge active">Admin</span>
+        </div>
+        <h1>Panel de administración</h1>
+        <div class="desc">Gestiona los cursos y precios de la plataforma.</div>
+        <div id="panelContent">Cargando...</div>
+      </div>
+      <div class="panel-meta">
+        <div class="panel-meta-item"><span class="material-icons-round">verified_user</span>Acceso restringido</div>
+      </div>
     </div>
   </main>
   <footer class="page-footer">
