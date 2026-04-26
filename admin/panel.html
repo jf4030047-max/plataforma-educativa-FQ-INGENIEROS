@@ -3,84 +3,211 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Panel del Administrador | FQ INGENIEROS</title>
+  <title>Panel de Administración | FQ INGENIEROS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
-  <link rel="stylesheet" href="../assets/css/notifications.css" />
-  <link rel="stylesheet" href="../assets/css/header.css" />
+  <link href="../assets/css/notifications.css" rel="stylesheet" />
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/auth-ui.js"></script>
+  <script src="../assets/js/notifications.js"></script>
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
-    .container{width:min(1140px,92%);margin:0 auto}
-    .page{padding:88px 0 60px}
-    .breadcrumb{font-size:12px;color:#64748b;margin-bottom:20px;display:flex;align-items:center;gap:4px}
-    .breadcrumb a{color:#1565c0;text-decoration:none}
-    .breadcrumb a:hover{text-decoration:underline}
-    .panel-layout{display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start}
-    .panel-main .badge-row{display:flex;gap:8px;margin-bottom:12px}
-    .cbadge{padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-    .cbadge.active{background:#d1fae5;color:#065f46}
-    .cbadge.info{background:#dbeafe;color:#1565c0}
-    .panel-main h1{font-size:clamp(24px,3.5vw,34px);font-weight:800;color:#0f172a;margin-bottom:10px;line-height:1.2}
-    .panel-main .desc{font-size:15px;color:#475569;line-height:1.7;margin-bottom:20px}
-    .panel-meta{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px}
-    .panel-meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:#64748b;font-weight:500}
-    .panel-meta-item .material-icons-round{font-size:18px;color:#1565c0}
-    .section{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:22px;margin-bottom:18px}
-    .section h2{font-size:17px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;margin-bottom:14px}
-    .section h2 .material-icons-round{font-size:20px;color:#1565c0}
-    .page-footer{text-align:center;padding:28px 0;color:#64748b;font-size:13px;border-top:1px solid #dce3ed;margin-top:48px}
-    .page-footer a{color:#1565c0;text-decoration:none}
-    @media(max-width:800px){.panel-layout{grid-template-columns:1fr}}
-  </style>
-</head>
-<body>
-  <!-- Top bar -->
-  <header class="top-bar">
-    <div class="container top-bar-inner">
-      <a class="brand" href="../index.html">
-        <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
-        <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
-      </a>
-      <div class="top-bar-right">
-        <div class="navbar-actions" id="navActions"></div>
-        <a class="back-link" href="../dashboard/index.html"><span class="material-icons-round">arrow_back</span> Dashboard</a>
-      </div>
-    </div>
-  </header>
-  <main class="page">
-    <div class="container">
-      <div class="breadcrumb">
-        <a href="../index.html">Inicio</a>
-        <span class="material-icons-round" style="font-size:14px">chevron_right</span>
-        <a href="../dashboard/index.html">Dashboard</a>
-        <span class="material-icons-round" style="font-size:14px">chevron_right</span>
-        <span id="breadcrumbName">Panel del administrador</span>
-      </div>
-      <div class="panel-layout">
-        <!-- Main -->
-        <div class="panel-main" id="panelMain">
-          <div class="badge-row" id="badgeRow"></div>
-          <h1 id="panelTitle">Panel del administrador</h1>
-          <p class="desc" id="panelDesc">Aquí puedes gestionar los cursos, usuarios y recursos de la plataforma.</p>
-          <div class="panel-meta" id="panelMeta"></div>
-          <div class="section">
-            <h2><span class="material-icons-round">play_circle</span> Cursos y recursos</h2>
-            <div id="panelContent">Aquí irán los cursos, recursos y gestión administrativa.</div>
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Panel de Administración | FQ INGENIEROS</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+      <link href="../assets/css/notifications.css" rel="stylesheet" />
+      <script src="../assets/js/firebase-config.js"></script>
+      <script src="../assets/js/auth-ui.js"></script>
+      <script src="../assets/js/notifications.js"></script>
+      <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
+        .admin-layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+        .admin-sidebar{background:#0f172a;color:#e2e8f0;display:flex;flex-direction:column;align-items:center;padding:0}
+        .sidebar-header{display:flex;align-items:center;gap:10px;padding:28px 0 18px 0;width:100%;justify-content:center;border-bottom:1px solid rgba(255,255,255,.08)}
+        .sidebar-header img{width:38px;height:38px;border-radius:8px;object-fit:cover}
+        .sidebar-header strong{font-size:15px;color:#fff}
+        .sidebar-header span{font-size:10px;color:#60a5fa;letter-spacing:1px;text-transform:uppercase;display:block;font-weight:600}
+        .sidebar-menu{flex:1;width:100%;padding:24px 0 0 0;list-style:none}
+        .sidebar-menu li{width:100%}
+        .sidebar-menu a{display:flex;align-items:center;gap:12px;padding:13px 32px;color:#94a3b8;text-decoration:none;font-size:15px;font-weight:500;border-left:4px solid transparent;transition:background .18s,border-color .18s,color .18s}
+        .sidebar-menu a.active,.sidebar-menu a:hover{background:rgba(255,255,255,.06);color:#fff;border-left:4px solid #1565c0}
+        .sidebar-footer{padding:18px 0 22px 0;width:100%;text-align:center;font-size:12px;color:#64748b;border-top:1px solid rgba(255,255,255,.08)}
+        .sidebar-footer a{color:#60a5fa;text-decoration:none}
+        .admin-main{padding:0;overflow-y:auto;max-height:100vh}
+        .admin-top-bar{background:#fff;border-bottom:1px solid #dce3ed;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:10}
+        .admin-top-bar h2{font-size:20px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px}
+        .admin-top-bar-actions{display:flex;align-items:center;gap:14px}
+        .admin-badge{background:#eff6ff;color:#1565c0;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
+        .btn-logout{background:none;border:1.5px solid #dce3ed;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;color:#334155;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;font-family:inherit}
+        .btn-logout:hover{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+        .admin-content{padding:32px 40px}
+        .stats-row{display:flex;gap:18px;margin-bottom:32px;flex-wrap:wrap}
+        .stat-card{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:24px 32px;min-width:180px;flex:1 1 180px;max-width:240px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(15,23,42,0.04)}
+        .stat-icon{font-size:32px;padding:8px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+        .stat-value{font-size:22px;font-weight:700;color:#0f172a}
+        .stat-label{font-size:13px;color:#64748b}
+        .admin-section{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:28px 32px;box-shadow:0 2px 8px rgba(15,23,42,0.04)}
+        .admin-section h3{font-size:17px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+        @media (max-width: 1100px) {.admin-layout{grid-template-columns:1fr}}
+        @media (max-width: 700px) {.admin-content{padding:18px 6vw}.stats-row{flex-direction:column;gap:10px}.stat-card{max-width:100%}}
+      </style>
+    </head>
+    <body>
+      <div class="admin-layout">
+        <aside class="admin-sidebar">
+          <div class="sidebar-header">
+            <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+            <div>
+              <strong>FQ INGENIEROS</strong>
+              <span>Admin</span>
+            </div>
           </div>
-        </div>
-        <!-- Sidebar -->
-        <aside class="section" style="min-height:180px">
-          <h2><span class="material-icons-round">info</span> Información</h2>
-          <div id="panelSidebar">Aquí puedes mostrar información adicional, avisos o estadísticas.</div>
+          <ul class="sidebar-menu">
+            <li><a href="panel.html" class="active"><span class="material-icons-round">dashboard</span>Panel</a></li>
+            <li><a href="../cursos/panel.html"><span class="material-icons-round">school</span>Cursos</a></li>
+            <li><a href="../profesor/index.html"><span class="material-icons-round">people</span>Usuarios</a></li>
+            <li><a href="../certificado/examen.html"><span class="material-icons-round">folder</span>Recursos</a></li>
+            <li><a href="../dashboard/index.html"><span class="material-icons-round">bar_chart</span>Estadísticas</a></li>
+            <li><a href="index.html"><span class="material-icons-round">settings</span>Configuración</a></li>
+          </ul>
+          <div class="sidebar-footer">
+            Plataforma Educativa FQ INGENIEROS &copy; 2026
+          </div>
         </aside>
+        <main class="admin-main">
+          <div class="admin-top-bar">
+            <h2><span class="material-icons-round">admin_panel_settings</span> Panel del Administrador</h2>
+            <div class="admin-top-bar-actions">
+              <span class="admin-badge"><span class="material-icons-round">verified_user</span> Administrador</span>
+              <button class="btn-logout" onclick="window.location.href='../auth/action.html'">
+                <span class="material-icons-round">logout</span> Salir
+              </button>
+            </div>
+          </div>
+          <div class="admin-content">
+            <div class="stats-row">
+              <div class="stat-card">
+                <span class="material-icons-round stat-icon" style="background:#e0f2fe;color:#0284c7;">school</span>
+                <div>
+                  <div class="stat-value">12</div>
+                  <div class="stat-label">Cursos activos</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <span class="material-icons-round stat-icon" style="background:#fef9c3;color:#ca8a04;">people</span>
+                <div>
+                  <div class="stat-value">350</div>
+                  <div class="stat-label">Usuarios registrados</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <span class="material-icons-round stat-icon" style="background:#dcfce7;color:#16a34a;">attach_money</span>
+                <div>
+                  <div class="stat-value">S/ 8,500</div>
+                  <div class="stat-label">Ingresos mes</div>
+                </div>
+              </div>
+            </div>
+            <div class="admin-section">
+              <h3><span class="material-icons-round">play_circle</span> Cursos y recursos</h3>
+              <div id="panelContent">Aquí irán los cursos, recursos y gestión administrativa.</div>
+            </div>
+          </div>
+        </main>
+        <!-- Chat Widget -->
+        <div id="fqChatWidget" style="position:fixed;bottom:28px;right:28px;z-index:9999;width:340px;max-width:95vw;font-family:Inter,sans-serif;box-shadow:0 8px 32px rgba(15,23,42,0.18);border-radius:18px;overflow:hidden;background:#fff;display:flex;flex-direction:column;">
+          <div style="background:#1565c0;color:#fff;padding:14px 18px;font-weight:700;display:flex;align-items:center;gap:8px;font-size:16px;">
+            <span class="material-icons-round">chat</span> Chat Soporte
+          </div>
+          <div id="fqChatMessages" style="flex:1;min-height:180px;max-height:260px;overflow-y:auto;padding:14px 12px 8px 12px;font-size:14px;"></div>
+          <form id="fqChatForm" style="display:flex;gap:6px;padding:10px 10px 10px 10px;background:#f1f5f9;border-top:1px solid #e2e8f0;">
+            <input id="fqChatInput" type="text" placeholder="Escribe tu mensaje..." autocomplete="off" style="flex:1;padding:8px 12px;border-radius:8px;border:1.5px solid #dce3ed;font-size:14px;outline:none;" />
+            <button type="submit" style="background:#1565c0;color:#fff;border:none;border-radius:8px;padding:0 16px;font-weight:600;cursor:pointer;">Enviar</button>
+          </form>
+        </div>
       </div>
-    </div>
-  </main>
-  <footer class="page-footer">
-    Plataforma Educativa FQ INGENIEROS &copy; 2026
-  </footer>
-</body>
-</html>
+      <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+      <script src="../assets/js/firebase-config.js"></script>
+      <script>
+        // Redirección a login si no está autenticado
+        document.addEventListener('DOMContentLoaded', function() {
+          if (typeof auth === 'undefined') return;
+          auth.onAuthStateChanged(function(user) {
+            if (!user) {
+              window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+            }
+          });
+        });
+        // Chat en tiempo real con Firestore
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+          const db = firebase.firestore();
+          const chatBox = document.getElementById('fqChatMessages');
+          const chatForm = document.getElementById('fqChatForm');
+          const chatInput = document.getElementById('fqChatInput');
+          // Mostrar mensajes en tiempo real
+          db.collection('adminChat').orderBy('timestamp','asc').limitToLast(50)
+            .onSnapshot(function(snap) {
+              chatBox.innerHTML = '';
+              snap.forEach(function(doc) {
+                const msg = doc.data();
+                const time = msg.timestamp && msg.timestamp.toDate ? msg.timestamp.toDate() : new Date();
+                const timeStr = time.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'});
+                chatBox.innerHTML += `<div style="margin-bottom:7px"><b style="color:#1565c0">${msg.user||'Admin'}</b> <span style="color:#64748b;font-size:12px">${timeStr}</span><br>${msg.text}</div>`;
+              });
+              chatBox.scrollTop = chatBox.scrollHeight;
+            });
+          // Enviar mensaje
+          chatForm.onsubmit = function(e) {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (!text) return;
+            chatInput.value = '';
+            db.collection('adminChat').add({
+              text,
+              user: (window.FQAuth && FQAuth.getUser() && FQAuth.getUser().email) || 'Admin',
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          };
+        }
+      </script>
+    </body>
+    </html>
+                    <link href="../assets/css/notifications.css" rel="stylesheet" />
+                    <style>
+                      *{box-sizing:border-box;margin:0;padding:0}
+                      body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
+                      .layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+                      .sidebar{background:#0f172a;color:#e2e8f0;padding:0;display:flex;flex-direction:column}
+                      .sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 22px;border-bottom:1px solid rgba(255,255,255,.08)}
+                      .sidebar-brand img{width:36px;height:36px;border-radius:8px;object-fit:cover}
+                      .sidebar-brand strong{font-size:13px;color:#fff}
+                      .sidebar-brand span{font-size:10px;color:#60a5fa;letter-spacing:1px;text-transform:uppercase;display:block;font-weight:600}
+                      .sidebar-nav{flex:1;padding:16px 12px}
+                      .nav-label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding:12px 10px 6px;margin-top:8px}
+                      .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s;cursor:pointer;margin-bottom:2px}
+                      .nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+                      .nav-item.active{background:#1565c0;color:#fff}
+                      .nav-item .material-icons-round{font-size:20px}
+                      .nav-item .badge-count{margin-left:auto;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;min-width:20px;text-align:center}
+                      .sidebar-footer{padding:16px 22px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:#64748b}
+                      .sidebar-footer a{color:#60a5fa;text-decoration:none}
+                      .main{padding:0;overflow-y:auto;max-height:100vh}
+                      .top-bar{background:#fff;border-bottom:1px solid #dce3ed;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:10}
+                      .top-bar h2{font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px}
+                      .top-bar-actions{display:flex;align-items:center;gap:14px}
+                      .admin-badge{background:#eff6ff;color:#1565c0;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
+                      .btn-logout{background:none;border:1.5px solid #dce3ed;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;color:#334155;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;font-family:inherit}
+                      .btn-logout:hover{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+                      .content{padding:28px 32px}
+                      [El contenido profesional restaurado, igual al layout avanzado del panel de administrador]
