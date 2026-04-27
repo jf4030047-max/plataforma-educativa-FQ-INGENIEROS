@@ -160,35 +160,45 @@
               <span class="material-icons-round">info</span>
               <span>Después de realizar el pago, completa los datos y sube tu comprobante para validar la emisión de tu certificado.</span>
             </div>
-            <form id="payForm" onsubmit="submitPayment(event)">
+            <form id="payForm" onsubmit="submitPayment(event)" novalidate>
               <div class="form-group">
-                <label class="form-label">Nombre completo</label>
-                <input type="text" class="form-control" placeholder="Ej: Juan Pérez García" required />
+                <label class="form-label" for="fullName">Nombre completo</label>
+                <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Ej: Juan Pérez García" required aria-required="true" />
+                <div class="form-hint" id="fullNameError" style="color:#e53935;display:none"></div>
               </div>
               <div class="form-group">
-                <label class="form-label">Correo electrónico</label>
-                <input type="email" class="form-control" placeholder="correo@ejemplo.com" required />
+                <label class="form-label" for="email">Correo electrónico</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="correo@ejemplo.com" required aria-required="true" />
+                <div class="form-hint" id="emailError" style="color:#e53935;display:none"></div>
               </div>
               <div class="form-group">
-                <label class="form-label">Curso</label>
-                <select class="form-control" id="courseSelect" required></select>
+                <label class="form-label" for="courseSelect">Curso</label>
+                <select class="form-control" id="courseSelect" name="courseSelect" required aria-required="true"></select>
+                <div class="form-hint" id="courseError" style="color:#e53935;display:none"></div>
               </div>
               <div class="form-group">
-                <label class="form-label">Número de operación / referencia</label>
-                <input type="text" class="form-control" placeholder="Ej: 00123456" required />
+                <label class="form-label" for="operationNumber">Número de operación / referencia</label>
+                <input type="text" class="form-control" id="operationNumber" name="operationNumber" placeholder="Ej: 00123456" required aria-required="true" />
+                <div class="form-hint" id="operationError" style="color:#e53935;display:none"></div>
               </div>
               <div class="form-group">
-                <label class="form-label">Comprobante de pago (imagen)</label>
-                <input type="file" class="form-control" accept="image/*,.pdf" required />
-                <p class="form-hint">Sube una captura o foto del comprobante (JPG, PNG o PDF).</p>
+                <label class="form-label" for="comprobante">Comprobante de pago (imagen)</label>
+                <input type="file" class="form-control" id="comprobante" name="comprobante" accept="image/jpeg,image/png,application/pdf" required aria-required="true" />
+                <p class="form-hint">Sube una captura o foto del comprobante (JPG, PNG o PDF, máx. 3MB).</p>
+                <div class="form-hint" id="comprobanteError" style="color:#e53935;display:none"></div>
               </div>
               <div class="form-group">
-                <label class="form-label">Observaciones (opcional)</label>
-                <textarea class="form-control" placeholder="Algún dato adicional..."></textarea>
+                <label class="form-label" for="observaciones">Observaciones (opcional)</label>
+                <textarea class="form-control" id="observaciones" name="observaciones" placeholder="Algún dato adicional..."></textarea>
               </div>
-              <button type="submit" class="btn btn-primary">
+              <div class="form-group" style="margin-bottom:18px">
+                <div id="captchaContainer"></div>
+              </div>
+              <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
                 <span class="material-icons-round">send</span> Enviar comprobante
               </button>
+              <div class="form-hint" id="formSuccess" style="color:#16a34a;display:none;margin-top:10px"></div>
+              <div class="form-hint" id="formError" style="color:#e53935;display:none;margin-top:10px"></div>
             </form>
           </div>
         </section>
@@ -304,11 +314,125 @@
   document.addEventListener('DOMContentLoaded', function() {
     fetchPaymentDataAndCoursePrice();
   });
+  // --- Validación automática y feedback UX ---
+  function validateForm() {
+    let valid = true;
+    // Nombre
+    const fullName = document.getElementById('fullName');
+    const fullNameError = document.getElementById('fullNameError');
+    if (!fullName.value.trim() || fullName.value.length < 3) {
+      fullNameError.textContent = 'Ingresa tu nombre completo.';
+      fullNameError.style.display = 'block';
+      valid = false;
+    } else {
+      fullNameError.style.display = 'none';
+    }
+    // Email
+    const email = document.getElementById('email');
+    const emailError = document.getElementById('emailError');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.value.trim() || !emailRegex.test(email.value)) {
+      emailError.textContent = 'Correo electrónico inválido.';
+      emailError.style.display = 'block';
+      valid = false;
+    } else {
+      emailError.style.display = 'none';
+    }
+    // Curso
+    const courseSelect = document.getElementById('courseSelect');
+    const courseError = document.getElementById('courseError');
+    if (!courseSelect.value) {
+      courseError.textContent = 'Selecciona un curso.';
+      courseError.style.display = 'block';
+      valid = false;
+    } else {
+      courseError.style.display = 'none';
+    }
+    // Operación
+    const operationNumber = document.getElementById('operationNumber');
+    const operationError = document.getElementById('operationError');
+    if (!operationNumber.value.trim() || operationNumber.value.length < 5) {
+      operationError.textContent = 'Número de operación inválido.';
+      operationError.style.display = 'block';
+      valid = false;
+    } else {
+      operationError.style.display = 'none';
+    }
+    // Comprobante
+    const comprobante = document.getElementById('comprobante');
+    const comprobanteError = document.getElementById('comprobanteError');
+    if (!comprobante.files[0]) {
+      comprobanteError.textContent = 'Adjunta el comprobante.';
+      comprobanteError.style.display = 'block';
+      valid = false;
+    } else {
+      const file = comprobante.files[0];
+      const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+      if (!allowedTypes.includes(file.type)) {
+        comprobanteError.textContent = 'Formato no permitido. Usa JPG, PNG o PDF.';
+        comprobanteError.style.display = 'block';
+        valid = false;
+      } else if (file.size > 3 * 1024 * 1024) {
+        comprobanteError.textContent = 'El archivo supera 3MB.';
+        comprobanteError.style.display = 'block';
+        valid = false;
+      } else {
+        comprobanteError.style.display = 'none';
+      }
+    }
+    // Captcha
+    if (!window.captchaPassed) {
+      valid = false;
+    }
+    document.getElementById('submitBtn').disabled = !valid;
+    return valid;
+  }
+
+  // Simulación de captcha simple
+  function renderSimpleCaptcha() {
+    const container = document.getElementById('captchaContainer');
+    const a = Math.floor(Math.random()*10)+1;
+    const b = Math.floor(Math.random()*10)+1;
+    container.innerHTML = `<label for='captchaInput'>¿Cuánto es ${a} + ${b}? <input id='captchaInput' type='number' style='width:60px;margin-left:8px'></label><span id='captchaError' style='color:#e53935;display:none;margin-left:10px'></span>`;
+    window.captchaPassed = false;
+    document.getElementById('captchaInput').addEventListener('input', function() {
+      if (parseInt(this.value) === a + b) {
+        window.captchaPassed = true;
+        document.getElementById('captchaError').style.display = 'none';
+      } else {
+        window.captchaPassed = false;
+        document.getElementById('captchaError').textContent = 'Respuesta incorrecta.';
+        document.getElementById('captchaError').style.display = 'inline';
+      }
+      validateForm();
+    });
+  }
+
+  // Validación en tiempo real
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchPaymentDataAndCoursePrice();
+    renderSimpleCaptcha();
+    ['fullName','email','courseSelect','operationNumber','comprobante'].forEach(id => {
+      document.getElementById(id).addEventListener('input', validateForm);
+      if (id === 'comprobante') document.getElementById(id).addEventListener('change', validateForm);
+    });
+  });
+
   function submitPayment(e) {
     e.preventDefault();
+    if (!validateForm()) {
+      document.getElementById('formError').textContent = 'Corrige los errores antes de enviar.';
+      document.getElementById('formError').style.display = 'block';
+      return;
+    } else {
+      document.getElementById('formError').style.display = 'none';
+    }
     var user = auth.currentUser;
-    if (!user) { alert('Debes iniciar sesión.'); return; }
-    var courseParam = new URLSearchParams(window.location.search).get('course') || '';
+    if (!user) {
+      document.getElementById('formError').textContent = 'Debes iniciar sesión.';
+      document.getElementById('formError').style.display = 'block';
+      return;
+    }
     var form = document.getElementById('payForm');
     var courseSelect = document.getElementById('courseSelect');
     var selectedId = courseSelect ? courseSelect.value : '';
@@ -317,28 +441,62 @@
       userId: user.uid,
       userEmail: user.email || '',
       courseId: selectedId,
-      fullName: form.querySelector('input[type="text"]').value.trim(),
-      email: form.querySelector('input[type="email"]').value.trim(),
+      fullName: form.fullName.value.trim(),
+      email: form.email.value.trim(),
       course: selectedCourse ? selectedCourse.name : '',
-      operationNumber: form.querySelectorAll('input[type="text"]')[1].value.trim(),
+      operationNumber: form.operationNumber.value.trim(),
       method: document.getElementById('selectedMethod').textContent,
       amount: coursePrice || paymentData.amount,
       status: 'pending',
-      submittedAt: new Date().toISOString()
+      submittedAt: new Date().toISOString(),
+      observaciones: form.observaciones.value.trim()
     };
-    var btn = form.querySelector('button[type="submit"]');
+    var btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.innerHTML = '<span class="material-icons-round">hourglass_top</span> Enviando...';
-    db.collection('payments').add(formData).then(function() {
-      document.getElementById('summaryStatus').textContent = 'Enviado';
-      document.getElementById('summaryStatus').style.color = '#81c784';
-      btn.innerHTML = '<span class="material-icons-round">check_circle</span> ¡Comprobante enviado!';
-      btn.style.background = '#16a34a';
-      alert('¡Comprobante enviado correctamente! Revisaremos tu pago en un máximo de 24 horas y te notificaremos.');
+    // Subir comprobante a Firebase Storage
+    var file = document.getElementById('comprobante').files[0];
+    var storageRef = firebase.storage().ref('comprobantes/' + user.uid + '_' + Date.now() + '_' + file.name);
+    storageRef.put(file).then(function(snapshot) {
+      snapshot.ref.getDownloadURL().then(function(url) {
+        formData.comprobanteUrl = url;
+        db.collection('payments').add(formData).then(function() {
+          document.getElementById('summaryStatus').textContent = 'Enviado';
+          document.getElementById('summaryStatus').style.color = '#81c784';
+          btn.innerHTML = '<span class="material-icons-round">check_circle</span> ¡Comprobante enviado!';
+          btn.style.background = '#16a34a';
+          document.getElementById('formSuccess').textContent = '¡Comprobante enviado correctamente! Revisaremos tu pago en un máximo de 24 horas y te notificaremos.';
+          document.getElementById('formSuccess').style.display = 'block';
+          // Opcional: enviar correo de confirmación
+          sendConfirmationEmail(formData.email, formData.fullName, formData.course);
+        });
+      });
     }).catch(function(err) {
       btn.disabled = false;
       btn.innerHTML = '<span class="material-icons-round">send</span> Enviar comprobante';
-      alert('Error al enviar: ' + err.message);
+      document.getElementById('formError').textContent = 'Error al enviar: ' + err.message;
+      document.getElementById('formError').style.display = 'block';
+    });
+  }
+
+  // --- INTEGRACIÓN EMAILJS ---
+  // Agrega este script antes de tu cierre </body> o en el <head>:
+  // <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  // Inicializa EmailJS con tu Public Key
+  if (typeof emailjs !== 'undefined') {
+    emailjs.init('TU_PUBLIC_KEY_EMAILJS'); // Reemplaza por tu Public Key
+  }
+
+  function sendConfirmationEmail(email, name, course) {
+    if (typeof emailjs === 'undefined') return;
+    emailjs.send('TU_SERVICE_ID', 'TU_TEMPLATE_ID', {
+      to_email: email,
+      to_name: name,
+      course_name: course
+    }).then(function(response) {
+      console.log('Correo de confirmación enviado:', response.status, response.text);
+    }, function(error) {
+      console.error('Error enviando correo:', error);
     });
   }
 </script>
@@ -356,6 +514,9 @@
     }
   });
 </script>
+</script>
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 </body>
 </html>
 <!-- Eliminado bloque HTML duplicado final -->

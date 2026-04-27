@@ -358,24 +358,38 @@
 				<div class="stats-grid">
 					<div class="stat-card">
 						<div class="stat-icon amber"><span class="material-icons-round">class</span></div>
-						<div class="stat-info"><strong>0</strong><span>Cursos asignados</span></div>
+						<div class="stat-info"><strong id="statCursos">0</strong><span>Cursos asignados</span></div>
 					</div>
 					<div class="stat-card">
 						<div class="stat-icon blue"><span class="material-icons-round">event</span></div>
-						<div class="stat-info"><strong>0</strong><span>Sesiones próximas</span></div>
+						<div class="stat-info"><strong id="statExamenes">0</strong><span>Sesiones próximas</span></div>
 					</div>
 					<div class="stat-card">
 						<div class="stat-icon green"><span class="material-icons-round">check_circle</span></div>
-						<div class="stat-info"><strong>0</strong><span>Alumnos activos</span></div>
+						<div class="stat-info"><strong id="statAlumnos">0</strong><span>Alumnos activos</span></div>
 					</div>
 				</div>
-				<div class="panel active">
+				<div class="panel active" id="panel-alumnos">
 					<div class="panel-header">
-						<h3>Bienvenido al panel de profesor</h3>
+						<h3>Alumnos <span id="alumnosTotal" style="font-size:15px;color:#64748b;font-weight:500"></span></h3>
+						<div class="search-box">
+							<span class="material-icons-round">search</span>
+							<input type="text" placeholder="Buscar alumno..." id="searchAlumnos" oninput="renderAlumnos()" />
+						</div>
 					</div>
-					<div class="empty-state">
-						<span class="material-icons-round">school</span>
-						<p>Aquí verás tus cursos, sesiones y alumnos asignados.</p>
+					<div class="table-wrap">
+						<table>
+							<thead>
+								<tr>
+									<th>Alumno</th>
+									<th>Cursos</th>
+									<th>Registro</th>
+								</tr>
+							</thead>
+							<tbody id="alumnosTable">
+								<tr><td colspan="3" style="text-align:center;color:#64748b;padding:32px">Cargando alumnos...</td></tr>
+							</tbody>
+						</table>
 					</div>
 				</div>
 			</div>
@@ -437,6 +451,129 @@ function logoutProf() {
 	sessionStorage.removeItem('prof_auth');
 	window.location.reload();
 }
-// ...restaurar aquí el resto del JS original: listeners, renderDashboard, renderAlumnos, renderZoomCards, etc...
+// ═══ HELPERS ═══
+function escapeHtml(str) {
+	return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getInitials(name) {
+	return (name || '?').split(' ').map(function(w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
+}
+
+function getCourseName(id) {
+	var c = coursesData.find(function(x) { return x.id === id; });
+	return c ? c.name : id;
+}
+
+function formatDate(ts) {
+	if (!ts) return '—';
+	var d = ts.toDate ? ts.toDate() : new Date(ts);
+	return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+// ═══ HELPERS: filtros por profesor ═══
+function myAlumnos() {
+	if (!currentProf) return usersData;
+	var myCids = myCourses().map(function(c) { return c.id; });
+	return usersData.filter(function(u) {
+		if (!u.enrolledCourses) return false;
+		return myCids.some(function(cid) {
+			return u.enrolledCourses.indexOf(cid) !== -1;
+		});
+	});
+}
+
+function myExams() {
+	if (!currentProf) return examsData;
+	var myCids = myCourses().map(function(c) { return c.id; });
+	return examsData.filter(function(e) {
+		return myCids.indexOf(e.courseId) !== -1;
+	});
+}
+
+function myMaterials() {
+	if (!currentProf) return materialsData;
+	var myCids = myCourses().map(function(c) { return c.id; });
+	return materialsData.filter(function(m) {
+		return myCids.indexOf(m.courseId) !== -1;
+	});
+}
+
+// ═══ DASHBOARD ═══
+function renderDashboard() {
+	var alumnos = myAlumnos();
+	var cursos = myCourses();
+	var exams = myExams();
+
+	var el = document.getElementById('statAlumnos');
+	if (el) el.textContent = alumnos.length;
+
+	var el2 = document.getElementById('statCursos');
+	if (el2) el2.textContent = cursos.length;
+
+	var el3 = document.getElementById('statExamenes');
+	if (el3) el3.textContent = exams.length;
+
+	var el4 = document.getElementById('alumnosCount');
+	if (el4) el4.textContent = alumnos.length;
+
+	// Courses summary
+	var html = '';
+	cursos.forEach(function(c) {
+		var enrolled = usersData.filter(function(u) {
+			return u.enrolledCourses && u.enrolledCourses.indexOf(c.id) !== -1;
+		}).length;
+		var zoomStatus = c.zoomLink ? '<span style="color:#16a34a;font-size:12px;display:flex;align-items:center;gap:3px"><span class="material-icons-round" style="font-size:14px">check_circle</span> Zoom activo</span>' : '<span style="color:#94a3b8;font-size:12px">Sin Zoom</span>';
+		var recStatus = c.recordingUrl ? '<span style="color:#d97706;font-size:12px;display:flex;align-items:center;gap:3px"><span class="material-icons-round" style="font-size:14px">play_circle</span> Grabación</span>' : '';
+
+		html += '<div class="course-card">';
+		html += '<h4><span class="material-icons-round" style="color:#d97706">' + (c.icon || 'menu_book') + '</span> ' + escapeHtml(c.name || c.id) + '</h4>';
+		html += '<div style="display:flex;gap:24px;font-size:13px;color:#64748b">';
+		html += '<span><strong>' + enrolled + '</strong> alumnos</span>';
+		html += '<span><strong>' + (c.sessions || 0) + '</strong> sesiones</span>';
+		html += '<span>' + escapeHtml(c.duration || '—') + '</span>';
+		html += '</div>';
+		html += '<div style="display:flex;gap:16px;margin-top:8px">' + zoomStatus + recStatus + '</div>';
+		html += '</div>';
+	});
+
+	if (cursos.length === 0) {
+		html = '<div class="empty-state"><span class="material-icons-round">menu_book</span><p>No hay cursos asignados a tu cuenta.</p></div>';
+	}
+
+	var dashEl = document.getElementById('dashCourses');
+	if (dashEl) dashEl.innerHTML = html;
+}
+
+// ═══ ALUMNOS ═══
+function renderAlumnos() {
+	var search = (document.getElementById('searchAlumnos') || {}).value || '';
+	search = search.toLowerCase();
+	var alumnos = myAlumnos();
+	var totalEl = document.getElementById('alumnosTotal');
+	if (totalEl) totalEl.textContent = '(' + alumnos.length + ')';
+
+	var tbody = document.getElementById('alumnosTable');
+	if (!tbody) return;
+
+	var filtered = alumnos.filter(function(u) {
+		if (!search) return true;
+		return ((u.name || '') + ' ' + (u.email || '')).toLowerCase().indexOf(search) !== -1;
+	});
+
+	if (filtered.length === 0) {
+		tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#64748b;padding:32px">No se encontraron alumnos.</td></tr>';
+		return;
+	}
+
+	tbody.innerHTML = filtered.map(function(u) {
+		var courses = (u.enrolledCourses || []).map(function(cid) { return getCourseName(cid); }).join(', ') || '—';
+		return '<tr>' +
+			'<td><div class="user-cell"><div class="user-avatar">' + getInitials(u.name || u.email) + '</div><div><div class="user-name">' + escapeHtml(u.name || 'Sin nombre') + '</div><div class="user-email">' + escapeHtml(u.email) + '</div></div></div></td>' +
+			'<td>' + escapeHtml(courses) + '</td>' +
+			'<td>' + formatDate(u.createdAt) + '</td>' +
+			'</tr>';
+	}).join('');
+}
 </script>
 </body>

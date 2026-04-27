@@ -3,9 +3,9 @@
 	 Paleta: Blanco · Negro · Azul
 	 ══════════════════════════════════════════════ */
 
-:root {
-	--white: #ffffff;
-	--off-white: #f7f9fc;
+ :root {
+	--white: #f3f8fd;
+	--off-white: #eaf4fb;
 	--gray-100: #eef2f7;
 	--gray-200: #dce3ed;
 	--gray-300: #b0bec5;
@@ -32,7 +32,10 @@
 body {
 	font-family: 'Inter', system-ui, sans-serif;
 	color: var(--gray-700);
-	background: var(--white);
+	background: linear-gradient(180deg, #eaf4fb 0%, #f3f8fd 100%);
+	background-image: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(180deg, #eaf4fb 0%, #f3f8fd 100%);
+	background-repeat: repeat;
+	background-size: auto, 100% 100%;
 	line-height: 1.6;
 }
 

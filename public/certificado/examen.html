@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Examen de Evaluación | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/header.css" />
+  <link rel="stylesheet" href="../assets/css/notifications.css" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
+    .container{width:min(800px,92%);margin:0 auto}
+    .page{padding:88px 0 60px}
+    .state-box{text-align:center;padding:60px 20px;background:#fff;border:1px solid #dce3ed;border-radius:16px}
+    .state-box .material-icons-round{font-size:56px;color:#dce3ed;margin-bottom:12px}
+    .state-box h2{font-size:18px;color:#0f172a;margin-bottom:6px}
+    .state-box p{font-size:14px;color:#64748b;margin-bottom:20px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .2s;text-decoration:none}
+    .btn-primary{background:#1565c0;color:#fff}
+    .btn-primary:hover{background:#1e88e5;transform:translateY(-1px)}
+    .btn-success{background:#16a34a;color:#fff}
+    .btn-success:hover{background:#15803d}
+    .btn-outline{background:#fff;color:#1565c0;border:1.5px solid #1565c0}
+    .btn-outline:hover{background:#eff6ff}
+    .btn-lg{padding:14px 32px;font-size:15px}
+    .btn-full{width:100%}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .exam-intro{text-align:center}
+    .exam-intro-icon{width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,#1565c0,#1e88e5);display:inline-grid;place-items:center;margin-bottom:16px}
+    .exam-intro-icon .material-icons-round{font-size:36px;color:#fff}
+    .exam-intro h1{font-size:clamp(22px,4vw,32px);font-weight:800;color:#0f172a;margin-bottom:6px}
+    .exam-intro .course-name{font-size:16px;color:#1565c0;font-weight:600;margin-bottom:24px}
+    .exam-info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+    .exam-info-item{background:#fff;border:1px solid #dce3ed;border-radius:12px;padding:16px 12px;text-align:center}
+    .exam-info-item .material-icons-round{font-size:24px;color:#1565c0;margin-bottom:6px;display:block}
+    .exam-info-item strong{display:block;font-size:18px;font-weight:800;color:#0f172a}
+    .exam-info-item span{font-size:11px;color:#64748b}
+    .exam-rules{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:20px 24px;text-align:left;margin-bottom:24px}
+    .exam-rules h3{font-size:15px;font-weight:700;color:#0f172a;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .exam-rules ul{list-style:none;padding:0}
+    .exam-rules li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#475569;padding:5px 0}
+    .exam-rules li .material-icons-round{font-size:16px;color:#1565c0;flex-shrink:0;margin-top:1px}
+  </style>
+</head>
+<body>
+  <div class="container page">
+    <div class="exam-intro">
+      <div class="exam-intro-icon"><span class="material-icons-round">quiz</span></div>
+      <h1>Examen de Evaluación</h1>
+      <div class="course-name">Curso: [Nombre del Curso]</div>
+    </div>
+    <div class="exam-info-grid">
+      <div class="exam-info-item"><span class="material-icons-round">help</span><strong>10</strong><span>Preguntas</span></div>
+      <div class="exam-info-item"><span class="material-icons-round">timer</span><strong>20 min</strong><span>Tiempo límite</span></div>
+      <div class="exam-info-item"><span class="material-icons-round">check_circle</span><strong>70%</strong><span>Puntaje mínimo</span></div>
+      <div class="exam-info-item"><span class="material-icons-round">workspace_premium</span><strong>Certificado</strong><span>Al aprobar</span></div>
+    </div>
+    <div class="exam-rules">
+      <h3><span class="material-icons-round">info</span> Instrucciones</h3>
+      <ul>
+        <li><span class="material-icons-round">play_arrow</span> El examen inicia al hacer clic en "Comenzar".</li>
+        <li><span class="material-icons-round">timer</span> Dispones de 20 minutos para completarlo.</li>
+        <li><span class="material-icons-round">edit</span> Solo puedes enviar una respuesta por pregunta.</li>
+        <li><span class="material-icons-round">check</span> Debes obtener al menos 70% para aprobar.</li>
+        <li><span class="material-icons-round">block</span> No recargues la página durante el examen.</li>
+      </ul>
+    </div>
+    <div style="text-align:center;margin-top:32px">
+      <a href="#" class="btn btn-primary btn-lg">Comenzar examen</a>
+    </div>
+  </div>
+</body>
+</html>
