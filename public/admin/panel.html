@@ -9,13 +9,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
   <link href="../assets/css/notifications.css" rel="stylesheet" />
-    <!-- Eliminados duplicados de scripts de Firebase y configuración personalizada -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <script src="../assets/js/firebase-config.js"></script>
-    <script src="../assets/js/auth-ui.js"></script>
-    <script src="../assets/js/notifications.js"></script>
+  <!-- Firebase libraries y configuración personalizada SOLO una vez -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/auth-ui.js"></script>
+  <script src="../assets/js/notifications.js"></script>
   <style>
     <!DOCTYPE html>
     <html lang="es">
@@ -143,10 +143,7 @@
           </form>
         </div>
       </div>
-      <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-      <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-      <script src="../assets/js/firebase-config.js"></script>
+      <!-- Eliminados duplicados de scripts de Firebase y configuración personalizada -->
       <script>
         // Redirección a login si no está autenticado
         document.addEventListener('DOMContentLoaded', function() {
