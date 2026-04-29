@@ -77,8 +77,8 @@
           </div>
           <ul class="sidebar-menu">
             <li><a href="panel.html" class="active"><span class="material-icons-round">dashboard</span>Panel</a></li>
-            <li><a href="../cursos/panel.html"><span class="material-icons-round">school</span>Cursos</a></li>
-            <li><a href="usuarios.html"><span class="material-icons-round">people</span>Usuarios</a></li>
+              <li><a href="#" id="menu-cursos"><span class="material-icons-round">school</span>Cursos</a></li>
+              <li><a href="#" id="menu-usuarios"><span class="material-icons-round">people</span>Usuarios</a></li>
             <li><a href="../certificado/examen.html"><span class="material-icons-round">folder</span>Recursos</a></li>
             <li><a href="../dashboard/index.html"><span class="material-icons-round">bar_chart</span>Estadísticas</a></li>
             <li><a href="index.html"><span class="material-icons-round">settings</span>Configuración</a></li>
@@ -122,10 +122,11 @@
               </div>
             </div>
             <div class="admin-section">
+                  <div id="seccion-cursos" class="admin-section">
                     <h3><span class="material-icons-round">play_circle</span> Cursos</h3>
                     <div id="cursosContent">Cargando cursos...</div>
                   </div>
-                  <div class="admin-section">
+                  <div id="seccion-usuarios" class="admin-section" style="display:none">
                     <h3><span class="material-icons-round">people</span> Usuarios</h3>
                     <div id="usuariosContent">Cargando usuarios...</div>
                   </div>
@@ -146,6 +147,31 @@
         });
       </script>
       <script src="admin-panel.js"></script>
+      <script>
+        // Navegación dinámica entre Cursos y Usuarios
+        document.addEventListener('DOMContentLoaded', function () {
+          const btnCursos = document.getElementById('menu-cursos');
+          const btnUsuarios = document.getElementById('menu-usuarios');
+          const seccionCursos = document.getElementById('seccion-cursos');
+          const seccionUsuarios = document.getElementById('seccion-usuarios');
+          if (btnCursos && btnUsuarios && seccionCursos && seccionUsuarios) {
+            btnCursos.addEventListener('click', function(e) {
+              e.preventDefault();
+              seccionCursos.style.display = '';
+              seccionUsuarios.style.display = 'none';
+              btnCursos.classList.add('active');
+              btnUsuarios.classList.remove('active');
+            });
+            btnUsuarios.addEventListener('click', function(e) {
+              e.preventDefault();
+              seccionCursos.style.display = 'none';
+              seccionUsuarios.style.display = '';
+              btnUsuarios.classList.add('active');
+              btnCursos.classList.remove('active');
+            });
+          }
+        });
+      </script>
           <script>
           // Mostrar cursos y usuarios en el panel
           document.addEventListener('DOMContentLoaded', function () {
