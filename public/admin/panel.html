@@ -53,95 +53,132 @@
         .admin-badge{background:#eff6ff;color:#1565c0;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
         .btn-logout{background:none;border:1.5px solid #dce3ed;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;color:#334155;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;font-family:inherit}
         .btn-logout:hover{background:#fef2f2;border-color:#fecaca;color:#dc2626}
-        .admin-content{padding:32px 40px}
-        .stats-row{display:flex;gap:18px;margin-bottom:32px;flex-wrap:wrap}
-        .stat-card{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:24px 32px;min-width:180px;flex:1 1 180px;max-width:240px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(15,23,42,0.04)}
-        .stat-icon{font-size:32px;padding:8px;border-radius:8px;display:flex;align-items:center;justify-content:center}
-        .stat-value{font-size:22px;font-weight:700;color:#0f172a}
-        .stat-label{font-size:13px;color:#64748b}
-        .admin-section{background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:28px 32px;box-shadow:0 2px 8px rgba(15,23,42,0.04)}
-        .admin-section h3{font-size:17px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;margin-bottom:14px}
-        @media (max-width: 1100px) {.admin-layout{grid-template-columns:1fr}}
-        @media (max-width: 700px) {.admin-content{padding:18px 6vw}.stats-row{flex-direction:column;gap:10px}.stat-card{max-width:100%}}
-      </style>
-    </head>
-    <body>
-      <div class="admin-layout">
-        <aside class="admin-sidebar">
-          <div class="sidebar-header">
-            <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
-            <div>
-              <strong>FQ INGENIEROS</strong>
-              <span>Admin</span>
-            </div>
-          </div>
-          <ul class="sidebar-menu">
-            <li><a href="panel.html" class="active"><span class="material-icons-round">dashboard</span>Panel</a></li>
-              <li><a href="#" id="menu-cursos"><span class="material-icons-round">school</span>Cursos</a></li>
-              <li><a href="#" id="menu-usuarios"><span class="material-icons-round">people</span>Usuarios</a></li>
-            <li><a href="../certificado/examen.html"><span class="material-icons-round">folder</span>Recursos</a></li>
-            <li><a href="../dashboard/index.html"><span class="material-icons-round">bar_chart</span>Estadísticas</a></li>
-            <li><a href="index.html"><span class="material-icons-round">settings</span>Configuración</a></li>
-          </ul>
-          <div class="sidebar-footer">
-            Plataforma Educativa FQ INGENIEROS &copy; 2026
-          </div>
-        </aside>
-        <main class="admin-main">
-          <div class="admin-top-bar">
-            <h2><span class="material-icons-round">admin_panel_settings</span> Panel del Administrador</h2>
-            <div class="admin-top-bar-actions">
-              <span class="admin-badge"><span class="material-icons-round">verified_user</span> Administrador</span>
-              <button class="btn-logout" onclick="window.location.href='../auth/action.html'">
-                <span class="material-icons-round">logout</span> Salir
-              </button>
-            </div>
-          </div>
-          <div class="admin-content">
-            <div class="stats-row">
-              <div class="stat-card">
-                <span class="material-icons-round stat-icon" style="background:#e0f2fe;color:#0284c7;">school</span>
-                <div>
-                  <div class="stat-value">12</div>
-                  <div class="stat-label">Cursos activos</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <span class="material-icons-round stat-icon" style="background:#fef9c3;color:#ca8a04;">people</span>
-                <div>
-                  <div class="stat-value">350</div>
-                  <div class="stat-label">Usuarios registrados</div>
-                </div>
-              </div>
-              <div class="stat-card">
-                <span class="material-icons-round stat-icon" style="background:#dcfce7;color:#16a34a;">attach_money</span>
-                <div>
-                  <div class="stat-value">S/ 8,500</div>
-                  <div class="stat-label">Ingresos mes</div>
-                </div>
-              </div>
-            </div>
-            <div class="admin-section">
-                  <div id="seccion-cursos" class="admin-section">
-                    <h3><span class="material-icons-round">play_circle</span> Cursos</h3>
-                    <button id="btn-nuevo-curso" style="margin-bottom:16px;padding:8px 18px;background:#1565c0;color:#fff;border:none;border-radius:7px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:7px"><span class="material-icons-round">add</span>Nuevo curso</button>
-                    <div id="form-nuevo-curso" style="display:none;margin-bottom:18px;background:#f1f5f9;padding:18px 18px 10px 18px;border-radius:10px">
-                      <h4 style="margin-bottom:10px;font-size:16px">Agregar curso</h4>
-                      <form id="nuevoCursoForm">
-                        <input type="text" id="nuevoNombre" placeholder="Nombre del curso" required style="margin-right:10px;padding:6px 10px;border-radius:6px;border:1px solid #cbd5e1">
-                        <input type="date" id="nuevoFecha" required style="margin-right:10px;padding:6px 10px;border-radius:6px;border:1px solid #cbd5e1">
-                        <input type="text" id="nuevoTemas" placeholder="Temas (separados por coma)" style="margin-right:10px;padding:6px 10px;border-radius:6px;border:1px solid #cbd5e1">
-                        <input type="number" id="nuevoPrecio" placeholder="Precio S/" min="0" step="0.01" style="margin-right:10px;padding:6px 10px;border-radius:6px;border:1px solid #cbd5e1;width:110px">
-                        <button type="submit" style="background:#16a34a;color:#fff;padding:7px 16px;border:none;border-radius:6px;font-weight:600">Guardar</button>
-                        <button type="button" id="cancelarNuevoCurso" style="margin-left:8px;background:#e2e8f0;color:#334155;padding:7px 16px;border:none;border-radius:6px;font-weight:600">Cancelar</button>
-                      </form>
-                    </div>
-                    <div id="cursosContent">Cargando cursos...</div>
-                  </div>
-                  <div id="seccion-usuarios" class="admin-section" style="display:none">
-                    <h3><span class="material-icons-round">people</span> Usuarios</h3>
-                    <div id="usuariosContent">Cargando usuarios...</div>
-                  </div>
+        <script>
+        // Unificación de scripts: navegación, cursos, usuarios y formulario nuevo curso
+        document.addEventListener('DOMContentLoaded', function () {
+          // Navegación dinámica
+          const btnCursos = document.getElementById('menu-cursos');
+          const btnUsuarios = document.getElementById('menu-usuarios');
+          const seccionCursos = document.getElementById('seccion-cursos');
+          const seccionUsuarios = document.getElementById('seccion-usuarios');
+          if (btnCursos && btnUsuarios && seccionCursos && seccionUsuarios) {
+            btnCursos.addEventListener('click', function(e) {
+              e.preventDefault();
+              seccionCursos.style.display = '';
+              seccionUsuarios.style.display = 'none';
+              btnCursos.classList.add('active');
+              btnUsuarios.classList.remove('active');
+            });
+            btnUsuarios.addEventListener('click', function(e) {
+              e.preventDefault();
+              seccionCursos.style.display = 'none';
+              seccionUsuarios.style.display = '';
+              btnUsuarios.classList.add('active');
+              btnCursos.classList.remove('active');
+            });
+          }
+
+          if (typeof firebase === 'undefined' || !firebase.firestore) return;
+          const db = firebase.firestore();
+
+          // Cursos
+          const cursosContent = document.getElementById('cursosContent');
+          function cargarCursos() {
+            db.collection('courses').get()
+              .then(function(snap) {
+                if (snap.empty) {
+                  cursosContent.innerHTML = '<div style="color:#64748b">No hay cursos registrados.</div>';
+                  return;
+                }
+                let html = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>Nombre</th><th>Fecha</th><th>Temas</th><th>Precio (S/)</th><th>Acciones</th></tr></thead><tbody>';
+                snap.forEach(function(doc) {
+                  const c = doc.data();
+                  html += `<tr>
+                    <td><input type='text' value='${c.name||''}' data-id='${doc.id}' class='edit-nombre' style='width:120px'></td>
+                    <td><input type='date' value='${c.fecha||''}' data-id='${doc.id}' class='edit-fecha'></td>
+                    <td><input type='text' value='${(c.temas||[]).join(', ')}' data-id='${doc.id}' class='edit-temas' style='width:180px'></td>
+                    <td><input type='number' value='${c.precio||''}' data-id='${doc.id}' class='edit-precio' style='width:90px'></td>
+                    <td><button data-id='${doc.id}' class='btn-guardar-curso'>Guardar</button></td>
+                  </tr>`;
+                });
+                html += '</tbody></table>';
+                cursosContent.innerHTML = html;
+                // Guardar cambios
+                cursosContent.querySelectorAll('.btn-guardar-curso').forEach(btn => {
+                  btn.onclick = function() {
+                    const id = btn.getAttribute('data-id');
+                    const nombre = cursosContent.querySelector(`.edit-nombre[data-id='${id}']`).value;
+                    const fecha = cursosContent.querySelector(`.edit-fecha[data-id='${id}']`).value;
+                    const temas = cursosContent.querySelector(`.edit-temas[data-id='${id}']`).value.split(',').map(t=>t.trim());
+                    const precio = parseFloat(cursosContent.querySelector(`.edit-precio[data-id='${id}']`).value) || 0;
+                    db.collection('courses').doc(id).set({ name: nombre, fecha, temas, precio }, { merge: true })
+                      .then(()=>{ btn.textContent = 'Guardado'; setTimeout(()=>btn.textContent='Guardar',1200); })
+                      .catch(err=>{ btn.textContent = 'Error'; });
+                  };
+                });
+              })
+              .catch(function(err) {
+                cursosContent.innerHTML = '<div style="color:#dc2626">Error al cargar cursos: ' + err.message + '</div>';
+              });
+          }
+          cargarCursos();
+
+          // Formulario nuevo curso
+          const btnNuevo = document.getElementById('btn-nuevo-curso');
+          const formNuevo = document.getElementById('form-nuevo-curso');
+          const cancelarNuevo = document.getElementById('cancelarNuevoCurso');
+          const nuevoCursoForm = document.getElementById('nuevoCursoForm');
+          if (btnNuevo && formNuevo && cancelarNuevo && nuevoCursoForm) {
+            btnNuevo.onclick = function() {
+              formNuevo.style.display = '';
+              btnNuevo.style.display = 'none';
+            };
+            cancelarNuevo.onclick = function() {
+              formNuevo.style.display = 'none';
+              btnNuevo.style.display = '';
+              nuevoCursoForm.reset();
+            };
+            nuevoCursoForm.onsubmit = function(e) {
+              e.preventDefault();
+              const nombre = document.getElementById('nuevoNombre').value.trim();
+              const fecha = document.getElementById('nuevoFecha').value;
+              const temas = document.getElementById('nuevoTemas').value.split(',').map(t=>t.trim());
+              const precio = parseFloat(document.getElementById('nuevoPrecio').value) || 0;
+              if (!nombre || !fecha) return;
+              db.collection('courses').add({ name: nombre, fecha, temas, precio })
+                .then(()=>{
+                  formNuevo.style.display = 'none';
+                  btnNuevo.style.display = '';
+                  nuevoCursoForm.reset();
+                  cargarCursos();
+                })
+                .catch(()=>{
+                  alert('Error al guardar el curso');
+                });
+            };
+          }
+
+          // Usuarios
+          const usuariosContent = document.getElementById('usuariosContent');
+          db.collection('users').get()
+            .then(function(snap) {
+              if (snap.empty) {
+                usuariosContent.innerHTML = '<div style="color:#64748b">No hay usuarios registrados.</div>';
+                return;
+              }
+              let html = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>Email</th><th>Nombre</th><th>Rol</th></tr></thead><tbody>';
+              snap.forEach(function(doc) {
+                const u = doc.data();
+                html += `<tr><td>${u.email||''}</td><td>${u.nombre||''}</td><td>${u.rol||''}</td></tr>`;
+              });
+              html += '</tbody></table>';
+              usuariosContent.innerHTML = html;
+            })
+            .catch(function(err) {
+              usuariosContent.innerHTML = '<div style="color:#dc2626">Error al cargar usuarios: ' + err.message + '</div>';
+            });
+        });
+        </script>
           </div>
         </main>
         <!-- Chat Widget eliminado -->
