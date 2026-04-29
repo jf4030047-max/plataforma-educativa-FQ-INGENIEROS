@@ -74,7 +74,7 @@
           <ul class="sidebar-menu">
             <li><a href="panel.html" class="active"><span class="material-icons-round">dashboard</span>Panel</a></li>
             <li><a href="../cursos/panel.html"><span class="material-icons-round">school</span>Cursos</a></li>
-            <li><a href="../profesor/index.html"><span class="material-icons-round">people</span>Usuarios</a></li>
+            <li><a href="#" id="usuariosMenuBtn"><span class="material-icons-round">people</span>Usuarios</a></li>
             <li><a href="../certificado/examen.html"><span class="material-icons-round">folder</span>Recursos</a></li>
             <li><a href="../dashboard/index.html"><span class="material-icons-round">bar_chart</span>Estadísticas</a></li>
             <li><a href="index.html"><span class="material-icons-round">settings</span>Configuración</a></li>
@@ -182,6 +182,42 @@
         }
       </script>
     </body>
+      <script src="../public/admin/admin-panel.js"></script>
+      <script>
+        // Mostrar usuarios en el panel al hacer clic en el menú
+        document.addEventListener('DOMContentLoaded', function() {
+          var usuariosBtn = document.getElementById('usuariosMenuBtn');
+          if (usuariosBtn) {
+            usuariosBtn.addEventListener('click', function(e) {
+              e.preventDefault();
+              const panelContent = document.getElementById('panelContent');
+              if (!panelContent) return;
+              panelContent.innerHTML = '<div style="color:#64748b">Cargando usuarios...</div>';
+              if (typeof firebase === 'undefined' || !firebase.firestore) {
+                panelContent.innerHTML = '<div style="color:#dc2626">Firebase no está disponible.</div>';
+                return;
+              }
+              const db = firebase.firestore();
+              db.collection('users').get().then(function(snap) {
+                if (snap.empty) {
+                  panelContent.innerHTML = '<div style="color:#64748b">No hay usuarios registrados.</div>';
+                  return;
+                }
+                let html = '<h3 style="margin-bottom:14px;font-size:17px">Usuarios registrados</h3>';
+                html += '<table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Nombre</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Correo</th></tr></thead><tbody>';
+                snap.forEach(function(doc) {
+                  const u = doc.data();
+                  html += `<tr><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">${u.name||'-'}</td><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">${u.email||'-'}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                panelContent.innerHTML = html;
+              }).catch(function(err) {
+                panelContent.innerHTML = '<div style="color:#dc2626">Error al cargar usuarios: ' + err.message + '</div>';
+              });
+            });
+          }
+        });
+      </script>
     </html>
                     <link href="../assets/css/notifications.css" rel="stylesheet" />
                     <style>
