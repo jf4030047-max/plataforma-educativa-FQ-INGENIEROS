@@ -187,57 +187,65 @@
       </script>
       <script src="admin-panel.js"></script>
           <script>
-          // Mostrar cursos y permitir edición
+          // Mostrar cursos y usuarios en el panel
           document.addEventListener('DOMContentLoaded', function () {
             if (typeof firebase === 'undefined' || !firebase.firestore) return;
             const db = firebase.firestore();
             // Cursos
             const cursosContent = document.getElementById('cursosContent');
-            db.collection('courses').get().then(function(snap) {
-              if (snap.empty) {
-                cursosContent.innerHTML = '<div style="color:#64748b">No hay cursos registrados.</div>';
-                return;
-              }
-              let html = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>Nombre</th><th>Fecha</th><th>Temas</th><th>Acciones</th></tr></thead><tbody>';
-              snap.forEach(function(doc) {
-                const c = doc.data();
-                html += `<tr>
-                  <td><input type='text' value='${c.name||''}' data-id='${doc.id}' class='edit-nombre' style='width:120px'></td>
-                  <td><input type='date' value='${c.fecha||''}' data-id='${doc.id}' class='edit-fecha'></td>
-                  <td><input type='text' value='${(c.temas||[]).join(', ')}' data-id='${doc.id}' class='edit-temas' style='width:180px'></td>
-                  <td><button data-id='${doc.id}' class='btn-guardar-curso'>Guardar</button></td>
-                </tr>`;
+            db.collection('courses').get()
+              .then(function(snap) {
+                if (snap.empty) {
+                  cursosContent.innerHTML = '<div style="color:#64748b">No hay cursos registrados.</div>';
+                  return;
+                }
+                let html = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>Nombre</th><th>Fecha</th><th>Temas</th><th>Acciones</th></tr></thead><tbody>';
+                snap.forEach(function(doc) {
+                  const c = doc.data();
+                  html += `<tr>
+                    <td><input type='text' value='${c.name||''}' data-id='${doc.id}' class='edit-nombre' style='width:120px'></td>
+                    <td><input type='date' value='${c.fecha||''}' data-id='${doc.id}' class='edit-fecha'></td>
+                    <td><input type='text' value='${(c.temas||[]).join(', ')}' data-id='${doc.id}' class='edit-temas' style='width:180px'></td>
+                    <td><button data-id='${doc.id}' class='btn-guardar-curso'>Guardar</button></td>
+                  </tr>`;
+                });
+                html += '</tbody></table>';
+                cursosContent.innerHTML = html;
+                // Guardar cambios
+                cursosContent.querySelectorAll('.btn-guardar-curso').forEach(btn => {
+                  btn.onclick = function() {
+                    const id = btn.getAttribute('data-id');
+                    const nombre = cursosContent.querySelector(`.edit-nombre[data-id='${id}']`).value;
+                    const fecha = cursosContent.querySelector(`.edit-fecha[data-id='${id}']`).value;
+                    const temas = cursosContent.querySelector(`.edit-temas[data-id='${id}']`).value.split(',').map(t=>t.trim());
+                    db.collection('courses').doc(id).set({ name: nombre, fecha, temas }, { merge: true })
+                      .then(()=>{ btn.textContent = 'Guardado'; setTimeout(()=>btn.textContent='Guardar',1200); })
+                      .catch(err=>{ btn.textContent = 'Error'; });
+                  };
+                });
+              })
+              .catch(function(err) {
+                cursosContent.innerHTML = '<div style="color:#dc2626">Error al cargar cursos: ' + err.message + '</div>';
               });
-              html += '</tbody></table>';
-              cursosContent.innerHTML = html;
-              // Guardar cambios
-              cursosContent.querySelectorAll('.btn-guardar-curso').forEach(btn => {
-                btn.onclick = function() {
-                  const id = btn.getAttribute('data-id');
-                  const nombre = cursosContent.querySelector(`.edit-nombre[data-id='${id}']`).value;
-                  const fecha = cursosContent.querySelector(`.edit-fecha[data-id='${id}']`).value;
-                  const temas = cursosContent.querySelector(`.edit-temas[data-id='${id}']`).value.split(',').map(t=>t.trim());
-                  db.collection('courses').doc(id).set({ name: nombre, fecha, temas }, { merge: true })
-                    .then(()=>{ btn.textContent = 'Guardado'; setTimeout(()=>btn.textContent='Guardar',1200); })
-                    .catch(err=>{ btn.textContent = 'Error'; });
-                };
-              });
-            });
             // Usuarios
             const usuariosContent = document.getElementById('usuariosContent');
-            db.collection('users').get().then(function(snap) {
-              if (snap.empty) {
-                usuariosContent.innerHTML = '<div style="color:#64748b">No hay usuarios registrados.</div>';
-                return;
-              }
-              let html = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>Email</th><th>Nombre</th><th>Rol</th></tr></thead><tbody>';
-              snap.forEach(function(doc) {
-                const u = doc.data();
-                html += `<tr><td>${u.email||''}</td><td>${u.nombre||''}</td><td>${u.rol||''}</td></tr>`;
+            db.collection('users').get()
+              .then(function(snap) {
+                if (snap.empty) {
+                  usuariosContent.innerHTML = '<div style="color:#64748b">No hay usuarios registrados.</div>';
+                  return;
+                }
+                let html = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>Email</th><th>Nombre</th><th>Rol</th></tr></thead><tbody>';
+                snap.forEach(function(doc) {
+                  const u = doc.data();
+                  html += `<tr><td>${u.email||''}</td><td>${u.nombre||''}</td><td>${u.rol||''}</td></tr>`;
+                });
+                html += '</tbody></table>';
+                usuariosContent.innerHTML = html;
+              })
+              .catch(function(err) {
+                usuariosContent.innerHTML = '<div style="color:#dc2626">Error al cargar usuarios: ' + err.message + '</div>';
               });
-              html += '</tbody></table>';
-              usuariosContent.innerHTML = html;
-            });
           });
           </script>
     </body>
