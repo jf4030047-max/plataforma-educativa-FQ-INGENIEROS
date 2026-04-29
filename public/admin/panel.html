@@ -74,7 +74,7 @@
           <ul class="sidebar-menu">
             <li><a href="panel.html" class="active"><span class="material-icons-round">dashboard</span>Panel</a></li>
             <li><a href="../cursos/panel.html"><span class="material-icons-round">school</span>Cursos</a></li>
-            <li><a href="../profesor/index.html"><span class="material-icons-round">people</span>Usuarios</a></li>
+            <li><a href="usuarios.html"><span class="material-icons-round">people</span>Usuarios</a></li>
             <li><a href="../certificado/examen.html"><span class="material-icons-round">folder</span>Recursos</a></li>
             <li><a href="../dashboard/index.html"><span class="material-icons-round">bar_chart</span>Estadísticas</a></li>
             <li><a href="index.html"><span class="material-icons-round">settings</span>Configuración</a></li>
@@ -118,9 +118,13 @@
               </div>
             </div>
             <div class="admin-section">
-              <h3><span class="material-icons-round">play_circle</span> Cursos y recursos</h3>
-              <div id="panelContent">Aquí irán los cursos, recursos y gestión administrativa.</div>
-            </div>
+                    <h3><span class="material-icons-round">play_circle</span> Cursos</h3>
+                    <div id="cursosContent">Cargando cursos...</div>
+                  </div>
+                  <div class="admin-section">
+                    <h3><span class="material-icons-round">people</span> Usuarios</h3>
+                    <div id="usuariosContent">Cargando usuarios...</div>
+                  </div>
           </div>
         </main>
         <!-- Chat Widget -->
@@ -182,6 +186,60 @@
         }
       </script>
       <script src="admin-panel.js"></script>
+          <script>
+          // Mostrar cursos y permitir edición
+          document.addEventListener('DOMContentLoaded', function () {
+            if (typeof firebase === 'undefined' || !firebase.firestore) return;
+            const db = firebase.firestore();
+            // Cursos
+            const cursosContent = document.getElementById('cursosContent');
+            db.collection('courses').get().then(function(snap) {
+              if (snap.empty) {
+                cursosContent.innerHTML = '<div style="color:#64748b">No hay cursos registrados.</div>';
+                return;
+              }
+              let html = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>Nombre</th><th>Fecha</th><th>Temas</th><th>Acciones</th></tr></thead><tbody>';
+              snap.forEach(function(doc) {
+                const c = doc.data();
+                html += `<tr>
+                  <td><input type='text' value='${c.name||''}' data-id='${doc.id}' class='edit-nombre' style='width:120px'></td>
+                  <td><input type='date' value='${c.fecha||''}' data-id='${doc.id}' class='edit-fecha'></td>
+                  <td><input type='text' value='${(c.temas||[]).join(', ')}' data-id='${doc.id}' class='edit-temas' style='width:180px'></td>
+                  <td><button data-id='${doc.id}' class='btn-guardar-curso'>Guardar</button></td>
+                </tr>`;
+              });
+              html += '</tbody></table>';
+              cursosContent.innerHTML = html;
+              // Guardar cambios
+              cursosContent.querySelectorAll('.btn-guardar-curso').forEach(btn => {
+                btn.onclick = function() {
+                  const id = btn.getAttribute('data-id');
+                  const nombre = cursosContent.querySelector(`.edit-nombre[data-id='${id}']`).value;
+                  const fecha = cursosContent.querySelector(`.edit-fecha[data-id='${id}']`).value;
+                  const temas = cursosContent.querySelector(`.edit-temas[data-id='${id}']`).value.split(',').map(t=>t.trim());
+                  db.collection('courses').doc(id).set({ name: nombre, fecha, temas }, { merge: true })
+                    .then(()=>{ btn.textContent = 'Guardado'; setTimeout(()=>btn.textContent='Guardar',1200); })
+                    .catch(err=>{ btn.textContent = 'Error'; });
+                };
+              });
+            });
+            // Usuarios
+            const usuariosContent = document.getElementById('usuariosContent');
+            db.collection('users').get().then(function(snap) {
+              if (snap.empty) {
+                usuariosContent.innerHTML = '<div style="color:#64748b">No hay usuarios registrados.</div>';
+                return;
+              }
+              let html = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>Email</th><th>Nombre</th><th>Rol</th></tr></thead><tbody>';
+              snap.forEach(function(doc) {
+                const u = doc.data();
+                html += `<tr><td>${u.email||''}</td><td>${u.nombre||''}</td><td>${u.rol||''}</td></tr>`;
+              });
+              html += '</tbody></table>';
+              usuariosContent.innerHTML = html;
+            });
+          });
+          </script>
     </body>
     </html>
                     <link href="../assets/css/notifications.css" rel="stylesheet" />
