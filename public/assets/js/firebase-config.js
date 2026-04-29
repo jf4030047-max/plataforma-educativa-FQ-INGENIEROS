@@ -52,6 +52,7 @@
    ══════════════════════════════════════════════════════════ */
 
 
+
 // Solo declarar firebaseConfig si no existe
 if (typeof firebaseConfig === 'undefined') {
   var firebaseConfig = {
@@ -64,17 +65,19 @@ if (typeof firebaseConfig === 'undefined') {
   };
 }
 
-if (!firebase.apps.length) {
+if (typeof firebase !== 'undefined' && !firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
-const auth = firebase.auth();
-const db = firebase.firestore();
+// Evitar redefinir auth y db
+var auth = window.auth || (typeof firebase !== 'undefined' ? firebase.auth() : null);
+var db = window.db || (typeof firebase !== 'undefined' ? firebase.firestore() : null);
 
-// Idioma español para emails de autenticación
-auth.languageCode = 'es';
-
-// Sesión persistente (sobrevive cierre de pestaña/navegador)
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+if (auth) {
+  // Idioma español para emails de autenticación
+  auth.languageCode = 'es';
+  // Sesión persistente (sobrevive cierre de pestaña/navegador)
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+}
 
 const ADMIN_EMAIL = 'fq.ingenieros.empresa@gmail.com';
 

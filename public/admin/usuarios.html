@@ -6,11 +6,12 @@
   <title>Usuarios | Admin FQ INGENIEROS</title>
   <link href="../assets/css/notifications.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
-  <!-- Primero las librerías de Firebase -->
+  <!-- Firebase libraries (orden correcto, solo una vez) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <!-- Luego la configuración personalizada -->
   <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/auth-ui.js"></script>
   <script src="../assets/js/notifications.js"></script>
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; background: #f7f9fc; color: #334155; }
@@ -35,17 +36,20 @@
     </table>
   </div>
   <script>
-    // Solo declaramos db si no existe
-    var db = window.db || firebase.firestore();
-    db.collection('users').get().then(snapshot => {
-      const tbody = document.querySelector('#usuarios-table tbody');
-      snapshot.forEach(doc => {
-        const user = doc.data();
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${user.email || ''}</td><td>${user.nombre || ''}</td><td>${user.rol || ''}</td>`;
-        tbody.appendChild(tr);
+    // Usar instancia global de db
+    if (typeof db !== 'undefined' && db) {
+      db.collection('users').get().then(snapshot => {
+        const tbody = document.querySelector('#usuarios-table tbody');
+        snapshot.forEach(doc => {
+          const user = doc.data();
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${user.email || ''}</td><td>${user.nombre || ''}</td><td>${user.rol || ''}</td>`;
+          tbody.appendChild(tr);
+        });
       });
-    });
+    } else {
+      document.querySelector('#usuarios-table tbody').innerHTML = '<tr><td colspan="3" style="color:#dc2626">No se pudo conectar a Firebase.</td></tr>';
+    }
   </script>
 </body>
 </html>
