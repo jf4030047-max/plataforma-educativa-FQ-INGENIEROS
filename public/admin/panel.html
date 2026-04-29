@@ -170,143 +170,140 @@
       </div>
       <!-- Eliminados duplicados de scripts de Firebase y configuración personalizada -->
       <script>
+      // Panel Admin: navegación, autenticación, cursos y usuarios
+      document.addEventListener('DOMContentLoaded', function () {
         // Redirección a login si no está autenticado
-        document.addEventListener('DOMContentLoaded', function() {
-          if (typeof auth === 'undefined') return;
+        if (typeof auth !== 'undefined') {
           auth.onAuthStateChanged(function(user) {
             if (!user) {
               window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
             }
           });
-        });
-      </script>
-      <script src="admin-panel.js"></script>
-      <script>
-        // Navegación dinámica entre Cursos y Usuarios
-        document.addEventListener('DOMContentLoaded', function () {
-          const btnCursos = document.getElementById('menu-cursos');
-          const btnUsuarios = document.getElementById('menu-usuarios');
-          const seccionCursos = document.getElementById('seccion-cursos');
-          const seccionUsuarios = document.getElementById('seccion-usuarios');
-          if (btnCursos && btnUsuarios && seccionCursos && seccionUsuarios) {
-            btnCursos.addEventListener('click', function(e) {
-              e.preventDefault();
-              seccionCursos.style.display = '';
-              seccionUsuarios.style.display = 'none';
-              btnCursos.classList.add('active');
-              btnUsuarios.classList.remove('active');
-            });
-            btnUsuarios.addEventListener('click', function(e) {
-              e.preventDefault();
-              seccionCursos.style.display = 'none';
-              seccionUsuarios.style.display = '';
-              btnUsuarios.classList.add('active');
-              btnCursos.classList.remove('active');
-            });
-          }
-        });
-      </script>
-          <script>
-          // Mostrar cursos y usuarios en el panel
-          document.addEventListener('DOMContentLoaded', function () {
-            if (typeof firebase === 'undefined' || !firebase.firestore) return;
-            const db = firebase.firestore();
-            // Cursos
-            const cursosContent = document.getElementById('cursosContent');
-            db.collection('courses').get()
-              .then(function(snap) {
-                if (snap.empty) {
-                  cursosContent.innerHTML = '<div style="color:#64748b">No hay cursos registrados.</div>';
-                  return;
-                }
-                let html = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>Nombre</th><th>Fecha</th><th>Temas</th><th>Precio (S/)</th><th>Acciones</th></tr></thead><tbody>';
-                snap.forEach(function(doc) {
-                  const c = doc.data();
-                  html += `<tr>
-                    <td><input type='text' value='${c.name||''}' data-id='${doc.id}' class='edit-nombre' style='width:120px'></td>
-                    <td><input type='date' value='${c.fecha||''}' data-id='${doc.id}' class='edit-fecha'></td>
-                    <td><input type='text' value='${(c.temas||[]).join(', ')}' data-id='${doc.id}' class='edit-temas' style='width:180px'></td>
-                    <td><input type='number' value='${c.precio||''}' data-id='${doc.id}' class='edit-precio' style='width:90px'></td>
-                    <td><button data-id='${doc.id}' class='btn-guardar-curso'>Guardar</button></td>
-                  </tr>`;
-                });
-                html += '</tbody></table>';
-                cursosContent.innerHTML = html;
-                // Guardar cambios
-                cursosContent.querySelectorAll('.btn-guardar-curso').forEach(btn => {
-                  btn.onclick = function() {
-                    const id = btn.getAttribute('data-id');
-                    const nombre = cursosContent.querySelector(`.edit-nombre[data-id='${id}']`).value;
-                    const fecha = cursosContent.querySelector(`.edit-fecha[data-id='${id}']`).value;
-                    const temas = cursosContent.querySelector(`.edit-temas[data-id='${id}']`).value.split(',').map(t=>t.trim());
-                    const precio = parseFloat(cursosContent.querySelector(`.edit-precio[data-id='${id}']`).value) || 0;
-                    db.collection('courses').doc(id).set({ name: nombre, fecha, temas, precio }, { merge: true })
-                      .then(()=>{ btn.textContent = 'Guardado'; setTimeout(()=>btn.textContent='Guardar',1200); })
-                      .catch(err=>{ btn.textContent = 'Error'; });
-                  };
-                });
-              })
-              .catch(function(err) {
-                cursosContent.innerHTML = '<div style="color:#dc2626">Error al cargar cursos: ' + err.message + '</div>';
-              });
-                  // Lógica para mostrar/ocultar formulario de nuevo curso y guardar
-                  document.addEventListener('DOMContentLoaded', function () {
-                    const btnNuevo = document.getElementById('btn-nuevo-curso');
-                    const formNuevo = document.getElementById('form-nuevo-curso');
-                    const cancelarNuevo = document.getElementById('cancelarNuevoCurso');
-                    const nuevoCursoForm = document.getElementById('nuevoCursoForm');
-                    if (btnNuevo && formNuevo && cancelarNuevo && nuevoCursoForm) {
-                      btnNuevo.onclick = function() {
-                        formNuevo.style.display = '';
-                        btnNuevo.style.display = 'none';
-                      };
-                      cancelarNuevo.onclick = function() {
-                        formNuevo.style.display = 'none';
-                        btnNuevo.style.display = '';
-                        nuevoCursoForm.reset();
-                      };
-                      nuevoCursoForm.onsubmit = function(e) {
-                        e.preventDefault();
-                        const nombre = document.getElementById('nuevoNombre').value.trim();
-                        const fecha = document.getElementById('nuevoFecha').value;
-                        const temas = document.getElementById('nuevoTemas').value.split(',').map(t=>t.trim());
-                        const precio = parseFloat(document.getElementById('nuevoPrecio').value) || 0;
-                        if (!nombre || !fecha) return;
-                        db.collection('courses').add({ name: nombre, fecha, temas, precio })
-                          .then(()=>{
-                            formNuevo.style.display = 'none';
-                            btnNuevo.style.display = '';
-                            nuevoCursoForm.reset();
-                            // Recargar cursos
-                            if (typeof cargarCursos === 'function') cargarCursos();
-                            else window.location.reload();
-                          })
-                          .catch(()=>{
-                            alert('Error al guardar el curso');
-                          });
-                      };
-                    }
-                  });
-            // Usuarios
-            const usuariosContent = document.getElementById('usuariosContent');
-            db.collection('users').get()
-              .then(function(snap) {
-                if (snap.empty) {
-                  usuariosContent.innerHTML = '<div style="color:#64748b">No hay usuarios registrados.</div>';
-                  return;
-                }
-                let html = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>Email</th><th>Nombre</th><th>Rol</th></tr></thead><tbody>';
-                snap.forEach(function(doc) {
-                  const u = doc.data();
-                  html += `<tr><td>${u.email||''}</td><td>${u.nombre||''}</td><td>${u.rol||''}</td></tr>`;
-                });
-                html += '</tbody></table>';
-                usuariosContent.innerHTML = html;
-              })
-              .catch(function(err) {
-                usuariosContent.innerHTML = '<div style="color:#dc2626">Error al cargar usuarios: ' + err.message + '</div>';
-              });
+        }
+
+        // Navegación dinámica
+        const btnCursos = document.getElementById('menu-cursos');
+        const btnUsuarios = document.getElementById('menu-usuarios');
+        const seccionCursos = document.getElementById('seccion-cursos');
+        const seccionUsuarios = document.getElementById('seccion-usuarios');
+        if (btnCursos && btnUsuarios && seccionCursos && seccionUsuarios) {
+          btnCursos.addEventListener('click', function(e) {
+            e.preventDefault();
+            seccionCursos.style.display = '';
+            seccionUsuarios.style.display = 'none';
+            btnCursos.classList.add('active');
+            btnUsuarios.classList.remove('active');
           });
+          btnUsuarios.addEventListener('click', function(e) {
+            e.preventDefault();
+            seccionCursos.style.display = 'none';
+            seccionUsuarios.style.display = '';
+            btnUsuarios.classList.add('active');
+            btnCursos.classList.remove('active');
+          });
+        }
+
+        if (typeof firebase === 'undefined' || !firebase.firestore) return;
+        const db = firebase.firestore();
+
+        // Cursos
+        const cursosContent = document.getElementById('cursosContent');
+        function cargarCursos() {
+          db.collection('courses').get()
+            .then(function(snap) {
+              if (snap.empty) {
+                cursosContent.innerHTML = '<div style="color:#64748b">No hay cursos registrados.</div>';
+                return;
+              }
+              let html = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>Nombre</th><th>Fecha</th><th>Temas</th><th>Precio (S/)</th><th>Acciones</th></tr></thead><tbody>';
+              snap.forEach(function(doc) {
+                const c = doc.data();
+                html += `<tr>
+                  <td><input type='text' value='${c.name||''}' data-id='${doc.id}' class='edit-nombre' style='width:120px'></td>
+                  <td><input type='date' value='${c.fecha||''}' data-id='${doc.id}' class='edit-fecha'></td>
+                  <td><input type='text' value='${(c.temas||[]).join(', ')}' data-id='${doc.id}' class='edit-temas' style='width:180px'></td>
+                  <td><input type='number' value='${c.precio||''}' data-id='${doc.id}' class='edit-precio' style='width:90px'></td>
+                  <td><button data-id='${doc.id}' class='btn-guardar-curso'>Guardar</button></td>
+                </tr>`;
+              });
+              html += '</tbody></table>';
+              cursosContent.innerHTML = html;
+              // Guardar cambios
+              cursosContent.querySelectorAll('.btn-guardar-curso').forEach(btn => {
+                btn.onclick = function() {
+                  const id = btn.getAttribute('data-id');
+                  const nombre = cursosContent.querySelector(`.edit-nombre[data-id='${id}']`).value;
+                  const fecha = cursosContent.querySelector(`.edit-fecha[data-id='${id}']`).value;
+                  const temas = cursosContent.querySelector(`.edit-temas[data-id='${id}']`).value.split(',').map(t=>t.trim());
+                  const precio = parseFloat(cursosContent.querySelector(`.edit-precio[data-id='${id}']`).value) || 0;
+                  db.collection('courses').doc(id).set({ name: nombre, fecha, temas, precio }, { merge: true })
+                    .then(()=>{ btn.textContent = 'Guardado'; setTimeout(()=>btn.textContent='Guardar',1200); })
+                    .catch(err=>{ btn.textContent = 'Error'; });
+                };
+              });
+            })
+            .catch(function(err) {
+              cursosContent.innerHTML = '<div style="color:#dc2626">Error al cargar cursos: ' + err.message + '</div>';
+            });
+        }
+        cargarCursos();
+
+        // Formulario nuevo curso
+        const btnNuevo = document.getElementById('btn-nuevo-curso');
+        const formNuevo = document.getElementById('form-nuevo-curso');
+        const cancelarNuevo = document.getElementById('cancelarNuevoCurso');
+        const nuevoCursoForm = document.getElementById('nuevoCursoForm');
+        if (btnNuevo && formNuevo && cancelarNuevo && nuevoCursoForm) {
+          btnNuevo.onclick = function() {
+            formNuevo.style.display = '';
+            btnNuevo.style.display = 'none';
+          };
+          cancelarNuevo.onclick = function() {
+            formNuevo.style.display = 'none';
+            btnNuevo.style.display = '';
+            nuevoCursoForm.reset();
+          };
+          nuevoCursoForm.onsubmit = function(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('nuevoNombre').value.trim();
+            const fecha = document.getElementById('nuevoFecha').value;
+            const temas = document.getElementById('nuevoTemas').value.split(',').map(t=>t.trim());
+            const precio = parseFloat(document.getElementById('nuevoPrecio').value) || 0;
+            if (!nombre || !fecha) return;
+            db.collection('courses').add({ name: nombre, fecha, temas, precio })
+              .then(()=>{
+                formNuevo.style.display = 'none';
+                btnNuevo.style.display = '';
+                nuevoCursoForm.reset();
+                cargarCursos();
+              })
+              .catch(()=>{
+                alert('Error al guardar el curso');
+              });
+          };
+        }
+
+        // Usuarios
+        const usuariosContent = document.getElementById('usuariosContent');
+        db.collection('users').get()
+          .then(function(snap) {
+            if (snap.empty) {
+              usuariosContent.innerHTML = '<div style="color:#64748b">No hay usuarios registrados.</div>';
+              return;
+            }
+            let html = '<table style="width:100%;border-collapse:collapse"><thead><tr><th>Email</th><th>Nombre</th><th>Rol</th></tr></thead><tbody>';
+            snap.forEach(function(doc) {
+              const u = doc.data();
+              html += `<tr><td>${u.email||''}</td><td>${u.nombre||''}</td><td>${u.rol||''}</td></tr>`;
+            });
+            html += '</tbody></table>';
+            usuariosContent.innerHTML = html;
+          })
+          .catch(function(err) {
+            usuariosContent.innerHTML = '<div style="color:#dc2626">Error al cargar usuarios: ' + err.message + '</div>';
+          });
+      });
+      </script>
           </script>
     </body>
     </html>
