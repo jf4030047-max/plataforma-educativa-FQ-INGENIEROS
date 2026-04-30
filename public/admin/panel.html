@@ -184,20 +184,17 @@
             alert(msg);
           }
         }
-        // Redirección a login si no está autenticado
-        if (typeof auth !== 'undefined') {
+        // Mostrar panel aunque no haya usuario autenticado
+        if (typeof auth !== 'undefined' && auth && typeof auth.onAuthStateChanged === 'function') {
           auth.onAuthStateChanged(function(user) {
             if (!user) {
-              showPanelError('No hay usuario autenticado. Por favor, inicia sesión como administrador.');
-              setTimeout(function() {
-                window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
-              }, 2000);
+              showPanelError('No hay usuario autenticado. Puedes navegar el panel, pero algunas funciones estarán deshabilitadas.');
             }
           }, function(error) {
             showPanelError('Error de autenticación: ' + (error && error.message ? error.message : error));
           });
         } else {
-          showPanelError('No se pudo inicializar la autenticación.');
+          showPanelError('No se pudo inicializar la autenticación. Puedes navegar el panel, pero algunas funciones estarán deshabilitadas.');
         }
         // Captura global de errores JS
         window.onerror = function(msg, url, line, col, error) {
