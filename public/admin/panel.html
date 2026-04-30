@@ -174,6 +174,35 @@
       <script>
       // Panel Admin: navegación, autenticación, cursos y usuarios
       document.addEventListener('DOMContentLoaded', function () {
+        // Mensaje de error global
+        function showPanelError(msg) {
+          var el = document.getElementById('panel-error');
+          if (el) {
+            el.style.display = '';
+            el.textContent = msg;
+          } else {
+            alert(msg);
+          }
+        }
+        // Redirección a login si no está autenticado
+        if (typeof auth !== 'undefined') {
+          auth.onAuthStateChanged(function(user) {
+            if (!user) {
+              showPanelError('No hay usuario autenticado. Por favor, inicia sesión como administrador.');
+              setTimeout(function() {
+                window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+              }, 2000);
+            }
+          }, function(error) {
+            showPanelError('Error de autenticación: ' + (error && error.message ? error.message : error));
+          });
+        } else {
+          showPanelError('No se pudo inicializar la autenticación.');
+        }
+        // Captura global de errores JS
+        window.onerror = function(msg, url, line, col, error) {
+          showPanelError('Error en la página: ' + msg);
+        };
         // Redirección a login si no está autenticado
         if (typeof auth !== 'undefined') {
           auth.onAuthStateChanged(function(user) {
