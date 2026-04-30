@@ -11,6 +11,7 @@
   <link href="../assets/css/notifications.css" rel="stylesheet" />
   <!-- Firebase libraries y configuración personalizada SOLO una vez -->
   <!-- Scripts de Firebase y lógica solo si están disponibles, pero el panel siempre se muestra -->
+  <!-- Chat widget eliminado completamente por requerimiento -->
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
@@ -33,6 +34,7 @@
         .admin-badge{background:#eff6ff;color:#1565c0;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
         .btn-logout{background:none;border:1.5px solid #dce3ed;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;color:#334155;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;font-family:inherit}
         .btn-logout:hover{background:#fef2f2;border-color:#fecaca;color:#dc2626}
+        <!--
         <script>
         // Unificación de scripts: navegación, cursos, usuarios y formulario nuevo curso
         document.addEventListener('DOMContentLoaded', function () {
@@ -111,6 +113,7 @@
               nuevoCursoForm.reset();
             };
             nuevoCursoForm.onsubmit = function(e) {
+              <!--
               <script>
               // Panel Admin: navegación entre secciones SIEMPRE visible
               document.addEventListener('DOMContentLoaded', function () {
@@ -138,6 +141,7 @@
                 // Si quieres reactivar la lógica de Firebase, vuelve a incluir los scripts y la lógica aquí.
               });
               </script>
+              -->
           if (el) {
             el.style.display = '';
             el.textContent = msg;
