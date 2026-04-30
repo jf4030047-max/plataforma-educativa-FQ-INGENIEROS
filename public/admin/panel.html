@@ -35,9 +35,7 @@
         .btn-logout{background:none;border:1.5px solid #dce3ed;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;color:#334155;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;font-family:inherit}
         .btn-logout:hover{background:#fef2f2;border-color:#fecaca;color:#dc2626}
         <!--
-        <script>
-        // Unificación de scripts: navegación, cursos, usuarios y formulario nuevo curso
-        document.addEventListener('DOMContentLoaded', function () {
+        <!-- Chat widget y scripts externos eliminados completamente -->
           <main class="admin-main">
             <div class="admin-top-bar">
               <h2><span class="material-icons-round">admin_panel_settings</span> Panel del Administrador</h2>
@@ -113,35 +111,7 @@
               nuevoCursoForm.reset();
             };
             nuevoCursoForm.onsubmit = function(e) {
-              <!--
-              <script>
-              // Panel Admin: navegación entre secciones SIEMPRE visible
-              document.addEventListener('DOMContentLoaded', function () {
-                // Navegación dinámica
-                const btnCursos = document.getElementById('menu-cursos');
-                const btnUsuarios = document.getElementById('menu-usuarios');
-                const seccionCursos = document.getElementById('seccion-cursos');
-                const seccionUsuarios = document.getElementById('seccion-usuarios');
-                if (btnCursos && btnUsuarios && seccionCursos && seccionUsuarios) {
-                  btnCursos.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    seccionCursos.style.display = '';
-                    seccionUsuarios.style.display = 'none';
-                    btnCursos.classList.add('active');
-                    btnUsuarios.classList.remove('active');
-                  });
-                  btnUsuarios.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    seccionCursos.style.display = 'none';
-                    seccionUsuarios.style.display = '';
-                    btnUsuarios.classList.add('active');
-                    btnCursos.classList.remove('active');
-                  });
-                }
-                // Si quieres reactivar la lógica de Firebase, vuelve a incluir los scripts y la lógica aquí.
-              });
-              </script>
-              -->
+              <!-- Navegación dinámica y lógica de panel admin aquí. Chat eliminado. -->
           if (el) {
             el.style.display = '';
             el.textContent = msg;
@@ -310,34 +280,6 @@
           });
       });
       </script>
-          </script>
-    </body>
-    </html>
-                    <link href="../assets/css/notifications.css" rel="stylesheet" />
-                    <style>
-                      *{box-sizing:border-box;margin:0;padding:0}
-                      body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
-                      .layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
-                      .sidebar{background:#0f172a;color:#e2e8f0;padding:0;display:flex;flex-direction:column}
-                      .sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 22px;border-bottom:1px solid rgba(255,255,255,.08)}
-                      .sidebar-brand img{width:36px;height:36px;border-radius:8px;object-fit:cover}
-                      .sidebar-brand strong{font-size:13px;color:#fff}
-                      .sidebar-brand span{font-size:10px;color:#60a5fa;letter-spacing:1px;text-transform:uppercase;display:block;font-weight:600}
-                      .sidebar-nav{flex:1;padding:16px 12px}
-                      .nav-label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding:12px 10px 6px;margin-top:8px}
-                      .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;transition:all .2s;cursor:pointer;margin-bottom:2px}
-                      .nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
-                      .nav-item.active{background:#1565c0;color:#fff}
-                      .nav-item .material-icons-round{font-size:20px}
-                      .nav-item .badge-count{margin-left:auto;background:#dc2626;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;min-width:20px;text-align:center}
-                      .sidebar-footer{padding:16px 22px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:#64748b}
-                      .sidebar-footer a{color:#60a5fa;text-decoration:none}
-                      .main{padding:0;overflow-y:auto;max-height:100vh}
-                      .top-bar{background:#fff;border-bottom:1px solid #dce3ed;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:10}
-                      .top-bar h2{font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px}
-                      .top-bar-actions{display:flex;align-items:center;gap:14px}
-                      .admin-badge{background:#eff6ff;color:#1565c0;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px}
-                      .btn-logout{background:none;border:1.5px solid #dce3ed;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;color:#334155;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .2s;font-family:inherit}
-                      .btn-logout:hover{background:#fef2f2;border-color:#fecaca;color:#dc2626}
-                      .content{padding:28px 32px}
-                      [El contenido profesional restaurado, igual al layout avanzado del panel de administrador]
+              </script>
+            </body>
+            </html>
