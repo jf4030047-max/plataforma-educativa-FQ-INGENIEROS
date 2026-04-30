@@ -59,7 +59,7 @@ if (typeof firebaseConfig === 'undefined') {
     apiKey: "AIzaSyDvI3ow91zUPOWkM2ZwJacUyfFSkNOkXto",
     authDomain: "fq-ingenieros-educativa.firebaseapp.com",
     projectId: "fq-ingenieros-educativa",
-    storageBucket: "fq-ingenieros-educativa.firebasestorage.app",
+    storageBucket: "fq-ingenieros-educativa.appspot.com",
     messagingSenderId: "1045330908815",
     appId: "1:1045330908815:web:6eae5d6287f1f1631642fa"
   };
