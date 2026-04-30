@@ -133,7 +133,15 @@
         }
         // Captura global de errores JS
         window.onerror = function(msg, url, line, col, error) {
-          showPanelError('Error en la página: ' + msg);
+          var panel = document.querySelector('.admin-main') || document.body;
+          if (panel) panel.style.display = '';
+          var errDiv = document.getElementById('panel-error');
+          if (errDiv) {
+            errDiv.style.display = '';
+            errDiv.textContent = 'Error en la página: ' + msg;
+          } else {
+            alert('Error en la página: ' + msg);
+          }
         };
         // Redirección a login si no está autenticado
         if (typeof auth !== 'undefined') {
