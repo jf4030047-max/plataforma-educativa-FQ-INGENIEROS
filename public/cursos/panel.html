@@ -88,6 +88,14 @@
     Plataforma Educativa FQ INGENIEROS &copy; 2026
   </footer>
   </body>
+  <!-- BEGIN Chat widget -->
+  <div id="chat-widget" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999;">
+    <a href="https://wa.me/51999999999" target="_blank" rel="noopener" style="display: flex; align-items: center; background: #25d366; color: white; border-radius: 50px; padding: 12px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); text-decoration: none; font-family: 'Inter', sans-serif; font-size: 16px;">
+      <span class="material-icons" style="font-size: 24px; margin-right: 8px;">chat</span>
+      ¿Necesitas ayuda? Escríbenos
+    </a>
+  </div>
+  <!-- END Chat widget -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="../assets/js/firebase-config.js"></script>
@@ -108,20 +116,5 @@
 
     db.collection('courses').get().then(function(snap) {
       if (snap.empty) {
+
         panelContent.innerHTML = '<div style="color:#64748b">No hay cursos registrados.</div>';
-        return;
-      }
-      let html = '<ul style="padding-left:18px">';
-      snap.forEach(function(doc) {
-        const c = doc.data();
-        html += `<li><b>${c.name||'Sin nombre'}</b> (ID: <code>${doc.id}</code>) — S/ ${c.price||'0'}${c.active===false ? ' <span style=\"color:#dc2626;font-size:12px\">(inactivo)</span>' : ''}</li>`;
-      });
-      html += '</ul>';
-      panelContent.innerHTML = html;
-    }).catch(function(err) {
-      panelContent.innerHTML = '<div style="color:#dc2626">Error al cargar cursos: ' + err.message + '</div>';
-    });
-  });
-  </script>
-</body>
-</html>

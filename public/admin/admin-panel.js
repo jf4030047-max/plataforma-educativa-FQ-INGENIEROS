@@ -21,133 +21,72 @@ document.addEventListener('DOMContentLoaded', function () {
     if (elIngresos) elIngresos.textContent = 'S/ ' + total.toLocaleString('es-PE');
   });
 
-  // --- Renderizadores ---
-  function renderCourses() {
-    const panelContent = document.getElementById('panelContent');
-    if (!panelContent) return;
-    panelContent.innerHTML = `
-      <form id="createCourseForm" style="margin-bottom:24px">
-        <h3 style="font-size:17px;margin-bottom:10px">Crear nuevo curso</h3>
-        <div style="margin-bottom:10px">
-          <label>Nombre del curso</label>
-          <input type="text" id="courseName" required style="width:100%;padding:8px;margin-top:2px" />
-        </div>
-        <div style="margin-bottom:10px">
-          <label>ID del curso (único, sin espacios)</label>
-          <input type="text" id="courseId" required style="width:100%;padding:8px;margin-top:2px" />
-        </div>
-        <div style="margin-bottom:10px">
-          <label>Precio (S/)</label>
-          <input type="number" id="coursePrice" min="0" required style="width:100%;padding:8px;margin-top:2px" />
-        </div>
-        <button type="submit" style="padding:10px 18px;background:#1565c0;color:#fff;border:none;border-radius:8px;font-weight:600">Crear curso</button>
-      </form>
-      <div id="coursesList"></div>
-    `;
-    // Listar cursos
-    const list = document.getElementById('coursesList');
-    if (!list) return;
-    list.innerHTML = '<div style="color:#64748b">Cargando cursos...</div>';
-    db.collection('courses').get().then(snap => {
-      if (snap.empty) {
-        list.innerHTML = '<div style="color:#64748b">No hay cursos registrados.</div>';
-        return;
-      }
-      let html = '<h4 style="margin:18px 0 8px">Cursos registrados</h4><ul style="padding-left:18px">';
-      snap.forEach(doc => {
-        const c = doc.data();
-        html += `<li style="margin-bottom:8px"><b>${c.name}</b> (ID: <code>${doc.id}</code>) — S/ ${c.price} ${c.active===false ? '<span style=\"color:#dc2626;font-size:12px\">(inactivo)</span>' : ''}
-        <button onclick=\"editCourse('${doc.id}')\" style=\"margin-left:10px;padding:2px 10px;font-size:12px;border-radius:6px;border:1px solid #1565c0;background:#fff;color:#1565c0;cursor:pointer\">Editar</button>
-        <button onclick=\"deleteCourse('${doc.id}')\" style=\"margin-left:4px;padding:2px 10px;font-size:12px;border-radius:6px;border:1px solid #dc2626;background:#fff;color:#dc2626;cursor:pointer\">Eliminar</button>
-        </li>`;
-      });
-      html += '</ul>';
-      list.innerHTML = html;
-      window.editCourse = function(id) {
-        db.collection('courses').doc(id).get().then(function(doc) {
-          if (!doc.exists) return alert('Curso no encontrado');
-          const c = doc.data();
-          const formHtml = `
-            <form id=\"editCourseForm\" style=\"margin-bottom:18px\">
-              <h3 style=\"font-size:16px;margin-bottom:10px\">Editar curso</h3>
-              <div style=\"margin-bottom:10px\">
-                <label>Nombre del curso</label>
-                <input type=\"text\" id=\"editCourseName\" value=\"${c.name||''}\" required style=\"width:100%;padding:8px;margin-top:2px\" />
-              </div>
-              <div style=\"margin-bottom:10px\">
-                <label>Precio (S/)</label>
-                <input type=\"number\" id=\"editCoursePrice\" value=\"${c.price||0}\" min=\"0\" required style=\"width:100%;padding:8px;margin-top:2px\" />
-              </div>
-              <div style=\"margin-bottom:10px\">
-                <label>Activo</label>
-                <input type=\"checkbox\" id=\"editCourseActive\" ${c.active!==false?'checked':''} />
-                <span style=\"font-size:13px;color:#64748b\">(Visible para usuarios)</span>
-              </div>
-              <button type=\"submit\" style=\"padding:8px 18px;background:#1565c0;color:#fff;border:none;border-radius:8px;font-weight:600\">Guardar cambios</button>
-              <button type=\"button\" id=\"cancelEditBtn\" style=\"margin-left:8px;padding:8px 18px;background:#e2e8f0;color:#334155;border:none;border-radius:8px;font-weight:600\">Cancelar</button>
-            </form>`;
-          list.innerHTML = formHtml;
-          document.getElementById('editCourseForm').onsubmit = function(e) {
-            e.preventDefault();
-            const name = document.getElementById('editCourseName').value.trim();
-            const price = parseFloat(document.getElementById('editCoursePrice').value);
-            const active = document.getElementById('editCourseActive').checked;
-            db.collection('courses').doc(id).update({ name, price, active }).then(function() {
-              alert('Curso actualizado');
-              renderCourses();
-            }).catch(function(err) {
-              alert('Error al actualizar: ' + err.message);
-            });
-          };
-          document.getElementById('cancelEditBtn').onclick = function() { renderCourses(); };
-        });
-      };
-      window.deleteCourse = function(id) {
-        if (!confirm('¿Eliminar este curso? Esta acción no se puede deshacer.')) return;
-        db.collection('courses').doc(id).delete().then(function() {
-          alert('Curso eliminado');
-          renderCourses();
-        }).catch(function(err) {
-          alert('Error al eliminar: ' + err.message);
-        });
-      };
-    });
-  }
-
+  // --- Renderizado de Usuarios ---
   function renderUsers() {
-    const panelContent = document.getElementById('panelContent');
-    if (!panelContent) return;
-    panelContent.innerHTML = '<div style="color:#64748b">Cargando usuarios...</div>';
+    const usuariosContent = document.getElementById('usuariosContent');
+    if (!usuariosContent) return;
+    usuariosContent.innerHTML = '<div style="color:#64748b">Cargando usuarios...</div>';
     db.collection('users').get().then(snap => {
       if (snap.empty) {
-        panelContent.innerHTML = '<div style="color:#64748b">No hay usuarios registrados.</div>';
+        usuariosContent.innerHTML = '<div style="color:#64748b">No hay usuarios registrados.</div>';
         return;
       }
-      let html = '<h3 style="margin-bottom:14px;font-size:17px">Usuarios registrados</h3>';
-      html += '<table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Nombre</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Correo</th></tr></thead><tbody>';
+      let html = '<table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Nombre</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Correo</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Rol</th></tr></thead><tbody>';
       snap.forEach(doc => {
         const u = doc.data();
-        html += `<tr><td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\">${u.name||'-'}</td><td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\">${u.email||'-'}</td></tr>`;
+        html += `<tr><td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\">${u.nombre||u.name||'-'}</td><td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\">${u.email||'-'}</td><td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\">${u.rol||'-'}</td></tr>`;
       });
       html += '</tbody></table>';
-      panelContent.innerHTML = html;
+      usuariosContent.innerHTML = html;
     }).catch(err => {
-      panelContent.innerHTML = '<div style="color:#dc2626">Error al cargar usuarios: ' + err.message + '</div>';
+      usuariosContent.innerHTML = '<div style="color:#dc2626">Error al cargar usuarios: ' + err.message + '</div>';
     });
   }
 
-  // --- Menú ---
-  document.querySelectorAll('.sidebar-menu a').forEach(link => {
-    link.addEventListener('click', function(e) {
-      if (this.textContent.includes('Panel')) {
-        renderCourses();
-      } else if (this.textContent.includes('Usuarios')) {
-        e.preventDefault();
-        renderUsers();
+  // --- Renderizado de Cursos ---
+  function renderCourses() {
+    const cursosContent = document.getElementById('cursosContent');
+    if (!cursosContent) return;
+    cursosContent.innerHTML = '<div style="color:#64748b">Cargando cursos...</div>';
+    db.collection('courses').get().then(snap => {
+      if (snap.empty) {
+        cursosContent.innerHTML = '<div style="color:#64748b">No hay cursos registrados.</div>';
+        return;
       }
+      let html = '<table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Nombre</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Fecha</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Tema principal</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Precio</th></tr></thead><tbody>';
+      snap.forEach(doc => {
+        const c = doc.data();
+        html += `<tr><td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\">${c.name||c.nombre||'-'}</td><td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\">${c.fecha||c.date||'-'}</td><td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\">${c.temaPrincipal||'-'}</td><td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\">S/ ${c.precio||'-'}</td></tr>`;
+      });
+      html += '</tbody></table>';
+      cursosContent.innerHTML = html;
+    }).catch(err => {
+      cursosContent.innerHTML = '<div style="color:#dc2626">Error al cargar cursos: ' + err.message + '</div>';
     });
-  });
+  }
 
-  // Mostrar cursos por defecto
-  renderCourses();
+  // --- Tabs switching logic ---
+  const tabUsuarios = document.getElementById('tabUsuarios');
+  const tabCursos = document.getElementById('tabCursos');
+  const usuariosSection = document.getElementById('usuariosSection');
+  const cursosSection = document.getElementById('cursosSection');
+
+  if (tabUsuarios && tabCursos && usuariosSection && cursosSection) {
+    tabUsuarios.addEventListener('click', function() {
+      tabUsuarios.classList.add('active');
+      tabCursos.classList.remove('active');
+      usuariosSection.style.display = '';
+      cursosSection.style.display = 'none';
+      renderUsers();
+    });
+    tabCursos.addEventListener('click', function() {
+      tabCursos.classList.add('active');
+      tabUsuarios.classList.remove('active');
+      usuariosSection.style.display = 'none';
+      cursosSection.style.display = '';
+      renderCourses();
+    });
+    // Mostrar usuarios por defecto
+    renderUsers();
+  }
 });

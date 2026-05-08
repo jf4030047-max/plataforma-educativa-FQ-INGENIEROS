@@ -98,21 +98,21 @@
               <div class="stat-card">
                 <span class="material-icons-round stat-icon" style="background:#e0f2fe;color:#0284c7;">school</span>
                 <div>
-                  <div class="stat-value">12</div>
+                  <div class="stat-value" id="statCursos">...</div>
                   <div class="stat-label">Cursos activos</div>
                 </div>
               </div>
               <div class="stat-card">
                 <span class="material-icons-round stat-icon" style="background:#fef9c3;color:#ca8a04;">people</span>
                 <div>
-                  <div class="stat-value">350</div>
+                  <div class="stat-value" id="statUsuarios">...</div>
                   <div class="stat-label">Usuarios registrados</div>
                 </div>
               </div>
               <div class="stat-card">
                 <span class="material-icons-round stat-icon" style="background:#dcfce7;color:#16a34a;">attach_money</span>
                 <div>
-                  <div class="stat-value">S/ 8,500</div>
+                  <div class="stat-value" id="statIngresos">...</div>
                   <div class="stat-label">Ingresos mes</div>
                 </div>
               </div>
@@ -120,6 +120,140 @@
             <div class="admin-section">
               <h3><span class="material-icons-round">play_circle</span> Cursos y recursos</h3>
               <div id="panelContent">Aquí irán los cursos, recursos y gestión administrativa.</div>
+              <div style="margin-top:32px;">
+                                <h3 style="font-size:17px;margin-bottom:10px;"><span class="material-icons-round">people</span> Usuarios y cursos inscritos</h3>
+                                <div id="usuariosCursosContent">Cargando usuarios...</div>
+                      <script>
+                        // Mostrar usuarios y cursos inscritos con celular y DNI
+                        document.addEventListener('DOMContentLoaded', function() {
+                          if (typeof firebase !== 'undefined' && firebase.firestore) {
+                            const db = firebase.firestore();
+                            db.collection('users').get().then(snap => {
+                              let html = '<table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Nombre</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Correo</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Celular</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">DNI</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Curso inscrito</th></tr></thead><tbody>';
+                              snap.forEach(doc => {
+                                const u = doc.data();
+                                let curso = '-';
+                                if (u.curso) curso = u.curso;
+                                else if (u.cursos && Array.isArray(u.cursos) && u.cursos.length > 0) curso = u.cursos.join(', ');
+                                let celular = u.celular || u.telefono || u.phone || '-';
+                                let dni = u.dni || u.DNI || '-';
+                                html += `<tr><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">${u.name||'-'}</td><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">${u.email||'-'}</td><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">${celular}</td><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">${dni}</td><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">${curso}</td></tr>`;
+                              });
+                              html += '</tbody></table>';
+                              document.getElementById('usuariosCursosContent').innerHTML = html;
+                            }).catch(()=>{
+                              document.getElementById('usuariosCursosContent').textContent = 'Error al cargar usuarios.';
+                            });
+                          }
+                        });
+                      </script>
+                <h3 style="font-size:17px;margin-bottom:10px;"><span class="material-icons-round">payments</span> Pagos realizados</h3>
+                <div id="pagosContent">Cargando pagos...</div>
+              </div>
+              <div style="margin-top:32px;">
+                <h3 style="font-size:17px;margin-bottom:10px;"><span class="material-icons-round">school</span> Cursos creados</h3>
+                <div id="cursosContent">Cargando cursos...</div>
+                <div style="margin-top:24px;">
+                  <h4 style="font-size:15px;margin-bottom:8px">Agregar / Editar curso</h4>
+                  <form id="cursoForm" style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;margin-bottom:18px">
+                    <input type="hidden" id="cursoId" />
+                    <div style="flex:1 1 180px">
+                      <label style="font-size:13px;font-weight:600">Nombre</label>
+                      <input type="text" id="nombreCurso" class="form-control" required />
+                    </div>
+                    <div style="flex:1 1 180px">
+                      <label style="font-size:13px;font-weight:600">Docente</label>
+                      <input type="text" id="docenteCurso" class="form-control" required />
+                    </div>
+                    <div style="flex:1 1 120px">
+                      <label style="font-size:13px;font-weight:600">Costo (S/)</label>
+                      <input type="number" id="costoCurso" class="form-control" min="0" step="0.01" required />
+                    </div>
+                    <div style="flex:2 1 260px">
+                      <label style="font-size:13px;font-weight:600">Temas (separados por coma)</label>
+                      <input type="text" id="temasCurso" class="form-control" placeholder="Tema 1, Tema 2, ..." />
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="max-height:40px"><span class="material-icons-round">save</span> Guardar</button>
+                  </form>
+                  <div id="cursoFormMsg" style="font-size:13px;color:#16a34a;margin-bottom:10px"></div>
+                </div>
+                      // CRUD de cursos
+                      document.addEventListener('DOMContentLoaded', function() {
+                        if (typeof firebase !== 'undefined' && firebase.firestore) {
+                          const db = firebase.firestore();
+                          const cursosContent = document.getElementById('cursosContent');
+                          const cursoForm = document.getElementById('cursoForm');
+                          const cursoId = document.getElementById('cursoId');
+                          const nombreCurso = document.getElementById('nombreCurso');
+                          const docenteCurso = document.getElementById('docenteCurso');
+                          const costoCurso = document.getElementById('costoCurso');
+                          const temasCurso = document.getElementById('temasCurso');
+                          const cursoFormMsg = document.getElementById('cursoFormMsg');
+
+                          function cargarCursos() {
+                            db.collection('courses').get().then(snap => {
+                              let html = '<table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Nombre</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Docente</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Temas</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Costo (S/)</th><th></th></tr></thead><tbody>';
+                              snap.forEach(doc => {
+                                const c = doc.data();
+                                html += `<tr>
+                                  <td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\">${c.nombre||'-'}</td>
+                                  <td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\">${c.docente||'-'}</td>
+                                  <td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\">${Array.isArray(c.temas)?c.temas.join(', '):(c.temas||'-')}</td>
+                                  <td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\">S/ ${c.costo||'-'}</td>
+                                  <td style=\"padding:7px 6px;border-bottom:1px solid #f1f5f9\"><button onclick=\"editarCurso('${doc.id}')\" style=\"background:#e0e7ef;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:13px\"><span class=\"material-icons-round\">edit</span></button></td>
+                                </tr>`;
+                              });
+                              html += '</tbody></table>';
+                              cursosContent.innerHTML = html;
+                            }).catch(()=>{
+                              cursosContent.textContent = 'Error al cargar cursos';
+                            });
+                          }
+
+                          window.editarCurso = function(id) {
+                            db.collection('courses').doc(id).get().then(doc => {
+                              if (!doc.exists) return;
+                              const c = doc.data();
+                              cursoId.value = id;
+                              nombreCurso.value = c.nombre||'';
+                              docenteCurso.value = c.docente||'';
+                              costoCurso.value = c.costo||'';
+                              temasCurso.value = Array.isArray(c.temas)?c.temas.join(', '):(c.temas||'');
+                              window.scrollTo({top:cursoForm.offsetTop-60,behavior:'smooth'});
+                            });
+                          }
+
+                          if (cursoForm) {
+                            cursoForm.onsubmit = function(e) {
+                              e.preventDefault();
+                              const data = {
+                                nombre: nombreCurso.value.trim(),
+                                docente: docenteCurso.value.trim(),
+                                costo: parseFloat(costoCurso.value),
+                                temas: temasCurso.value.split(',').map(t=>t.trim()).filter(Boolean)
+                              };
+                              cursoFormMsg.textContent = '';
+                              let ref;
+                              if (cursoId.value) {
+                                ref = db.collection('courses').doc(cursoId.value).set(data, {merge:true});
+                              } else {
+                                ref = db.collection('courses').add(data);
+                              }
+                              ref.then(()=>{
+                                cursoForm.reset();
+                                cursoId.value = '';
+                                cursoFormMsg.textContent = 'Curso guardado correctamente';
+                                cargarCursos();
+                                setTimeout(()=>{cursoFormMsg.textContent='';},2000);
+                              }).catch(()=>{
+                                cursoFormMsg.textContent = 'Error al guardar curso';
+                              });
+                            }
+                          }
+                          cargarCursos();
+                        }
+                      });
+              </div>
             </div>
           </div>
         </main>
@@ -148,6 +282,43 @@
               window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
             }
           });
+
+          // Estadísticas generales
+          if (typeof firebase !== 'undefined' && firebase.firestore) {
+            const db = firebase.firestore();
+            // Usuarios
+            db.collection('users').get().then(snap => {
+              document.getElementById('statUsuarios').textContent = snap.size;
+            }).catch(()=>{document.getElementById('statUsuarios').textContent = '-';});
+            // Cursos
+            db.collection('courses').get().then(snap => {
+              document.getElementById('statCursos').textContent = snap.size;
+              // Mostrar cursos
+              let html = '<table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Curso</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Docente</th></tr></thead><tbody>';
+              snap.forEach(doc => {
+                const c = doc.data();
+                html += `<tr><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">${c.nombre||'-'}</td><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">${c.docente||'-'}</td></tr>`;
+              });
+              html += '</tbody></table>';
+              document.getElementById('cursosContent').innerHTML = html;
+            }).catch(()=>{document.getElementById('cursosContent').textContent = 'Error al cargar cursos';});
+            // Pagos
+            db.collection('payments').get().then(snap => {
+              let total = 0;
+              let html = '<table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Nombre</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Correo</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Curso</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Monto</th><th style="text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0">Estado</th></tr></thead><tbody>';
+              snap.forEach(doc => {
+                const p = doc.data();
+                total += Number(p.amount||0);
+                html += `<tr><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">${p.fullName||'-'}</td><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">${p.email||'-'}</td><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">${p.course||'-'}</td><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">S/ ${p.amount||'-'}</td><td style="padding:7px 6px;border-bottom:1px solid #f1f5f9">${p.status||'-'}</td></tr>`;
+              });
+              html += '</tbody></table>';
+              document.getElementById('pagosContent').innerHTML = html;
+              document.getElementById('statIngresos').textContent = 'S/ ' + total.toLocaleString('es-PE', {minimumFractionDigits:2});
+            }).catch(()=>{
+              document.getElementById('pagosContent').textContent = 'Error al cargar pagos';
+              document.getElementById('statIngresos').textContent = '-';
+            });
+          }
         });
         // Chat en tiempo real con Firestore
         if (typeof firebase !== 'undefined' && firebase.firestore) {
