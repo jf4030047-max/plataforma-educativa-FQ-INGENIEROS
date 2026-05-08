@@ -28,8 +28,8 @@ function syncCoursePrices() {
 
 document.addEventListener('DOMContentLoaded', function () {
   syncCoursePrices();
-// index-dynamic.js
-// Sincroniza el estado de autenticación y matrícula en la página de inicio
+  // index-dynamic.js
+  // Sincroniza el estado de autenticación y matrícula en la página de inicio
 
 
 let authResolved = false;
