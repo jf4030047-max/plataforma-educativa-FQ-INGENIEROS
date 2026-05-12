@@ -457,6 +457,25 @@
     };
 
     function loadCoursesFromFirestore() {
+      // Guard: si db no está disponible, usar fallback
+      if (!db) {
+        console.warn('Firestore no disponible, usando datos de fallback');
+        Object.keys(FALLBACK_DATA).forEach(function(id) {
+          var fb = FALLBACK_DATA[id];
+          COURSES[id] = {
+            id: id, name: id.replace(/-/g, ' '),
+            price: 0, priceLabel: 'Gratis',
+            desc: '', duration: '', sessions: 1, enrolled: 0,
+            modality: fb.modality, icon: fb.icon,
+            tags: fb.tags, badge: fb.badge, badgeLabel: fb.badgeLabel,
+            zoomLink: '', recordingUrl: '',
+            schedules: fb.schedules, temario: fb.temario, includes: fb.includes
+          };
+        });
+        initCoursePage();
+        return Promise.resolve();
+      }
+
       return db.collection('courses').get({ source: 'server' }).then(function(snapshot) {
         console.log('Firestore: ' + snapshot.size + ' cursos cargados');
         snapshot.forEach(function(doc) {
