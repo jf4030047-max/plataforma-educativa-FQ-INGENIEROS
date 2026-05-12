@@ -79,7 +79,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('pagosPendientesContent');
     if (!container) return;
     
-    db.collection('payments').where('status', '==', 'pending').orderBy('uploadedAt', 'desc').limit(10).get().then(snap => {
+    // Query sin orderBy para evitar requerir índice compuesto
+    db.collection('payments').where('status', '==', 'pending').limit(10).get().then(snap => {
       if (snap.empty) {
         container.innerHTML = '<div style="color:#64748b;padding:16px;text-align:center;">✅ No hay pagos pendientes</div>';
         return;
@@ -120,6 +121,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
       html += '</tbody></table>';
       container.innerHTML = html;
+    }).catch(err => {
+      console.error('Error cargando pagos pendientes:', err);
+      container.innerHTML = '<div style="color:#dc2626;padding:16px;text-align:center;">⚠️ Error al cargar pagos</div>';
     });
   }
 
