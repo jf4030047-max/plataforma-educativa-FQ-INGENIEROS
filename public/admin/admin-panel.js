@@ -5,22 +5,190 @@ document.addEventListener('DOMContentLoaded', function () {
   if (typeof firebase === 'undefined' || !firebase.firestore) return;
   const db = firebase.firestore();
 
-  // ========== ESTADÍSTICAS ==========
+  // ========== ESTADÍSTICAS COMPLETAS ==========
   function actualizarEstadisticas() {
-    const elCursos = document.querySelector('.stat-card .stat-value');
-    const elUsuarios = document.querySelectorAll('.stat-card .stat-value')[1];
-    const elIngresos = document.querySelectorAll('.stat-card .stat-value')[2];
+    // Cursos activos
+    db.collection('courses').where('active', '==', true).get().then(snap => {
+      document.getElementById('statCursos').textContent = snap.size;
+    });
 
-    db.collection('courses').where('active', '==', true).get().then(snap => { if (elCursos) elCursos.textContent = snap.size; });
-    db.collection('users').get().then(snap => { if (elUsuarios) elUsuarios.textContent = snap.size; });
+    // Usuarios registrados
+    db.collection('users').get().then(snap => {
+      const totalUsers = snap.size;
+      document.getElementById('statUsuarios').textContent = totalUsers;
+      
+      // Estudiantes activos (con matriculaciones)
+      db.collection('enrollments').get().then(enrollSnap => {
+        const activeStudents = new Set();
+        enrollSnap.forEach(doc => { activeStudents.add(doc.data().userId); });
+        document.getElementById('estudiantesActivos').textContent = activeStudents.size;
+      });
+    });
 
+    // Ingresos del mes
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-    db.collection('payments').where('date', '>=', firstDay).where('date', '<=', lastDay).get().then(snap => {
+    db.collection('payments').where('status', '==', 'verified').get().then(snap => {
       let total = 0;
-      snap.forEach(doc => { const pago = doc.data(); if (typeof pago.amount === 'number') total += pago.amount; });
-      if (elIngresos) elIngresos.textContent = 'S/ ' + total.toLocaleString('es-PE');
+      snap.forEach(doc => {
+        const pago = doc.data();
+        if (typeof pago.amount === 'number') total += pago.amount;
+      });
+      document.getElementById('statIngresos').textContent = 'S/ ' + total.toLocaleString('es-PE');
+    });
+
+    // Matriculaciones este mes
+    db.collection('enrollments').get().then(snap => {
+      let thisMonth = 0;
+      snap.forEach(doc => {
+        const enr = doc.data();
+        if (enr.enrolledAt) {
+          const enrollDate = new Date(enr.enrolledAt.toDate ? enr.enrolledAt.toDate() : enr.enrolledAt);
+          if (enrollDate >= firstDay && enrollDate <= lastDay) thisMonth++;
+        }
+      });
+      document.getElementById('statMatriculaciones').textContent = thisMonth;
+    });
+
+    // Pagos pendientes de verificación
+    db.collection('payments').where('status', '==', 'pending').get().then(snap => {
+      document.getElementById('statPagosPendientes').textContent = snap.size;
+    });
+
+    // Certificados emitidos
+    db.collection('certificates').get().then(snap => {
+      document.getElementById('statCertificados').textContent = snap.size;
+    });
+
+    // Tasa de ocupación
+    Promise.all([
+      db.collection('courses').where('active', '==', true).get(),
+      db.collection('enrollments').get()
+    ]).then(([cursosSnap, enrollSnap]) => {
+      const totalCursos = cursosSnap.size || 1;
+      const totalEnroll = enrollSnap.size;
+      const capacidadMax = totalCursos * 30; // Asumiendo 30 estudiantes por curso
+      const tasaOcupacion = Math.round((totalEnroll / capacidadMax) * 100);
+      document.getElementById('tasaOcupacion').textContent = Math.min(100, tasaOcupacion) + '%';
+    });
+  }
+
+  // ========== PAGOS PENDIENTES ==========
+  function renderPagosPendientes() {
+    const container = document.getElementById('pagosPendientesContent');
+    if (!container) return;
+    
+    db.collection('payments').where('status', '==', 'pending').orderBy('uploadedAt', 'desc').limit(10).get().then(snap => {
+      if (snap.empty) {
+        container.innerHTML = '<div style="color:#64748b;padding:16px;text-align:center;">✅ No hay pagos pendientes</div>';
+        return;
+      }
+
+      let html = `
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="background:#f7f9fc">
+              <th style="text-align:left;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Estudiante</th>
+              <th style="text-align:left;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Curso</th>
+              <th style="text-align:left;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Monto</th>
+              <th style="text-align:left;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Método</th>
+              <th style="text-align:center;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      snap.forEach(doc => {
+        const pago = doc.data();
+        const monto = pago.amount || 0;
+        const metodo = pago.method || 'N/A';
+        
+        html += `
+          <tr style="border-bottom:1px solid #f1f5f9;">
+            <td style="padding:10px 8px;">${pago.userName || 'Usuario'}</td>
+            <td style="padding:10px 8px;">${pago.courseName || 'N/A'}</td>
+            <td style="padding:10px 8px;"><strong>S/ ${monto}</strong></td>
+            <td style="padding:10px 8px;"><span style="background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:4px;font-size:11px;">${metodo}</span></td>
+            <td style="padding:10px 8px;text-align:center;">
+              <button onclick="verificarPago('${doc.id}')" style="background:#16a34a;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;">Aprobar</button>
+              <button onclick="rechazarPago('${doc.id}')" style="background:#dc2626;color:white;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;margin-left:4px;">Rechazar</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    });
+  }
+
+  // ========== ÚLTIMAS MATRICULACIONES ==========
+  function renderUltimasMatriculaciones() {
+    const container = document.getElementById('ultimasMatriculacionesContent');
+    if (!container) return;
+    
+    db.collection('enrollments').orderBy('enrolledAt', 'desc').limit(8).get().then(snap => {
+      if (snap.empty) {
+        container.innerHTML = '<div style="color:#64748b;padding:16px;">No hay matriculaciones aún.</div>';
+        return;
+      }
+
+      let html = `
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="background:#f7f9fc">
+              <th style="text-align:left;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Estudiante</th>
+              <th style="text-align:left;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Curso</th>
+              <th style="text-align:left;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Fecha</th>
+              <th style="text-align:left;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      snap.forEach(doc => {
+        const enr = doc.data();
+        const fecha = enr.enrolledAt ? new Date(enr.enrolledAt.toDate ? enr.enrolledAt.toDate() : enr.enrolledAt).toLocaleDateString('es-PE') : 'N/A';
+        const status = enr.status || 'active';
+        const statusColor = status === 'completed' ? '#dcfce7' : status === 'cancelled' ? '#fee2e2' : '#dbeafe';
+        const statusText = status === 'completed' ? 'Completado' : status === 'cancelled' ? 'Cancelado' : 'Activo';
+        const statusTextColor = status === 'completed' ? '#16a34a' : status === 'cancelled' ? '#dc2626' : '#0284c7';
+        
+        html += `
+          <tr style="border-bottom:1px solid #f1f5f9;">
+            <td style="padding:10px 8px;">${enr.userName || 'Usuario'}</td>
+            <td style="padding:10px 8px;">${enr.courseName || 'N/A'}</td>
+            <td style="padding:10px 8px;">${fecha}</td>
+            <td style="padding:10px 8px;"><span style="background:${statusColor};color:${statusTextColor};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">${statusText}</span></td>
+          </tr>
+        `;
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    });
+  }
+
+  // ========== FUNCIÓN PARA VERIFICAR PAGO ==========
+  window.verificarPago = function(paymentId) {
+    if (!confirm('¿Aprobar este pago?')) return;
+    
+    db.collection('payments').doc(paymentId).update({ status: 'verified' }).then(() => {
+      mostrarNotificacion('✅ Pago aprobado correctamente', 'success');
+      actualizarEstadisticas();
+      renderPagosPendientes();
+    });
+  }
+
+  // ========== FUNCIÓN PARA RECHAZAR PAGO ==========
+  window.rechazarPago = function(paymentId) {
+    if (!confirm('¿Rechazar este pago?')) return;
+    
+    db.collection('payments').doc(paymentId).update({ status: 'rejected' }).then(() => {
+      mostrarNotificacion('❌ Pago rechazado', 'info');
+      actualizarEstadisticas();
+      renderPagosPendientes();
     });
   }
 
@@ -229,6 +397,24 @@ document.addEventListener('DOMContentLoaded', function () {
   // ========== INICIAR ==========
   renderUsers();
   actualizarEstadisticas();
+  renderPagosPendientes();
+  renderUltimasMatriculaciones();
+  
+  // Actualizar datos cada 30 segundos
+  setInterval(function() {
+    actualizarEstadisticas();
+    renderPagosPendientes();
+    renderUltimasMatriculaciones();
+  }, 30000);
+  
+  // Botón para actualizar pagos manualmente
+  const btnRefreshPagos = document.getElementById('btnRefreshPagos');
+  if (btnRefreshPagos) {
+    btnRefreshPagos.addEventListener('click', function() {
+      renderPagosPendientes();
+      mostrarNotificacion('✅ Datos actualizados', 'success');
+    });
+  }
 
   // Crear modal para editar curso
   function crearModalEditarCurso() {

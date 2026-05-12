@@ -209,24 +209,75 @@
           <div class="stat-card">
             <span class="material-icons-round stat-icon" style="background:#e3f0fa;color:#1565c0;">school</span>
             <div>
-              <div class="stat-value">3</div>
+              <div class="stat-value" id="statCursos">0</div>
               <div class="stat-label">Cursos activos</div>
             </div>
           </div>
           <div class="stat-card">
             <span class="material-icons-round stat-icon" style="background:#e0e7ff;color:#4f46e5;">people</span>
             <div>
-              <div class="stat-value">8</div>
+              <div class="stat-value" id="statUsuarios">0</div>
               <div class="stat-label">Usuarios registrados</div>
             </div>
           </div>
           <div class="stat-card">
             <span class="material-icons-round stat-icon" style="background:#dcfce7;color:#16a34a;">attach_money</span>
             <div>
-              <div class="stat-value">S/ 0</div>
+              <div class="stat-value" id="statIngresos">S/ 0</div>
               <div class="stat-label">Ingresos mes</div>
             </div>
           </div>
+        </div>
+        
+        <div class="stat-cards">
+          <div class="stat-card">
+            <span class="material-icons-round stat-icon" style="background:#fef3c7;color:#d97706;">task_alt</span>
+            <div>
+              <div class="stat-value" id="statMatriculaciones">0</div>
+              <div class="stat-label">Matriculaciones este mes</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="material-icons-round stat-icon" style="background:#fecaca;color:#dc2626;">pending_actions</span>
+            <div>
+              <div class="stat-value" id="statPagosPendientes">0</div>
+              <div class="stat-label">Pagos por verificar</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="material-icons-round stat-icon" style="background:#c7d2fe;color:#6366f1;">verified_user</span>
+            <div>
+              <div class="stat-value" id="statCertificados">0</div>
+              <div class="stat-label">Certificados emitidos</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="admin-section" style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(15,23,42,0.08);margin-bottom:32px;">
+          <h3 style="margin-top:0;"><span class="material-icons-round">info</span> Información del Sistema</h3>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;font-size:13px;color:#64748b;">
+            <div><strong style="color:#334155;">Plataforma:</strong> FQ INGENIEROS Educativa</div>
+            <div><strong style="color:#334155;">Versión:</strong> 1.0 MVP</div>
+            <div><strong style="color:#334155;">Última actualización:</strong> 12 Mayo 2026</div>
+            <div><strong style="color:#334155;">Estado:</strong> <span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:4px;font-weight:600;">Operativo</span></div>
+            <div><strong style="color:#334155;">Estudiantes activos:</strong> <span id="estudiantesActivos">0</span></div>
+            <div><strong style="color:#334155;">Tasa de ocupación:</strong> <span id="tasaOcupacion">0%</span></div>
+          </div>
+        </div>
+        
+        <div class="admin-section" style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(15,23,42,0.08);margin-bottom:32px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+            <h3 style="margin:0;"><span class="material-icons-round">payment</span> Pagos Pendientes de Verificación</h3>
+            <button id="btnRefreshPagos" class="btn-primary" style="font-size:12px;padding:8px 12px;">
+              <span class="material-icons-round" style="font-size:16px;">refresh</span>Actualizar
+            </button>
+          </div>
+          <div id="pagosPendientesContent">Cargando pagos...</div>
+        </div>
+        
+        <div class="admin-section" style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(15,23,42,0.08);margin-bottom:32px;">
+          <h3 style="margin-top:0;"><span class="material-icons-round">trending_up</span> Últimas Matriculaciones</h3>
+          <div id="ultimasMatriculacionesContent">Cargando matriculaciones...</div>
         </div>
         <div style="display:flex;gap:0;margin-bottom:24px;">
           <button id="tabUsuarios" class="tab-btn active" style="border-radius:10px 0 0 0;">Usuarios</button>
