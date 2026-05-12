@@ -601,7 +601,7 @@
             startDate: data.startDate || '',
             startTime: data.startTime || '',
             endTime: data.endTime || '',
-            schedules: (data.schedules && data.schedules.length > 0) ? data.schedules : (fb.schedules || []),
+            schedules: (fb.schedules && fb.schedules.length > 0) ? fb.schedules : ((data.schedules && data.schedules.length > 0) ? data.schedules : []),
             temario: (data.temario && data.temario.length > 0) ? data.temario : (fb.temario || []),
             includes: (data.includes && data.includes.length > 0) ? data.includes : (fb.includes || [])
           };
