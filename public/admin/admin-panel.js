@@ -136,6 +136,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const tabCursos = document.getElementById('tabCursos');
   const usuariosSection = document.getElementById('usuariosSection');
   const cursosSection = document.getElementById('cursosSection');
+  const menuCursos = document.getElementById('menuCursos');
+  const menuPanel = document.getElementById('menuPanel');
 
   if (tabUsuarios && tabCursos) {
     tabUsuarios.addEventListener('click', function() {
@@ -156,6 +158,17 @@ document.addEventListener('DOMContentLoaded', function () {
       usuariosSection.style.display = 'none';
       cursosSection.style.display = '';
       renderCourses();
+    });
+  }
+
+  // Hacer click en "Gestionar Cursos" del menú
+  if (menuCursos) {
+    menuCursos.addEventListener('click', function(e) {
+      e.preventDefault();
+      // Activar tab de cursos
+      if (tabCursos) {
+        tabCursos.click();
+      }
     });
   }
 
