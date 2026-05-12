@@ -582,9 +582,21 @@
             slugId = doc.id;
           }
           
-          // Determinar precio correcto (preferir data.price sobre campos derivados)
-          var finalPrice = data.price || 0;
-          var priceLabel = finalPrice === 0 ? 'Gratis' : ('S/ ' + finalPrice);
+          // Determinar precio correcto
+          // Preferencia: data.price > 0, si no, usar priceDisplay, si no Gratis
+          var finalPrice = 0;
+          var priceLabel = 'Gratis';
+          
+          if (data.price && data.price > 0) {
+            // Usar data.price si existe y es > 0
+            finalPrice = data.price;
+            priceLabel = 'S/ ' + finalPrice;
+          } else if (data.priceDisplay && typeof data.priceDisplay === 'string') {
+            // Si priceDisplay existe, usarlo
+            priceLabel = data.priceDisplay;
+            var priceNum = data.priceDisplay.match(/\d+/)?.[0];
+            finalPrice = parseInt(priceNum) || 0;
+          }
           
           var courseObj = {
             id: doc.id,
