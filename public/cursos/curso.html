@@ -549,10 +549,28 @@
           const data = doc.data();
           // Detectar fallback: por ID exacto o por keyword en nombre/id
           var fb = FALLBACK_DATA[doc.id] || {};
-          if (!fb.temario && (doc.id + ' ' + (data.name || '')).toLowerCase().indexOf('topograf') !== -1) {
-            fb = FALLBACK_TOPOGRAFIA;
+          // Buscar slug alternativo en FALLBACK_DATA si el ID de Firestore no está en fallback
+          var slugId = null;
+          if (!fb.temario) {
+            for (var key in FALLBACK_DATA) {
+              if (key !== doc.id && typeof FALLBACK_DATA[key] === 'object') {
+                if (key.indexOf('sst') !== -1 && doc.id.indexOf('sst') !== -1) {
+                  slugId = key;
+                  fb = FALLBACK_DATA[key];
+                  break;
+                }
+                if (key.indexOf('topograf') !== -1 && (doc.id + ' ' + (data.name || '')).toLowerCase().indexOf('topograf') !== -1) {
+                  slugId = key;
+                  fb = FALLBACK_DATA[key];
+                  break;
+                }
+              }
+            }
+          } else {
+            slugId = doc.id;
           }
-          COURSES[doc.id] = {
+          
+          var courseObj = {
             id: doc.id,
             name: data.name || '',
             price: data.price || 0,
@@ -575,13 +593,21 @@
             temario: (data.temario && data.temario.length > 0) ? data.temario : (fb.temario || []),
             includes: (data.includes && data.includes.length > 0) ? data.includes : (fb.includes || [])
           };
+          
+          // Asignar bajo el ID de Firestore
+          COURSES[doc.id] = courseObj;
+          
+          // Si hay un slug alternativo, también asignar bajo ese slug
+          if (slugId && slugId !== doc.id) {
+            COURSES[slugId] = courseObj;
+          }
         });
 
         // Si no hay cursos en Firestore, usar fallback completo
         if (snapshot.size === 0) {
           Object.keys(FALLBACK_DATA).forEach(function(id) {
             var fb = FALLBACK_DATA[id];
-            COURSES[id] = {
+            var courseObj = {
               id: id,
               name: id.replace(/-/g, ' '),
               price: 0, priceLabel: 'Gratis',
@@ -591,6 +617,11 @@
               zoomLink: '', recordingUrl: '',
               schedules: fb.schedules, temario: fb.temario, includes: fb.includes
             };
+            COURSES[id] = courseObj;
+            // Si este ID es un documento Firestore ID (UUID), también asignar slugs alternativos
+            if (id.match(/^[A-Z0-9]{8,}$/) && FALLBACK_DATA['sst-obras-civiles'] === fb) {
+              COURSES['sst-obras-civiles'] = courseObj;
+            }
           });
         }
 
@@ -600,7 +631,7 @@
         // Si falla Firestore, usar datos de respaldo
         Object.keys(FALLBACK_DATA).forEach(function(id) {
           var fb = FALLBACK_DATA[id];
-          COURSES[id] = {
+          var courseObj = {
             id: id, name: id.replace(/-/g, ' '),
             price: 0, priceLabel: 'Gratis',
             desc: '', duration: '', sessions: 1, enrolled: 0,
@@ -608,6 +639,13 @@
             tags: fb.tags, badge: fb.badge, badgeLabel: fb.badgeLabel,
             zoomLink: '', recordingUrl: '',
             schedules: fb.schedules, temario: fb.temario, includes: fb.includes
+          };
+          COURSES[id] = courseObj;
+          // Si este ID es un documento Firestore ID (UUID), también asignar slugs alternativos
+          if (id.match(/^[A-Z0-9]{8,}$/) && FALLBACK_DATA['sst-obras-civiles'] === fb) {
+            COURSES['sst-obras-civiles'] = courseObj;
+          }
+        });
           };
         });
         initCoursePage();
