@@ -283,12 +283,10 @@
   </div>
 
   <script>
-    // Inicializa Firebase Auth y Firestore después de cargar los SDK y la config
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    
+    // Usa las variables globales auth y db de firebase-config.js
     let currentCourse = null;
     let allCourses = [];
+    let paymentData = null;
 
     /* Set exam link dynamically */
     var courseParam = new URLSearchParams(window.location.search).get('course') || '';
@@ -296,7 +294,7 @@
     if (examLink) examLink.href = '../certificado/examen.html' + (courseParam ? '?course=' + courseParam : '');
 
     // --- Dynamic Payment Data ---
-    let paymentData = {
+    const defaultPaymentData = {
       holder: 'FQ INGENIEROS E.I.R.L.',
       amount: '20.00',
       accounts: {
@@ -309,12 +307,17 @@
 
     // Fetch payment data from Firestore (settings/paymentData)
     function fetchPaymentData() {
-      if (typeof firebase === 'undefined' || !firebase.firestore) return;
+      if (typeof firebase === 'undefined' || !db) return;
+      
+      paymentData = defaultPaymentData;
+      
       db.collection('settings').doc('paymentData').get().then(function(doc) {
         if (doc.exists) {
           var d = doc.data();
-          paymentData.holder = d.holder || paymentData.holder;
-          paymentData.accounts = d.accounts || paymentData.accounts;
+          paymentData = {
+            holder: d.holder || defaultPaymentData.holder,
+            accounts: d.accounts || defaultPaymentData.accounts
+          };
         }
         updatePaymentUI('Yape');
       }).catch(function() {
@@ -324,6 +327,11 @@
 
     // Cargar cursos desde Firestore
     function cargarCursos() {
+      if (!db) {
+        console.error('Firestore no está disponible');
+        return;
+      }
+      
       db.collection('courses').get().then(function(querySnapshot) {
         allCourses = [];
         const select = document.getElementById('cursoSelect');
@@ -372,6 +380,7 @@
     }
 
     function updatePaymentUI(method) {
+      if (!paymentData) paymentData = defaultPaymentData;
       document.getElementById('selectedMethod').textContent = method;
       document.getElementById('summaryMethod').textContent = method;
       document.getElementById('accountHolder').textContent = paymentData.holder;
@@ -398,8 +407,7 @@
         return;
       }
       
-      var user = auth.currentUser;
-      if (!user) { 
+      if (!auth || !auth.currentUser) { 
         alert('Debes iniciar sesión.');
         return; 
       }
@@ -417,8 +425,8 @@
 
       const price = currentCourse.price || currentCourse.precio || 20;
       const formData = {
-        userId: user.uid,
-        userEmail: user.email || '',
+        userId: auth.currentUser.uid,
+        userEmail: auth.currentUser.email || '',
         courseId: currentCourse.id,
         courseName: currentCourse.name || '',
         fullName: fullName,
@@ -466,12 +474,28 @@
   <script src="../assets/js/auth-ui.js"></script>
 
   <script>
-    /* Auth guard — redirect to login if not authenticated */
-    auth.onAuthStateChanged(function(user) {
-      if (!user) {
-        window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+    /* Inicializar después de que Firebase esté listo */
+    document.addEventListener('DOMContentLoaded', function() {
+      // Esperar a que auth esté disponible
+      if (typeof auth === 'undefined') {
+        setTimeout(() => {
+          fetchPaymentData();
+          cargarCursos();
+        }, 500);
+      } else {
+        fetchPaymentData();
+        cargarCursos();
       }
     });
+
+    /* Auth guard — redirect to login if not authenticated */
+    if (typeof auth !== 'undefined') {
+      auth.onAuthStateChanged(function(user) {
+        if (!user) {
+          window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+        }
+      });
+    }
   </script>
 
 </body>
