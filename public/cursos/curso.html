@@ -233,6 +233,8 @@
   <script>
     // Mostrar grabación si existe en Firestore
     function showCourseRecording(courseId) {
+      if (!db) return; // Guard: si db no está disponible, no cargar grabación
+      
       const section = document.getElementById('recordingSection');
       const video = document.getElementById('courseRecording');
       db.collection('recordings')
@@ -248,6 +250,10 @@
           } else {
             section.style.display = 'none';
           }
+        })
+        .catch(error => {
+          console.error('Error cargando grabación:', error);
+          section.style.display = 'none';
         });
     }
     // Llamar después de renderizar el curso
@@ -272,13 +278,7 @@
 
     // Cargar cursos desde Firestore
     var FALLBACK_DATA = {
-      'sst-obras-civiles': {
-        temario: [
-          { titulo: 'Introducción a la SST', temas: [
-            'Reseña histórica de la Seguridad y Salud en el Trabajo',
-            'Historia de la SST en el Perú',
-            'Términos y definiciones'
-       Wa2NuxyWwKyYmaNqP17T': {
+      'Wa2NuxyWwKyYmaNqP17T': {
         temario: [
           { titulo: 'Introducción a la SST', temas: [
             'Reseña histórica de la Seguridad y Salud en el Trabajo',
@@ -330,7 +330,13 @@
         modality: 'En vivo + Grabado',
         tags: ['Seguridad', 'Obras Civiles', 'Normativa']
       },
-      '   ]},
+      'sst-obras-civiles': {
+        temario: [
+          { titulo: 'Introducción a la SST', temas: [
+            'Reseña histórica de la Seguridad y Salud en el Trabajo',
+            'Historia de la SST en el Perú',
+            'Términos y definiciones'
+          ]},
           { titulo: 'Marco Legal en el Perú', temas: [
             'Ley N° 29783 y su reglamento D.S. 005-2012-TR',
             'Leyes de SST',
@@ -454,7 +460,8 @@
         badgeLabel: 'Pro',
         modality: 'En vivo + Grabado',
         tags: ['Supervisión', 'Control de Calidad', 'Dirección']
-      }
+      },
+      'Wa2NuxyWwKyYmaNqP17T': 'sst-obras-civiles' // Referencia al ID de Firestore
     };
 
     // Fallback dinámico: si el curso no está en FALLBACK_DATA pero tiene
@@ -514,6 +521,10 @@
         console.warn('Firestore no disponible, usando datos de fallback');
         Object.keys(FALLBACK_DATA).forEach(function(id) {
           var fb = FALLBACK_DATA[id];
+          // Si fb es una string, es una referencia a otro ID
+          if (typeof fb === 'string') {
+            fb = FALLBACK_DATA[fb];
+          }
           COURSES[id] = {
             id: id, name: id.replace(/-/g, ' '),
             price: 0, priceLabel: 'Gratis',
@@ -788,6 +799,13 @@
           document.getElementById('enrollActions').style.display = '';
           return;
         }
+        
+        // Guard: si db no está disponible, no cargar estado de inscripción desde Firestore
+        if (!db) {
+          console.log('[DEBUG] Firestore no disponible, usando estado local');
+          return;
+        }
+        
         var docId = user.uid + '_' + courseId;
         // Primero, revisar localStorage para experiencia instantánea
         // Ya no se usa localStorage para mostrar botones, solo Firestore
@@ -833,6 +851,12 @@
        ══════════════════════════════════════════════ */
     function handleEnroll() {
       if (!course) return;
+      
+      // Guard: si db no está disponible, mostrar error
+      if (!db) {
+        FQNotify.toast('No hay conexión a la base de datos', 'error');
+        return;
+      }
 
       var user = auth.currentUser;
       if (!user) {
@@ -990,6 +1014,13 @@
           };
           document.getElementById('cancelToastYes').onclick = function() {
             toast.remove();
+            
+            // Guard: si db no está disponible
+            if (!db) {
+              FQNotify.toast('No hay conexión a la base de datos', 'error');
+              return;
+            }
+            
             var authInstance = window.auth || firebase.auth();
             var user = authInstance.currentUser;
             if (!user) {
