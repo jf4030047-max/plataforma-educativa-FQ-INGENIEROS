@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -9,658 +9,470 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
   <link rel="stylesheet" href="../assets/css/header.css" />
+
+    <!-- AVISO: Todos los enlaces son relativos o externos. Si abres este archivo localmente, los enlaces a otros archivos HTML deben funcionar. Si algún enlace comienza con una barra (/) cámbialo por relativo. -->
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh}
+    body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#334155;min-height:100vh}
     .container{width:min(1140px,92%);margin:0 auto}
+
+    /* Page */
     .page{padding:100px 0 60px}
-    .page-header{margin-bottom:32px}
-    .page-header h1{font-size:clamp(26px,4vw,38px);font-weight:800;color:#0f172a;margin-bottom:8px}
-    .page-header p{color:#64748b;font-size:15px;max-width:520px}
-    .pay-grid{display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start}
-    .methods-section h2{font-size:20px;font-weight:700;color:#0f172a;margin-bottom:18px}
-    .method-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .page-header{margin-bottom:32px;text-align:center;color:#fff}
+    .page-header h1{font-size:clamp(28px,5vw,42px);font-weight:800;color:#fff;margin-bottom:12px}
+    .page-header p{color:rgba(255,255,255,.9);font-size:16px;max-width:600px;margin:0 auto}
+
+    /* Layout */
+    .pay-grid{display:grid;grid-template-columns:1fr 400px;gap:32px;align-items:start}
+
+    /* Payment methods */
+    .methods-section{background:#fff;border-radius:16px;padding:28px;box-shadow:0 10px 40px rgba(0,0,0,.1)}
+    .methods-section h2{font-size:20px;font-weight:700;color:#0f172a;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+    .method-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     .method-card{
-      background:#ffffff;
-      border:2px solid #dce3ed;
-      border-radius:14px;padding:20px;cursor:pointer;
-      transition:all .25s;position:relative;
+      background:#f8f9fa;border:2.5px solid #e0e7ff;border-radius:14px;padding:20px;cursor:pointer;
+      transition:all .3s cubic-bezier(.4,.0,.2,1);position:relative;
     }
-    .method-card:hover{border-color:#bfdbfe;transform:translateY(-2px);box-shadow:0 4px 16px rgba(15,23,42,.08)}
-    .method-card.selected{border-color:#1565c0;background:#eff6ff}
+    .method-card:hover{border-color:#667eea;transform:translateY(-4px);box-shadow:0 12px 24px rgba(102,126,234,.25)}
+    .method-card.selected{border-color:#667eea;background:linear-gradient(135deg,#eff6ff,#f0f4ff);box-shadow:0 8px 24px rgba(102,126,234,.2)}
     .method-card.selected::after{
       content:'✓';position:absolute;top:12px;right:14px;
-      width:22px;height:22px;border-radius:50%;background:#1565c0;color:#fff;
-      display:grid;place-items:center;font-size:12px;font-weight:700;
+      width:24px;height:24px;border-radius:50%;background:#667eea;color:#fff;
+      display:grid;place-items:center;font-size:14px;font-weight:700;
     }
-    .mc-icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;margin-bottom:12px;font-size:24px}
-    .mc-yape .mc-icon{background:linear-gradient(135deg,#6a1b9a,#8e24aa);color:#fff}
-    .mc-bcp .mc-icon{background:linear-gradient(135deg,#e65100,#ff6d00);color:#fff}
-    .mc-plin .mc-icon{background:linear-gradient(135deg,#00897b,#26a69a);color:#fff}
-    .mc-transfer .mc-icon{background:linear-gradient(135deg,#37474f,#546e7a);color:#fff}
+    .mc-icon{width:50px;height:50px;border-radius:12px;display:grid;place-items:center;margin-bottom:12px;font-size:26px}
+    .mc-yape .mc-icon{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+    .mc-bcp .mc-icon{background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff}
+    .mc-plin .mc-icon{background:linear-gradient(135deg,#4facfe,#00f2fe);color:#fff}
+    .mc-transfer .mc-icon{background:linear-gradient(135deg,#43e97b,#38f9d7);color:#fff}
     .method-card h4{font-size:15px;font-weight:700;color:#0f172a;margin-bottom:4px}
-    .method-card p{font-size:12.5px;color:#64748b;line-height:1.5}
-    .pay-info{margin-top:28px}
-    .pay-info h2{font-size:20px;font-weight:700;color:#0f172a;margin-bottom:14px}
-    .info-box{
-      background:#ffffff;
-      border:1px solid #dce3ed;border-radius:14px;padding:20px;
-    }
-    .info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eef2f7;font-size:14px}
+    .method-card p{font-size:13px;color:#64748b;line-height:1.5}
+
+    /* Payment data */
+    .pay-info{margin-top:28px;background:#fff;border-radius:16px;padding:28px;box-shadow:0 10px 40px rgba(0,0,0,.1)}
+    .pay-info h2{font-size:20px;font-weight:700;color:#0f172a;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+    .info-box{background:#f8f9fa;border-radius:12px;padding:20px}
+    .info-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #e0e7ff;font-size:14px}
     .info-row:last-child{border-bottom:none}
-    .info-row .label{color:#64748b}
-    .info-row .value{color:#0f172a;font-weight:600}
-    .info-row .value.highlight{color:#1565c0}
+    .info-row .label{color:#64748b;font-weight:500}
+    .info-row .value{color:#0f172a;font-weight:700;font-size:15px}
+    .info-row .value.highlight{color:#667eea;font-weight:800;font-size:16px}
+
+    /* Sidebar summary */
     .summary-card{
-      background:#ffffff;
-      border:1px solid #dce3ed;border-radius:16px;padding:24px;
-      position:sticky;top:88px;box-shadow:0 4px 16px rgba(15,23,42,.06);
+      background:#fff;border-radius:16px;padding:28px;
+      position:sticky;top:100px;box-shadow:0 10px 40px rgba(0,0,0,.1);border:2px solid #f0f4ff;
     }
-    .summary-card h3{font-size:18px;font-weight:700;color:#0f172a;margin-bottom:18px;display:flex;align-items:center;gap:8px}
-    .summary-item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eef2f7;font-size:14px}
+    .summary-card h3{font-size:18px;font-weight:700;color:#0f172a;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+    .summary-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #e0e7ff;font-size:14px}
     .summary-item:last-of-type{border-bottom:none}
     .summary-item .sl{color:#64748b}
-    .summary-item .sv{color:#0f172a;font-weight:600}
-    .summary-total{display:flex;justify-content:space-between;padding:14px 0;margin-top:8px;border-top:2px solid #bfdbfe;font-size:16px;font-weight:700}
+    .summary-item .sv{color:#0f172a;font-weight:700}
+    .summary-total{display:flex;justify-content:space-between;align-items:center;padding:16px 0;margin-top:12px;border-top:2px solid #667eea;font-size:18px;font-weight:800}
     .summary-total .sl{color:#0f172a}
-    .summary-total .sv{color:#1565c0}
-    .divider{border:none;border-top:1px solid #eef2f7;margin:16px 0}
-    .form-group{margin-bottom:16px}
-    .form-label{display:block;margin-bottom:6px;font-size:13px;font-weight:600;color:#334155}
+    .summary-total .sv{color:#667eea}
+    .divider{border:none;border-top:1px solid #e0e7ff;margin:16px 0}
+
+    /* Form */
+    .form-group{margin-bottom:18px}
+    .form-label{display:block;margin-bottom:8px;font-size:13px;font-weight:700;color:#0f172a}
     .form-control{
-      width:100%;padding:10px 13px;background:#f7f9fc;
-      border:1.5px solid #dce3ed;border-radius:10px;
-      color:#0f172a;font-size:14px;font-family:inherit;transition:border-color .2s;
+      width:100%;padding:12px 14px;background:#f8f9fa;
+      border:2px solid #e0e7ff;border-radius:10px;
+      color:#0f172a;font-size:14px;font-family:inherit;transition:all .2s;
     }
-    .form-control:focus{outline:none;border-color:#1e88e5;box-shadow:0 0 0 3px rgba(30,136,229,.1);background:#fff}
+    .form-control:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.1);background:#fff}
     .form-hint{font-size:12px;color:#64748b;margin-top:4px}
     textarea.form-control{resize:vertical;min-height:80px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .2s;text-decoration:none;width:100%}
-    .btn-primary{background:#1565c0;color:#fff}
-    .btn-primary:hover{background:#1e88e5;transform:translateY(-1px);box-shadow:0 4px 18px rgba(21,101,192,.3)}
+
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:10px;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all .3s;text-decoration:none;width:100%}
+    .btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;box-shadow:0 4px 16px rgba(102,126,234,.3)}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(102,126,234,.4)}
     .btn-primary:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
-    .btn-outline{background:transparent;color:#1565c0;border:1.5px solid #dce3ed;width:100%;margin-top:10px}
-    .btn-outline:hover{background:#eff6ff;border-color:#1565c0}
-    .alert{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:18px;display:flex;align-items:flex-start;gap:8px}
-    .alert-info{background:#eff6ff;border:1px solid #bfdbfe;color:#1565c0}
+    .btn-outline{background:transparent;color:#667eea;border:2px solid #667eea;width:100%;margin-top:12px}
+    .btn-outline:hover{background:#f0f4ff;border-color:#667eea}
+
+    /* Alert */
+    .alert{padding:14px 16px;border-radius:10px;font-size:13px;margin-bottom:18px;display:flex;align-items:flex-start;gap:8px}
+    .alert-info{background:linear-gradient(135deg,#eff6ff,#f0f4ff);border:2px solid #667eea;color:#667eea}
     .alert .material-icons-round{font-size:18px;margin-top:1px}
-    .page-footer{text-align:center;padding:28px 0;color:#64748b;font-size:13px;border-top:1px solid #dce3ed;margin-top:48px}
-    .page-footer a{color:#1565c0;text-decoration:none}
-    @media(max-width:800px){
+
+    /* Success Modal */
+    .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:1000}
+    .modal-overlay.active{display:flex}
+    .modal-content{background:#fff;border-radius:20px;padding:40px;max-width:480px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:modalSlideIn .3s ease-out}
+    @keyframes modalSlideIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+    .success-icon{width:80px;height:80px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:48px;color:#fff}
+    .modal-content h2{font-size:28px;font-weight:800;color:#0f172a;margin-bottom:12px}
+    .modal-content p{color:#64748b;font-size:15px;margin-bottom:8px;line-height:1.6}
+    .modal-content .price-tag{font-size:32px;font-weight:900;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:16px 0}
+    .btn-access{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;margin-top:20px}
+
+    /* Footer */
+    .page-footer{text-align:center;padding:28px 0;color:rgba(255,255,255,.8);font-size:13px;border-top:1px solid rgba(255,255,255,.2);margin-top:48px}
+    .page-footer a{color:#fff;text-decoration:none;font-weight:600}
+
+    @media(max-width:900px){
       .pay-grid{grid-template-columns:1fr}
+      .summary-card{position:static}
       .method-grid{grid-template-columns:1fr}
     }
   </style>
 </head>
 <body>
-<header class="top-bar">
-  <div class="container top-bar-inner">
-    <a class="brand" href="../index.html">
-      <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
-      <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
-    </a>
-    <div class="top-bar-right">
-      <div class="navbar-actions" id="navActions"></div>
-      <a class="back-link" href="../index.html"><span class="material-icons-round">arrow_back</span> Inicio</a>
-        <a class="back-link" href="../index.html" style="margin-left:16px;font-weight:bold;color:#1565c0;text-decoration:underline;">Ir al inicio de la plataforma</a>
-    </div>
-  </div>
-</header>
 
-<main class="page">
-  <div class="container">
-    <div class="page-header">
-      <h1>Gestión de pago</h1>
-      <p>Selecciona tu método de pago preferido, registra tu comprobante y obtén tu certificado digital.</p>
-    </div>
-    <div class="pay-grid">
-      <div>
-        <!-- MÉTODOS DE PAGO -->
-        <section class="methods-section">
-          <h2><span class="material-icons-round" style="vertical-align:middle;margin-right:6px">account_balance_wallet</span> Elige tu método de pago</h2>
-          <div class="method-grid">
-            <div class="method-card mc-yape selected" onclick="selectMethod(this, 'Yape')">
-              <div class="mc-icon"><span class="material-icons-round">phone_android</span></div>
-              <h4>Yape</h4>
-              <p>Paga desde tu app Yape al número registrado.</p>
-            </div>
-            <div class="method-card mc-plin" onclick="selectMethod(this, 'Plin')">
-              <div class="mc-icon"><span class="material-icons-round">phone_android</span></div>
-              <h4>Plin</h4>
-              <p>Envía tu pago por Plin desde cualquier banco asociado.</p>
-            </div>
-            <div class="method-card mc-bcp" onclick="selectMethod(this, 'BCP')">
-              <div class="mc-icon"><span class="material-icons-round">account_balance</span></div>
-              <h4>BCP — Banco de Crédito</h4>
-              <p>Transferencia o depósito a cuenta BCP.</p>
-            </div>
-            <div class="method-card mc-transfer" onclick="selectMethod(this, 'Transferencia interbancaria')">
-              <div class="mc-icon"><span class="material-icons-round">swap_horiz</span></div>
-              <h4>Transferencia interbancaria</h4>
-              <p>Desde cualquier otro banco usando el CCI.</p>
-            </div>
-          </div>
-        </section>
-        <!-- DATOS DE PAGO -->
-        <section class="pay-info" id="payInfo">
-          <h2><span class="material-icons-round" style="vertical-align:middle;margin-right:6px">info</span> Datos para el pago</h2>
-          <div class="info-box">
-            <div class="info-row"><span class="label">Método seleccionado</span><span class="value highlight" id="selectedMethod">Yape</span></div>
-            <div class="info-row"><span class="label">Titular</span><span class="value" id="accountHolder">FQ INGENIEROS E.I.R.L.</span></div>
-            <div class="info-row"><span class="label">Número / Cuenta</span><span class="value" id="accountNumber">958 003 888</span></div>
-            <div class="info-row"><span class="label">Monto del certificado</span><span class="value highlight" id="certAmount">S/ 20.00</span></div>
-            <div class="info-row"><span class="label">Concepto</span><span class="value">Certificado de curso</span></div>
-          </div>
-        </section>
-        <!-- FORMULARIO COMPROBANTE -->
-        <section class="pay-info" style="margin-top:28px">
-          <h2><span class="material-icons-round" style="vertical-align:middle;margin-right:6px">upload_file</span> Registrar comprobante</h2>
-          <div class="info-box">
-            <div class="alert alert-info">
-              <span class="material-icons-round">info</span>
-              <span>Después de realizar el pago, completa los datos y sube tu comprobante para validar la emisión de tu certificado.</span>
-            </div>
-            <form id="payForm" onsubmit="submitPayment(event)" novalidate>
-              <div class="form-group">
-                <label class="form-label" for="fullName">Nombre completo</label>
-                <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Ej: Juan Pérez García" required aria-required="true" />
-                <div class="form-hint" id="fullNameError" style="color:#e53935;display:none"></div>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="email">Correo electrónico</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="correo@ejemplo.com" required aria-required="true" />
-                <div class="form-hint" id="emailError" style="color:#e53935;display:none"></div>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="courseSelect">Curso</label>
-                <select class="form-control" id="courseSelect" name="courseSelect" required aria-required="true"></select>
-                <div class="form-hint" id="courseError" style="color:#e53935;display:none"></div>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="operationNumber">Número de operación / referencia</label>
-                <input type="text" class="form-control" id="operationNumber" name="operationNumber" placeholder="Ej: 00123456" required aria-required="true" />
-                <div class="form-hint" id="operationError" style="color:#e53935;display:none"></div>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="comprobante">Comprobante de pago (imagen)</label>
-                <input type="file" class="form-control" id="comprobante" name="comprobante" accept="image/jpeg,image/png,application/pdf" required aria-required="true" />
-                <p class="form-hint">Sube una captura o foto del comprobante (JPG, PNG o PDF, máx. 3MB).</p>
-                <div class="form-hint" id="comprobanteError" style="color:#e53935;display:none"></div>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="observaciones">Observaciones (opcional)</label>
-                <textarea class="form-control" id="observaciones" name="observaciones" placeholder="Algún dato adicional..."></textarea>
-              </div>
-              <div class="form-group" style="margin-bottom:18px">
-                <div id="captchaContainer"></div>
-              </div>
-              <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
-                <span class="material-icons-round">send</span> Enviar comprobante
-              </button>
-              <div class="form-hint" id="formSuccess" style="color:#16a34a;display:none;margin-top:10px"></div>
-              <div class="form-hint" id="formError" style="color:#e53935;display:none;margin-top:10px"></div>
-            </form>
-          </div>
-        </section>
+  <header class="top-bar">
+    <div class="container top-bar-inner">
+      <a class="brand" href="../index.html">
+        <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        <div><strong>FQ INGENIEROS</strong><span>Plataforma Educativa</span></div>
+      </a>
+      <div class="top-bar-right">
+        <div class="navbar-actions" id="navActions"></div>
+        <a class="back-link" href="../index.html"><span class="material-icons-round">arrow_back</span> Inicio</a>
+          <a class="back-link" href="../index.html" style="margin-left:16px;font-weight:bold;color:#1565c0;text-decoration:underline;">Ir al inicio de la plataforma</a>
       </div>
-      <!-- SIDEBAR RESUMEN -->
-      <aside class="summary-card">
-        <h3><span class="material-icons-round">receipt_long</span> Resumen</h3>
-        <div class="summary-item"><span class="sl">Certificado</span><span class="sv" id="summaryCertAmount">Cargando...</span></div>
-        <div class="summary-item"><span class="sl">Método</span><span class="sv" id="summaryMethod">Yape</span></div>
-        <div class="summary-item"><span class="sl">Estado</span><span class="sv" style="color:#1565c0" id="summaryStatus">Pendiente</span></div>
-        <div class="summary-total"><span class="sl">Total a pagar</span><span class="sv" id="summaryTotal">Cargando...</span></div>
-        <hr class="divider"/>
-        <div style="font-size:13px;color:#64748b;line-height:1.6">
-          <p><strong style="color:#0f172a">Pasos:</strong></p>
-          <p>1. Elige método de pago</p>
-          <p>2. Realiza el pago con los datos mostrados</p>
-          <p>3. Registra tu comprobante</p>
-          <p>4. Espera confirmación (máx. 24 hrs)</p>
-          <p>5. Descarga tu certificado</p>
-        </div>
-        <hr class="divider"/>
-        <a href="#" class="btn btn-outline" id="examLink"><span class="material-icons-round">quiz</span> ¿Aún no diste el examen?</a>
-      </aside>
     </div>
-  </div>
-</main>
-<footer class="page-footer">
-  <div class="container">
-    <p>© 2026 FQ INGENIEROS · <a href="../index.html">Inicio</a> · <a href="../empresa/about.html">Nosotros</a></p>
-  </div>
-</footer>
-<script>
-  /* Set exam link dynamically */
-  var courseParam = new URLSearchParams(window.location.search).get('course') || '';
-  var examLink = document.getElementById('examLink');
-  if (examLink) examLink.href = '../certificado/examen.html' + (courseParam ? '?course=' + courseParam : '');
-  // --- Dynamic Payment Data y precio por curso ---
-  let paymentData = {
-    holder: 'FQ INGENIEROS E.I.R.L.',
-    amount: '20.00',
-    accounts: {
-      'Yape': '958 003 888',
-      'Plin': '958 003 888',
-      'BCP': '355-72921034-0-46',
-      'Transferencia interbancaria': '002-35517292103404662'
-    }
-  };
-  let coursePrice = null;
-  let coursesList = [];
-  function fetchPaymentDataAndCoursePrice() {
-    if (typeof firebase === 'undefined' || !firebase.firestore) return;
-    var db = firebase.firestore();
-    // 1. Obtener datos generales de pago
-    db.collection('settings').doc('paymentData').get().then(function(doc) {
-      if (doc.exists) {
-        var d = doc.data();
-        paymentData.holder = d.holder || paymentData.holder;
-        paymentData.accounts = d.accounts || paymentData.accounts;
-      }
-      // 2. Obtener lista de cursos
-      db.collection('courses').get().then(function(snapshot) {
-        coursesList = [];
-        var courseSelect = document.getElementById('courseSelect');
-        if (courseSelect) {
-          courseSelect.innerHTML = '';
-          snapshot.forEach(function(doc) {
-            var c = doc.data();
-            coursesList.push({ id: doc.id, name: c.name, price: c.price });
-            var opt = document.createElement('option');
-            opt.value = doc.id;
-            opt.textContent = c.name + (c.price ? ' (S/ ' + c.price + ')' : '');
-            courseSelect.appendChild(opt);
-          });
-        }
-        // Seleccionar curso por parámetro si existe
-        var courseParam = new URLSearchParams(window.location.search).get('course');
-        if (courseParam && courseSelect) {
-          courseSelect.value = courseParam;
-        }
-        updateCoursePriceAndUI();
-        // Cambiar precio al cambiar curso
-        if (courseSelect) {
-          courseSelect.onchange = updateCoursePriceAndUI;
-        }
-      });
-    });
-  }
+  </header>
 
-  function updateCoursePriceAndUI() {
-    var courseSelect = document.getElementById('courseSelect');
-    var selectedId = courseSelect ? courseSelect.value : null;
-    var selectedCourse = coursesList.find(c => c.id === selectedId);
-    coursePrice = selectedCourse && selectedCourse.price ? selectedCourse.price : paymentData.amount;
-    updatePaymentUI('Yape');
-  }
-  function updatePaymentUI(method) {
-    document.getElementById('selectedMethod').textContent = method;
-    document.getElementById('summaryMethod').textContent = method;
-    document.getElementById('accountHolder').textContent = paymentData.holder;
-    document.getElementById('accountNumber').textContent = paymentData.accounts[method] || '—';
-    document.getElementById('certAmount').textContent = 'S/ ' + (coursePrice || paymentData.amount);
-    // Actualizar resumen (sidebar)
-    var summaryCertAmount = document.getElementById('summaryCertAmount');
-    if (summaryCertAmount) summaryCertAmount.textContent = 'S/ ' + (coursePrice || paymentData.amount);
-    var summaryTotal = document.getElementById('summaryTotal');
-    if (summaryTotal) summaryTotal.textContent = 'S/ ' + (coursePrice || paymentData.amount);
-  }
-  function selectMethod(el, name) {
-    document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-    updatePaymentUI(name);
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    fetchPaymentDataAndCoursePrice();
-  });
-  // --- Validación automática y feedback UX ---
-  function validateForm() {
-    let valid = true;
-    // Nombre
-    const fullName = document.getElementById('fullName');
-    const fullNameError = document.getElementById('fullNameError');
-    if (!fullName.value.trim() || fullName.value.length < 3) {
-      fullNameError.textContent = 'Ingresa tu nombre completo.';
-      fullNameError.style.display = 'block';
-      valid = false;
-    } else {
-      fullNameError.style.display = 'none';
-    }
-    // Email
-    const email = document.getElementById('email');
-    const emailError = document.getElementById('emailError');
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.value.trim() || !emailRegex.test(email.value)) {
-      emailError.textContent = 'Correo electrónico inválido.';
-      emailError.style.display = 'block';
-      valid = false;
-    } else {
-      emailError.style.display = 'none';
-    }
-    // Curso
-    const courseSelect = document.getElementById('courseSelect');
-    const courseError = document.getElementById('courseError');
-    if (!courseSelect.value) {
-      courseError.textContent = 'Selecciona un curso.';
-      courseError.style.display = 'block';
-      valid = false;
-    } else {
-      courseError.style.display = 'none';
-    }
-    // Operación
-    const operationNumber = document.getElementById('operationNumber');
-    const operationError = document.getElementById('operationError');
-    if (!operationNumber.value.trim() || operationNumber.value.length < 5) {
-      operationError.textContent = 'Número de operación inválido.';
-      operationError.style.display = 'block';
-      valid = false;
-    } else {
-      operationError.style.display = 'none';
-    }
-    // Comprobante
-    const comprobante = document.getElementById('comprobante');
-    const comprobanteError = document.getElementById('comprobanteError');
-    if (!comprobante.files[0]) {
-      comprobanteError.textContent = 'Adjunta el comprobante.';
-      comprobanteError.style.display = 'block';
-      valid = false;
-    } else {
-      const file = comprobante.files[0];
-      const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-      if (!allowedTypes.includes(file.type)) {
-        comprobanteError.textContent = 'Formato no permitido. Usa JPG, PNG o PDF.';
-        comprobanteError.style.display = 'block';
-        valid = false;
-      } else if (file.size > 3 * 1024 * 1024) {
-        comprobanteError.textContent = 'El archivo supera 3MB.';
-        comprobanteError.style.display = 'block';
-        valid = false;
-      } else {
-        comprobanteError.style.display = 'none';
-      }
-    }
-    // Captcha
-    if (!window.captchaPassed) {
-      valid = false;
-    }
-    document.getElementById('submitBtn').disabled = !valid;
-    return valid;
-  }
+  <main class="page">
+    <div class="container">
 
-  // Simulación de captcha simple
-  function renderSimpleCaptcha() {
-    const container = document.getElementById('captchaContainer');
-    const a = Math.floor(Math.random()*10)+1;
-    const b = Math.floor(Math.random()*10)+1;
-    container.innerHTML = `<label for='captchaInput'>¿Cuánto es ${a} + ${b}? <input id='captchaInput' type='number' style='width:60px;margin-left:8px'></label><span id='captchaError' style='color:#e53935;display:none;margin-left:10px'></span>`;
-    window.captchaPassed = false;
-    document.getElementById('captchaInput').addEventListener('input', function() {
-      if (parseInt(this.value) === a + b) {
-        window.captchaPassed = true;
-        document.getElementById('captchaError').style.display = 'none';
-      } else {
-        window.captchaPassed = false;
-        document.getElementById('captchaError').textContent = 'Respuesta incorrecta.';
-        document.getElementById('captchaError').style.display = 'inline';
-      }
-      validateForm();
-    });
-  }
-
-  // Validación en tiempo real
-  document.addEventListener('DOMContentLoaded', function() {
-    fetchPaymentDataAndCoursePrice();
-    renderSimpleCaptcha();
-    ['fullName','email','courseSelect','operationNumber','comprobante'].forEach(id => {
-      document.getElementById(id).addEventListener('input', validateForm);
-      if (id === 'comprobante') document.getElementById(id).addEventListener('change', validateForm);
-    });
-  });
-
-  function submitPayment(e) {
-    e.preventDefault();
-    if (!validateForm()) {
-      document.getElementById('formError').textContent = 'Corrige los errores antes de enviar.';
-      document.getElementById('formError').style.display = 'block';
-      return;
-    } else {
-      document.getElementById('formError').style.display = 'none';
-    }
-    var user = auth.currentUser;
-    if (!user) {
-      document.getElementById('formError').textContent = 'Debes iniciar sesión.';
-      document.getElementById('formError').style.display = 'block';
-      return;
-    }
-    var form = document.getElementById('payForm');
-    var courseSelect = document.getElementById('courseSelect');
-    var selectedId = courseSelect ? courseSelect.value : '';
-    var selectedCourse = coursesList.find(c => c.id === selectedId);
-    var formData = {
-      userId: user.uid,
-      userEmail: user.email || '',
-      courseId: selectedId,
-      fullName: form.fullName.value.trim(),
-      email: form.email.value.trim(),
-      course: selectedCourse ? selectedCourse.name : '',
-      operationNumber: form.operationNumber.value.trim(),
-      method: document.getElementById('selectedMethod').textContent,
-      amount: coursePrice || paymentData.amount,
-      status: 'pending',
-      submittedAt: new Date().toISOString(),
-      observaciones: form.observaciones.value.trim()
-    };
-    var btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="material-icons-round">hourglass_top</span> Enviando...';
-    // Subir comprobante a Firebase Storage
-    var file = document.getElementById('comprobante').files[0];
-    var storageRef = firebase.storage().ref('comprobantes/' + user.uid + '_' + Date.now() + '_' + file.name);
-    storageRef.put(file).then(function(snapshot) {
-      snapshot.ref.getDownloadURL().then(function(url) {
-        formData.comprobanteUrl = url;
-        db.collection('payments').add(formData).then(function() {
-          document.getElementById('summaryStatus').textContent = 'Enviado';
-          document.getElementById('summaryStatus').style.color = '#81c784';
-          btn.innerHTML = '<span class="material-icons-round">check_circle</span> ¡Comprobante enviado!';
-          btn.style.background = '#16a34a';
-          document.getElementById('formSuccess').textContent = '¡Comprobante enviado correctamente! Revisaremos tu pago en un máximo de 24 horas y te notificaremos.';
-          document.getElementById('formSuccess').style.display = 'block';
-          // Opcional: enviar correo de confirmación
-          sendConfirmationEmail(formData.email, formData.fullName, formData.course);
-        });
-      });
-    }).catch(function(err) {
-      btn.disabled = false;
-      btn.innerHTML = '<span class="material-icons-round">send</span> Enviar comprobante';
-      document.getElementById('formError').textContent = 'Error al enviar: ' + err.message;
-      document.getElementById('formError').style.display = 'block';
-    });
-  }
-
-  // --- INTEGRACIÓN EMAILJS ---
-  // Agrega este script antes de tu cierre </body> o en el <head>:
-  // <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-  // Inicializa EmailJS con tu Public Key
-  if (typeof emailjs !== 'undefined') {
-    emailjs.init('TU_PUBLIC_KEY_EMAILJS'); // Reemplaza por tu Public Key
-  }
-
-  function sendConfirmationEmail(email, name, course) {
-    if (typeof emailjs === 'undefined') return;
-    emailjs.send('TU_SERVICE_ID', 'TU_TEMPLATE_ID', {
-      to_email: email,
-      to_name: name,
-      course_name: course
-    }).then(function(response) {
-      console.log('Correo de confirmación enviado:', response.status, response.text);
-    }, function(error) {
-      console.error('Error enviando correo:', error);
-    });
-  }
-</script>
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="../assets/js/firebase-config.js"></script>
-<script src="../assets/js/auth-ui.js"></script>
-<script>
-  /* Auth guard — redirect to login if not authenticated */
-  auth.onAuthStateChanged(function(user) {
-    if (!user) {
-      window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
-    }
-  });
-</script>
-</script>
-<!-- EmailJS SDK -->
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-</body>
-</html>
-<!-- Eliminado bloque HTML duplicado final -->
-              <div class="form-group">
-                <label class="form-label">Número de operación / referencia</label>
-                <input type="text" class="form-control" placeholder="Ej: 00123456" required />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Comprobante de pago (imagen)</label>
-                <input type="file" class="form-control" accept="image/*,.pdf" required />
-                <p class="form-hint">Sube una captura o foto del comprobante (JPG, PNG o PDF).</p>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Observaciones (opcional)</label>
-                <textarea class="form-control" placeholder="Algún dato adicional..."></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary">
-                <span class="material-icons-round">send</span> Enviar comprobante
-              </button>
-            </form>
-          </div>
-        </section>
+      <div class="page-header">
+        <h1>🎓 Gestión de Pago</h1>
+        <p>Completa tu pago y obtén acceso inmediato a tu curso con tu certificado digital</p>
       </div>
-      <!-- SIDEBAR RESUMEN -->
-      <aside class="summary-card">
-        <h3><span class="material-icons-round">receipt_long</span> Resumen</h3>
-        <div class="summary-item"><span class="sl">Certificado</span><span class="sv">S/ 20.00</span></div>
-        <div class="summary-item"><span class="sl">Método</span><span class="sv" id="summaryMethod">Yape</span></div>
-        <div class="summary-item"><span class="sl">Estado</span><span class="sv" style="color:#1565c0" id="summaryStatus">Pendiente</span></div>
-        <div class="summary-total"><span class="sl">Total a pagar</span><span class="sv">S/ 20.00</span></div>
-        <hr class="divider"/>
-        <div style="font-size:13px;color:#64748b;line-height:1.6">
-          <p><strong style="color:#0f172a">Pasos:</strong></p>
-          <p>1. Elige método de pago</p>
-          <p>2. Realiza el pago con los datos mostrados</p>
-          <p>3. Registra tu comprobante</p>
-          <p>4. Espera confirmación (máx. 24 hrs)</p>
-          <p>5. Descarga tu certificado</p>
+
+      <div class="pay-grid">
+        <div>
+
+          <!-- MÉTODOS DE PAGO -->
+          <section class="methods-section">
+            <h2><span class="material-icons-round" style="vertical-align:middle;margin-right:6px">account_balance_wallet</span> Elige tu método de pago</h2>
+
+            <div class="method-grid">
+
+              <div class="method-card mc-yape selected" onclick="selectMethod(this, 'Yape')">
+                <div class="mc-icon"><span class="material-icons-round">phone_android</span></div>
+                <h4>Yape</h4>
+                <p>Paga desde tu app Yape al número registrado.</p>
+              </div>
+
+              <div class="method-card mc-plin" onclick="selectMethod(this, 'Plin')">
+                <div class="mc-icon"><span class="material-icons-round">phone_android</span></div>
+                <h4>Plin</h4>
+                <p>Envía tu pago por Plin desde cualquier banco asociado.</p>
+              </div>
+
+
+              <div class="method-card mc-bcp" onclick="selectMethod(this, 'BCP')">
+                <div class="mc-icon"><span class="material-icons-round">account_balance</span></div>
+                <h4>BCP — Banco de Crédito</h4>
+                <p>Transferencia o depósito a cuenta BCP.</p>
+              </div>
+
+              <div class="method-card mc-transfer" onclick="selectMethod(this, 'Transferencia interbancaria')">
+                <div class="mc-icon"><span class="material-icons-round">swap_horiz</span></div>
+                <h4>Transferencia interbancaria</h4>
+                <p>Desde cualquier otro banco usando el CCI.</p>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- DATOS DE PAGO -->
+          <section class="pay-info" id="payInfo">
+            <h2><span class="material-icons-round" style="vertical-align:middle;margin-right:6px">info</span> Datos para el pago</h2>
+            <div class="info-box">
+              <div class="info-row"><span class="label">Método seleccionado</span><span class="value highlight" id="selectedMethod">Yape</span></div>
+              <div class="info-row"><span class="label">Titular</span><span class="value" id="accountHolder">FQ INGENIEROS E.I.R.L.</span></div>
+              <div class="info-row"><span class="label">Número / Cuenta</span><span class="value" id="accountNumber">958 003 888</span></div>
+              <div class="info-row"><span class="label">Monto del certificado</span><span class="value highlight" id="certAmount">S/ 20.00</span></div>
+              <div class="info-row"><span class="label">Concepto</span><span class="value">Certificado de curso</span></div>
+            </div>
+          </section>
+
+          <!-- FORMULARIO COMPROBANTE -->
+          <section class="pay-info" style="margin-top:28px">
+            <h2><span class="material-icons-round" style="vertical-align:middle;margin-right:6px">upload_file</span> Registrar comprobante</h2>
+            <div class="info-box">
+              <div class="alert alert-info">
+                <span class="material-icons-round">info</span>
+                <span>Después de realizar el pago, completa los datos y sube tu comprobante para validar la emisión de tu certificado.</span>
+              </div>
+              <form id="payForm" onsubmit="submitPayment(event)">
+                <div class="form-group">
+                  <label class="form-label">📚 Selecciona tu curso</label>
+                  <select class="form-control" id="cursoSelect" onchange="actualizarCurso()">
+                    <option value="">-- Cargando cursos --</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nombre completo</label>
+                  <input type="text" class="form-control" id="fullNameInput" placeholder="Ej: Juan Pérez García" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Correo electrónico</label>
+                  <input type="email" class="form-control" id="emailInput" placeholder="correo@ejemplo.com" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Número de operación / referencia</label>
+                  <input type="text" class="form-control" id="operationInput" placeholder="Ej: 00123456" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">📸 Comprobante de pago (imagen)</label>
+                  <input type="file" class="form-control" id="receiptInput" accept="image/*,.pdf" required />
+                  <p class="form-hint">Sube una captura o foto del comprobante (JPG, PNG o PDF).</p>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Observaciones (opcional)</label>
+                  <textarea class="form-control" id="notesInput" placeholder="Algún dato adicional..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  <span class="material-icons-round">send</span> Enviar comprobante
+                </button>
+              </form>
+            </div>
+          </section>
+
         </div>
-        <hr class="divider"/>
-        <a href="#" class="btn btn-outline" id="examLink"><span class="material-icons-round">quiz</span> ¿Aún no diste el examen?</a>
-      </aside>
+
+        <!-- SIDEBAR RESUMEN -->
+        <aside class="summary-card">
+          <h3><span class="material-icons-round">receipt_long</span> Resumen</h3>
+          <div class="summary-item"><span class="sl">Monto del pago</span><span class="sv" id="certAmount">S/ 0.00</span></div>
+          <div class="summary-item"><span class="sl">Método</span><span class="sv" id="summaryMethod">Yape</span></div>
+          <div class="summary-item"><span class="sl">Estado</span><span class="sv" style="color:#667eea" id="summaryStatus">Pendiente</span></div>
+          <div class="summary-total" id="summaryTotal"><span class="sl">Total a pagar</span><span class="sv">S/ 0.00</span></div>
+          <hr class="divider"/>
+          <div style="font-size:13px;color:#64748b;line-height:1.7">
+            <p><strong style="color:#0f172a">📋 Pasos:</strong></p>
+            <p>1️⃣ Selecciona tu curso</p>
+            <p>2️⃣ Elige método de pago</p>
+            <p>3️⃣ Realiza el pago</p>
+            <p>4️⃣ Registra tu comprobante</p>
+            <p>5️⃣ ¡Accede a tu curso!</p>
+          </div>
+          <hr class="divider"/>
+          <a href="../certificado/examen.html" class="btn btn-outline" id="examLink"><span class="material-icons-round">quiz</span> ¿Aún no diste el examen?</a>
+        </aside>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="page-footer">
+    <div class="container">
+      <p>© 2026 FQ INGENIEROS · <a href="../index.html">Inicio</a> · <a href="../empresa/about.html">Nosotros</a></p>
+    </div>
+  </footer>
+
+  <!-- Modal de Éxito -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-content">
+      <div class="success-icon">✓</div>
+      <h2>¡Pago Exitoso!</h2>
+      <p id="successCourseName"></p>
+      <p style="color:#667eea;font-weight:700;font-size:16px;margin:8px 0">Tu acceso está confirmado</p>
+      <div class="price-tag" id="successPrice"></div>
+      <p style="font-size:13px;color:#64748b">Confirmaremos tu comprobante en máx. 24 horas</p>
+      <button class="btn btn-access" onclick="irAlCurso()">
+        <span class="material-icons-round">arrow_forward</span> Acceder al curso ahora
+      </button>
     </div>
   </div>
-</main>
-<footer class="page-footer">
-  <div class="container">
-    <p>© 2026 FQ INGENIEROS · <a href="../index.html">Inicio</a> · <a href="../empresa/about.html">Nosotros</a></p>
-  </div>
-</footer>
-<script>
-  /* Set exam link dynamically */
-  var courseParam = new URLSearchParams(window.location.search).get('course') || '';
-  var examLink = document.getElementById('examLink');
-  if (examLink) examLink.href = '../certificado/examen.html' + (courseParam ? '?course=' + courseParam : '');
-  // --- Dynamic Payment Data ---
-  let paymentData = {
-    holder: 'FQ INGENIEROS E.I.R.L.',
-    amount: '20.00',
-    accounts: {
-      'Yape': '958 003 888',
-      'Plin': '958 003 888',
-      'BCP': '355-72921034-0-46',
-      'Transferencia interbancaria': '002-35517292103404662'
-    }
-  };
-  function fetchPaymentData() {
-    if (typeof firebase === 'undefined' || !firebase.firestore) return;
-    var db = firebase.firestore();
-    db.collection('settings').doc('paymentData').get().then(function(doc) {
-      if (doc.exists) {
-        var d = doc.data();
-        paymentData.holder = d.holder || paymentData.holder;
-        paymentData.amount = d.amount || paymentData.amount;
-        paymentData.accounts = d.accounts || paymentData.accounts;
-      }
-      updatePaymentUI('Yape');
-    }).catch(function() {
-      updatePaymentUI('Yape');
-    });
-  }
-  function updatePaymentUI(method) {
-    document.getElementById('selectedMethod').textContent = method;
-    document.getElementById('summaryMethod').textContent = method;
-    document.getElementById('accountHolder').textContent = paymentData.holder;
-    document.getElementById('accountNumber').textContent = paymentData.accounts[method] || '—';
-    document.getElementById('certAmount').textContent = 'S/ ' + paymentData.amount;
-  }
-  function selectMethod(el, name) {
-    document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-    updatePaymentUI(name);
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    fetchPaymentData();
-  });
-  function submitPayment(e) {
-    e.preventDefault();
-    var user = auth.currentUser;
-    if (!user) { alert('Debes iniciar sesión.'); return; }
+
+  <script>
+    // Inicializa Firebase Auth y Firestore después de cargar los SDK y la config
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    let currentCourse = null;
+    let allCourses = [];
+
+    /* Set exam link dynamically */
     var courseParam = new URLSearchParams(window.location.search).get('course') || '';
-    var form = document.getElementById('payForm');
-    var formData = {
-      userId: user.uid,
-      userEmail: user.email || '',
-      courseId: courseParam,
-      fullName: form.querySelector('input[type="text"]').value.trim(),
-      email: form.querySelector('input[type="email"]').value.trim(),
-      course: form.querySelector('select').value,
-      operationNumber: form.querySelectorAll('input[type="text"]')[1].value.trim(),
-      method: document.getElementById('selectedMethod').textContent,
-      amount: 20,
-      status: 'pending',
-      submittedAt: new Date().toISOString()
+    var examLink = document.getElementById('examLink');
+    if (examLink) examLink.href = '../certificado/examen.html' + (courseParam ? '?course=' + courseParam : '');
+
+    // --- Dynamic Payment Data ---
+    let paymentData = {
+      holder: 'FQ INGENIEROS E.I.R.L.',
+      amount: '20.00',
+      accounts: {
+        'Yape': '958 003 888',
+        'Plin': '958 003 888',
+        'BCP': '355-72921034-0-46',
+        'Transferencia interbancaria': '002-35517292103404662'
+      }
     };
-    var btn = form.querySelector('button[type="submit"]');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="material-icons-round">hourglass_top</span> Enviando...';
-    db.collection('payments').add(formData).then(function() {
-      document.getElementById('summaryStatus').textContent = 'Enviado';
-      document.getElementById('summaryStatus').style.color = '#81c784';
-      btn.innerHTML = '<span class="material-icons-round">check_circle</span> ¡Comprobante enviado!';
-      btn.style.background = '#16a34a';
-      alert('¡Comprobante enviado correctamente! Revisaremos tu pago en un máximo de 24 horas y te notificaremos.');
-    }).catch(function(err) {
-      btn.disabled = false;
-      btn.innerHTML = '<span class="material-icons-round">send</span> Enviar comprobante';
-      alert('Error al enviar: ' + err.message);
-    });
-  }
-</script>
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="../assets/js/firebase-config.js"></script>
-<script src="../assets/js/auth-ui.js"></script>
-<script>
-  /* Auth guard — redirect to login if not authenticated */
-  auth.onAuthStateChanged(function(user) {
-    if (!user) {
-      window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+
+    // Fetch payment data from Firestore (settings/paymentData)
+    function fetchPaymentData() {
+      if (typeof firebase === 'undefined' || !firebase.firestore) return;
+      db.collection('settings').doc('paymentData').get().then(function(doc) {
+        if (doc.exists) {
+          var d = doc.data();
+          paymentData.holder = d.holder || paymentData.holder;
+          paymentData.accounts = d.accounts || paymentData.accounts;
+        }
+        updatePaymentUI('Yape');
+      }).catch(function() {
+        updatePaymentUI('Yape');
+      });
     }
-  });
-</script>
+
+    // Cargar cursos desde Firestore
+    function cargarCursos() {
+      db.collection('courses').get().then(function(querySnapshot) {
+        allCourses = [];
+        const select = document.getElementById('cursoSelect');
+        select.innerHTML = '<option value="">Selecciona un curso...</option>';
+        
+        querySnapshot.forEach(function(doc) {
+          const curso = doc.data();
+          curso.id = doc.id;
+          allCourses.push(curso);
+          
+          const option = document.createElement('option');
+          option.value = doc.id;
+          option.textContent = curso.name || 'Sin nombre';
+          select.appendChild(option);
+        });
+        
+        // Si hay courseParam en URL, seleccionar ese curso
+        if (courseParam) {
+          select.value = courseParam;
+          actualizarCurso();
+        }
+      }).catch(function(err) {
+        console.error('Error cargando cursos:', err);
+      });
+    }
+
+    function actualizarCurso() {
+      const select = document.getElementById('cursoSelect');
+      const courseId = select.value;
+      
+      if (!courseId) {
+        currentCourse = null;
+        document.getElementById('certAmount').textContent = 'S/ 0.00';
+        document.getElementById('summaryTotal').textContent = 'S/ 0.00';
+        return;
+      }
+      
+      currentCourse = allCourses.find(c => c.id === courseId);
+      if (currentCourse) {
+        const price = currentCourse.price || currentCourse.precio || 20;
+        const priceStr = 'S/ ' + parseFloat(price).toFixed(2);
+        
+        document.getElementById('certAmount').textContent = priceStr;
+        document.getElementById('summaryTotal').innerHTML = '<span class="sl">Total a pagar</span><span class="sv">' + priceStr + '</span>';
+      }
+    }
+
+    function updatePaymentUI(method) {
+      document.getElementById('selectedMethod').textContent = method;
+      document.getElementById('summaryMethod').textContent = method;
+      document.getElementById('accountHolder').textContent = paymentData.holder;
+      document.getElementById('accountNumber').textContent = paymentData.accounts[method] || '—';
+    }
+
+    function selectMethod(el, name) {
+      document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      updatePaymentUI(name);
+    }
+
+    // On load, fetch payment data and courses
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchPaymentData();
+      cargarCursos();
+    });
+
+    function submitPayment(e) {
+      e.preventDefault();
+      
+      if (!currentCourse) {
+        alert('Selecciona un curso antes de continuar.');
+        return;
+      }
+      
+      var user = auth.currentUser;
+      if (!user) { 
+        alert('Debes iniciar sesión.');
+        return; 
+      }
+
+      const fullName = document.getElementById('fullNameInput').value.trim();
+      const email = document.getElementById('emailInput').value.trim();
+      const operationNumber = document.getElementById('operationInput').value.trim();
+      const receipt = document.getElementById('receiptInput').value;
+      const notes = document.getElementById('notesInput').value.trim();
+
+      if (!fullName || !email || !operationNumber || !receipt) {
+        alert('Completa todos los campos obligatorios.');
+        return;
+      }
+
+      const price = currentCourse.price || currentCourse.precio || 20;
+      const formData = {
+        userId: user.uid,
+        userEmail: user.email || '',
+        courseId: currentCourse.id,
+        courseName: currentCourse.name || '',
+        fullName: fullName,
+        email: email,
+        method: document.getElementById('selectedMethod').textContent,
+        amount: parseFloat(price),
+        operationNumber: operationNumber,
+        status: 'pending',
+        notes: notes,
+        submittedAt: new Date().toISOString()
+      };
+
+      const btn = document.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-icons-round">hourglass_top</span> Procesando...';
+
+      db.collection('payments').add(formData).then(function() {
+        // Mostrar modal de éxito
+        document.getElementById('successCourseName').textContent = currentCourse.name || 'Tu curso';
+        document.getElementById('successPrice').textContent = 'S/ ' + parseFloat(price).toFixed(2);
+        document.getElementById('successModal').classList.add('active');
+        
+        // Reset form
+        document.getElementById('payForm').reset();
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-icons-round">send</span> Enviar comprobante';
+      }).catch(function(err) {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-icons-round">send</span> Enviar comprobante';
+        alert('Error al enviar: ' + err.message);
+      });
+    }
+
+    function irAlCurso() {
+      if (currentCourse) {
+        window.location.href = '../cursos/curso.html?id=' + currentCourse.id;
+      }
+    }
+  </script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/auth-ui.js"></script>
+
+  <script>
+    /* Auth guard — redirect to login if not authenticated */
+    auth.onAuthStateChanged(function(user) {
+      if (!user) {
+        window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+      }
+    });
+  </script>
+
 </body>
 </html>
