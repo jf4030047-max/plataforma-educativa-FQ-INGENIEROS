@@ -147,26 +147,49 @@ document.addEventListener('DOMContentLoaded', function () {
           <tbody>
       `;
 
+      const promesas = [];
+      const enrollmentsList = [];
+      
       snap.forEach(doc => {
         const enr = doc.data();
-        const fecha = enr.enrolledAt ? new Date(enr.enrolledAt.toDate ? enr.enrolledAt.toDate() : enr.enrolledAt).toLocaleDateString('es-PE') : 'N/A';
-        const status = enr.status || 'active';
-        const statusColor = status === 'completed' ? '#dcfce7' : status === 'cancelled' ? '#fee2e2' : '#dbeafe';
-        const statusText = status === 'completed' ? 'Completado' : status === 'cancelled' ? 'Cancelado' : 'Activo';
-        const statusTextColor = status === 'completed' ? '#16a34a' : status === 'cancelled' ? '#dc2626' : '#0284c7';
+        enrollmentsList.push(enr);
         
-        html += `
-          <tr style="border-bottom:1px solid #f1f5f9;">
-            <td style="padding:10px 8px;">${enr.userName || 'Usuario'}</td>
-            <td style="padding:10px 8px;">${enr.courseName || 'N/A'}</td>
-            <td style="padding:10px 8px;">${fecha}</td>
-            <td style="padding:10px 8px;"><span style="background:${statusColor};color:${statusTextColor};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">${statusText}</span></td>
-          </tr>
-        `;
+        // Obtener el nombre real del usuario desde la colección de usuarios
+        promesas.push(
+          db.collection('users').doc(enr.userId).get().then(userDoc => {
+            if (userDoc.exists) {
+              const usuario = userDoc.data();
+              enr.userName = usuario.nombre || usuario.name || usuario.email || 'Usuario';
+            } else {
+              enr.userName = enr.userEmail || 'Usuario';
+            }
+          }).catch(() => {
+            enr.userName = enr.userEmail || 'Usuario';
+          })
+        );
       });
 
-      html += '</tbody></table>';
-      container.innerHTML = html;
+      Promise.all(promesas).then(() => {
+        enrollmentsList.forEach(enr => {
+          const fecha = enr.enrolledAt ? new Date(enr.enrolledAt.toDate ? enr.enrolledAt.toDate() : enr.enrolledAt).toLocaleDateString('es-PE') : 'N/A';
+          const status = enr.status || 'active';
+          const statusColor = status === 'completed' ? '#dcfce7' : status === 'cancelled' ? '#fee2e2' : '#dbeafe';
+          const statusText = status === 'completed' ? 'Completado' : status === 'cancelled' ? 'Cancelado' : 'Activo';
+          const statusTextColor = status === 'completed' ? '#16a34a' : status === 'cancelled' ? '#dc2626' : '#0284c7';
+          
+          html += `
+            <tr style="border-bottom:1px solid #f1f5f9;">
+              <td style="padding:10px 8px;">${enr.userName}</td>
+              <td style="padding:10px 8px;">${enr.courseName || 'N/A'}</td>
+              <td style="padding:10px 8px;">${fecha}</td>
+              <td style="padding:10px 8px;"><span style="background:${statusColor};color:${statusTextColor};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">${statusText}</span></td>
+            </tr>
+          `;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      });
     });
   }
 
@@ -192,14 +215,40 @@ document.addEventListener('DOMContentLoaded', function () {
         // Para cada curso, obtener sus matriculaciones
         cursosPromesas.push(
           db.collection('enrollments').where('courseId', '==', cursoDoc.id).get().then(enrollSnap => {
+            const estudiantePromesas = [];
+            
             enrollSnap.forEach(enrollDoc => {
               const enroll = enrollDoc.data();
-              cursosData[cursoDoc.id].estudiantes.push({
-                nombre: enroll.userName || 'Usuario',
-                email: enroll.userEmail || 'N/A',
-                fecha: enroll.enrolledAt ? new Date(enroll.enrolledAt.toDate ? enroll.enrolledAt.toDate() : enroll.enrolledAt).toLocaleDateString('es-PE') : 'N/A'
-              });
+              
+              // Obtener el nombre real del usuario
+              estudiantePromesas.push(
+                db.collection('users').doc(enroll.userId).get().then(userDoc => {
+                  if (userDoc.exists) {
+                    const usuario = userDoc.data();
+                    const nombre = usuario.nombre || usuario.name || usuario.email || 'Usuario';
+                    cursosData[cursoDoc.id].estudiantes.push({
+                      nombre: nombre,
+                      email: enroll.userEmail || 'N/A',
+                      fecha: enroll.enrolledAt ? new Date(enroll.enrolledAt.toDate ? enroll.enrolledAt.toDate() : enroll.enrolledAt).toLocaleDateString('es-PE') : 'N/A'
+                    });
+                  } else {
+                    cursosData[cursoDoc.id].estudiantes.push({
+                      nombre: enroll.userEmail || 'Usuario',
+                      email: enroll.userEmail || 'N/A',
+                      fecha: enroll.enrolledAt ? new Date(enroll.enrolledAt.toDate ? enroll.enrolledAt.toDate() : enroll.enrolledAt).toLocaleDateString('es-PE') : 'N/A'
+                    });
+                  }
+                }).catch(() => {
+                  cursosData[cursoDoc.id].estudiantes.push({
+                    nombre: enroll.userEmail || 'Usuario',
+                    email: enroll.userEmail || 'N/A',
+                    fecha: enroll.enrolledAt ? new Date(enroll.enrolledAt.toDate ? enroll.enrolledAt.toDate() : enroll.enrolledAt).toLocaleDateString('es-PE') : 'N/A'
+                  });
+                })
+              );
             });
+            
+            return Promise.all(estudiantePromesas);
           })
         );
       });
