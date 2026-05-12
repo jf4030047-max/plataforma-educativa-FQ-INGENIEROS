@@ -403,50 +403,78 @@ document.addEventListener('DOMContentLoaded', function () {
 
     db.collection('courses').get().then(snap => {
       if (snap.empty) {
-        cursosContent.innerHTML = '<div style="color:#64748b;padding:16px">No hay cursos registrados.</div>';
+        cursosContent.innerHTML = '<div style="color:#64748b;padding:16px;background:#f7f9fc;border-radius:8px;text-align:center;">📭 No hay cursos registrados. <button onclick="document.getElementById(\'btnAgregarCurso\').click()" style="background:none;border:none;color:#1565c0;text-decoration:underline;cursor:pointer;font-weight:600;">Crear uno ahora</button></div>';
         return;
       }
 
       let html = `
-        <table style="width:100%;border-collapse:collapse;font-size:14px">
-          <thead>
-            <tr style="background:#f7f9fc">
-              <th style="text-align:left;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Nombre</th>
-              <th style="text-align:left;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Fecha</th>
-              <th style="text-align:left;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Tema</th>
-              <th style="text-align:left;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Precio</th>
-              <th style="text-align:center;padding:12px 8px;border-bottom:1px solid #e2e8f0;font-weight:600;color:#64748b">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
+        <div style="display:grid;gap:16px;">
       `;
 
       snap.forEach(doc => {
         const c = doc.data();
         const docId = doc.id;
         const nombre = c.name || c.nombre || 'Sin nombre';
-        const fecha = c.fecha || c.date || '-';
+        const fecha = c.fecha || c.startDate || c.date || '-';
         const tema = c.temaPrincipal || '-';
-        const precio = c.precio || '-';
+        const precio = c.precio || 'Gratis';
+        const desc = c.desc || c.description || 'Sin descripción';
+        const activo = c.active !== false; // Por defecto activo
+        const id = c.id || '-';
+
+        const badgeColor = activo ? '#dcfce7' : '#fee2e2';
+        const badgeTextColor = activo ? '#16a34a' : '#dc2626';
+        const badgeText = activo ? '✓ Activo' : '✗ Inactivo';
 
         html += `
-          <tr style="border-bottom:1px solid #f1f5f9">
-            <td style="padding:10px 8px">${nombre}</td>
-            <td style="padding:10px 8px">${fecha}</td>
-            <td style="padding:10px 8px">${tema}</td>
-            <td style="padding:10px 8px">S/ ${precio}</td>
-            <td style="padding:10px 8px;text-align:center">
-              <button onclick="editarCurso('${docId}')" style="background:none;border:none;cursor:pointer;color:#0284c7;font-size:16px" class="material-icons-round" title="Editar">edit</button>
-              <button onclick="confirmarEliminarCurso('${docId}','${nombre.replace(/'/g, "\\'")}')" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:16px;margin-left:8px" class="material-icons-round" title="Eliminar">delete</button>
-            </td>
-          </tr>
+          <div style="border:1.5px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff;transition:all 0.2s">
+            <div style="background:linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%);padding:16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:flex-start;justify-content:space-between;">
+              <div style="flex:1;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                  <h4 style="margin:0;color:#1565c0;font-size:16px;font-weight:700;">${nombre}</h4>
+                  <span style="background:${badgeColor};color:${badgeTextColor};padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;white-space:nowrap;">${badgeText}</span>
+                </div>
+                <p style="margin:4px 0 0 0;color:#64748b;font-size:13px;">🏷️ ID: <code style="background:#f1f5f9;padding:2px 6px;border-radius:3px;font-family:monospace;font-size:11px;">${docId}</code></p>
+              </div>
+              <div style="text-align:right;font-weight:700;color:#1565c0;font-size:18px;">
+                S/ ${precio}
+              </div>
+            </div>
+            
+            <div style="padding:16px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;font-size:13px;">
+                <div>
+                  <strong style="color:#64748b;display:block;margin-bottom:4px;">📅 Fecha</strong>
+                  <span style="color:#334155;">${fecha}</span>
+                </div>
+                <div>
+                  <strong style="color:#64748b;display:block;margin-bottom:4px;">📚 Tema</strong>
+                  <span style="color:#334155;">${tema}</span>
+                </div>
+              </div>
+              
+              <div style="margin-bottom:12px;">
+                <strong style="color:#64748b;display:block;margin-bottom:4px;font-size:13px;">📝 Descripción</strong>
+                <p style="margin:0;color:#64748b;font-size:13px;line-height:1.4;max-height:60px;overflow:hidden;text-overflow:ellipsis;">${desc}</p>
+              </div>
+              
+              <div style="display:flex;gap:8px;padding-top:12px;border-top:1px solid #f1f5f9;">
+                <button onclick="editarCurso('${docId}')" style="flex:1;background:#0284c7;color:#fff;border:none;padding:8px 12px;border-radius:6px;font-weight:600;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;" class="btn-action" title="Editar curso">
+                  <span class="material-icons-round" style="font-size:16px;">edit</span>Editar
+                </button>
+                <button onclick="confirmarEliminarCurso('${docId}','${nombre.replace(/'/g, "\\'")}')" style="flex:1;background:#dc2626;color:#fff;border:none;padding:8px 12px;border-radius:6px;font-weight:600;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px;" class="btn-action" title="Eliminar curso">
+                  <span class="material-icons-round" style="font-size:16px;">delete</span>Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
         `;
       });
 
-      html += '</tbody></table>';
+      html += '</div>';
       cursosContent.innerHTML = html;
     }).catch(err => {
-      cursosContent.innerHTML = '<div style="color:#dc2626;padding:16px">Error: ' + err.message + '</div>';
+      cursosContent.innerHTML = '<div style="color:#dc2626;padding:16px;background:#fee2e2;border-radius:8px;">❌ Error: ' + err.message + '</div>';
     });
   }
 
@@ -547,6 +575,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ========== INICIAR ==========
   renderUsers();
+  renderCourses(); // Mostrar cursos automáticamente
   actualizarEstadisticas();
   renderPagosPendientes();
   renderUltimasMatriculaciones();
@@ -558,6 +587,7 @@ document.addEventListener('DOMContentLoaded', function () {
     renderPagosPendientes();
     renderUltimasMatriculaciones();
     renderEstudiantesPorCurso();
+    renderCourses(); // Actualizar cursos también
   }, 30000);
   
   // Botón para actualizar pagos manualmente
@@ -569,30 +599,46 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // Botón para actualizar cursos manualmente
+  const btnRefreshCursos = document.getElementById('btnRefreshCursos');
+  if (btnRefreshCursos) {
+    btnRefreshCursos.addEventListener('click', function() {
+      renderCourses();
+      actualizarEstadisticas();
+      mostrarNotificacion('✅ Cursos actualizados', 'success');
+    });
+  }
+
   // Crear modal para editar curso
   function crearModalEditarCurso() {
     const html = `
-      <div id="modalEditarCurso" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;">
-        <div style="background:#fff;padding:32px;border-radius:14px;box-shadow:0 10px 40px rgba(15,23,42,0.2);width:90%;max-width:500px;" onclick="event.stopPropagation();">
-          <h3 style="margin-bottom:20px;color:#1565c0;font-size:20px;">✏️ Editar Curso</h3>
+      <div id="modalEditarCurso" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;overflow-y:auto;padding:40px 20px;">
+        <div style="background:#fff;padding:32px;border-radius:14px;box-shadow:0 10px 40px rgba(15,23,42,0.2);width:90%;max-width:550px;margin:auto;" onclick="event.stopPropagation();">
+          <h3 style="margin-bottom:20px;color:#1565c0;font-size:20px;font-weight:700;">✏️ Editar Curso</h3>
           <form id="formEditarCurso">
             <div style="margin-bottom:16px;">
-              <label style="display:block;margin-bottom:6px;color:#334155;font-weight:500;font-size:14px;">Nombre del curso</label>
+              <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Nombre del curso</label>
               <input type="text" id="editCursoNombre" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;" required>
             </div>
-            <div style="margin-bottom:16px;">
-              <label style="display:block;margin-bottom:6px;color:#334155;font-weight:500;font-size:14px;">Fecha</label>
-              <input type="date" id="editCursoFecha" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+              <div>
+                <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Fecha</label>
+                <input type="date" id="editCursoFecha" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;">
+              </div>
+              <div>
+                <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Precio</label>
+                <input type="number" id="editCursoPrecio" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;" step="0.01">
+              </div>
             </div>
             <div style="margin-bottom:16px;">
-              <label style="display:block;margin-bottom:6px;color:#334155;font-weight:500;font-size:14px;">Tema principal</label>
+              <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Tema principal</label>
               <input type="text" id="editCursoTema" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;">
             </div>
             <div style="margin-bottom:16px;">
-              <label style="display:block;margin-bottom:6px;color:#334155;font-weight:500;font-size:14px;">Precio</label>
-              <input type="number" id="editCursoPrecio" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;" step="0.01">
+              <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Descripción</label>
+              <textarea id="editCursoDesc" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;min-height:80px;"></textarea>
             </div>
-            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;">
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding-top:16px;border-top:1px solid #dce3ed;">
               <button type="button" id="btnCancelarEditar" style="background:#f3f4f6;color:#334155;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;">Cancelar</button>
               <button type="submit" style="background:#1565c0;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;">Guardar cambios</button>
             </div>
@@ -619,7 +665,8 @@ document.addEventListener('DOMContentLoaded', function () {
         name: document.getElementById('editCursoNombre').value,
         fecha: document.getElementById('editCursoFecha').value,
         temaPrincipal: document.getElementById('editCursoTema').value,
-        precio: parseFloat(document.getElementById('editCursoPrecio').value) || 0
+        precio: parseFloat(document.getElementById('editCursoPrecio').value) || 0,
+        desc: document.getElementById('editCursoDesc').value
       };
 
       try {
@@ -671,8 +718,11 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('editCursoFecha').value = curso.fecha || '';
       document.getElementById('editCursoTema').value = curso.temaPrincipal || '';
       document.getElementById('editCursoPrecio').value = curso.precio || 0;
+      document.getElementById('editCursoDesc').value = curso.desc || '';
       document.getElementById('formEditarCurso').dataset.docId = docId;
       modalEditarCurso.style.display = 'flex';
+    }).catch(err => {
+      mostrarNotificacion('❌ Error al cargar datos: ' + err.message, 'error');
     });
   }
 
