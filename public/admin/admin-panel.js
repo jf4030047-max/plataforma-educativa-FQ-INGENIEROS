@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!confirm('¿Aprobar este pago?')) return;
     
     db.collection('payments').doc(paymentId).update({ status: 'verified' }).then(() => {
-      mostrarNotificacion('✅ Pago aprobado correctamente', 'success');
+      window.mostrarNotificacion('✅ Pago aprobado correctamente', 'success');
       actualizarEstadisticas();
       renderPagosPendientes();
     });
@@ -341,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!confirm('¿Rechazar este pago?')) return;
     
     db.collection('payments').doc(paymentId).update({ status: 'rejected' }).then(() => {
-      mostrarNotificacion('❌ Pago rechazado', 'info');
+      window.mostrarNotificacion('❌ Pago rechazado', 'info');
       actualizarEstadisticas();
       renderPagosPendientes();
     });
@@ -572,8 +572,8 @@ document.addEventListener('DOMContentLoaded', function () {
         modalAgregarCurso.style.display = 'none';
         renderCourses();
         actualizarEstadisticas();
-        mostrarNotificacion('✅ Curso creado exitosamente', 'success');
-      }).catch(err => mostrarNotificacion('❌ Error: ' + err.message, 'error'));
+        window.mostrarNotificacion('✅ Curso creado exitosamente', 'success');
+      }).catch(err => window.mostrarNotificacion('❌ Error: ' + err.message, 'error'));
     });
   }
 
@@ -599,7 +599,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (btnRefreshPagos) {
     btnRefreshPagos.addEventListener('click', function() {
       renderPagosPendientes();
-      mostrarNotificacion('✅ Datos actualizados', 'success');
+      window.mostrarNotificacion('✅ Datos actualizados', 'success');
     });
   }
 
@@ -609,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
     btnRefreshCursos.addEventListener('click', function() {
       renderCourses();
       actualizarEstadisticas();
-      mostrarNotificacion('✅ Cursos actualizados', 'success');
+      window.mostrarNotificacion('✅ Cursos actualizados', 'success');
     });
   }
 
@@ -773,9 +773,9 @@ document.addEventListener('DOMContentLoaded', function () {
         cerrarModal();
         renderCourses();
         actualizarEstadisticas();
-        mostrarNotificacion('✅ Curso actualizado correctamente', 'success');
+        window.mostrarNotificacion('✅ Curso actualizado correctamente', 'success');
       } catch (err) {
-        mostrarNotificacion('❌ Error: ' + err.message, 'error');
+        window.mostrarNotificacion('❌ Error: ' + err.message, 'error');
       }
     });
 
@@ -784,7 +784,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const modalEditarCurso = crearModalEditarCurso();
 
-  function mostrarNotificacion(mensaje, tipo) {
+  window.mostrarNotificacion = function(mensaje, tipo) {
     const notif = document.createElement('div');
     notif.textContent = mensaje;
     notif.style.cssText = `
@@ -802,15 +802,10 @@ document.addEventListener('DOMContentLoaded', function () {
     `;
     document.body.appendChild(notif);
     setTimeout(() => notif.remove(), 3000);
-  }
+  };
 
   // Exponemos funciones globales para botones de acciones
-  window.editarCurso = editarCurso;
-  window.confirmarEliminarCurso = confirmarEliminarCurso;
-  window.editarUsuario = editarUsuario;
-  window.confirmarEliminarUsuario = confirmarEliminarUsuario;
-
-  function editarCurso(docId) {
+  window.editarCurso = function(docId) {
     db.collection('courses').doc(docId).get().then(doc => {
       const curso = doc.data();
       document.getElementById('editCursoNombre').value = curso.name || '';
@@ -827,34 +822,34 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       
       document.getElementById('formEditarCurso').dataset.docId = docId;
-      modalEditarCurso.style.display = 'flex';
+      document.getElementById('modalEditarCurso').style.display = 'flex';
     }).catch(err => {
-      mostrarNotificacion('❌ Error al cargar datos: ' + err.message, 'error');
+      window.mostrarNotificacion('❌ Error al cargar datos: ' + err.message, 'error');
     });
-  }
+  };
 
-  function confirmarEliminarCurso(docId, nombre) {
+  window.confirmarEliminarCurso = function(docId, nombre) {
     if (confirm(`¿Eliminar curso "${nombre}"? Esta acción no se puede deshacer.`)) {
       db.collection('courses').doc(docId).delete()
-        .then(() => { renderCourses(); actualizarEstadisticas(); mostrarNotificacion('✅ Curso eliminado', 'success'); })
-        .catch(err => mostrarNotificacion('❌ Error: ' + err.message, 'error'));
+        .then(() => { renderCourses(); actualizarEstadisticas(); window.mostrarNotificacion('✅ Curso eliminado', 'success'); })
+        .catch(err => window.mostrarNotificacion('❌ Error: ' + err.message, 'error'));
     }
-  }
+  };
 
-  function editarUsuario(docId) {
+  window.editarUsuario = function(docId) {
     const nuevoNombre = prompt('Nombre del usuario:');
     if (nuevoNombre) {
       db.collection('users').doc(docId).update({ nombre: nuevoNombre })
-        .then(() => { renderUsers(); actualizarEstadisticas(); mostrarNotificacion('✅ Usuario actualizado', 'success'); })
-        .catch(err => mostrarNotificacion('❌ Error: ' + err.message, 'error'));
+        .then(() => { renderUsers(); actualizarEstadisticas(); window.mostrarNotificacion('✅ Usuario actualizado', 'success'); })
+        .catch(err => window.mostrarNotificacion('❌ Error: ' + err.message, 'error'));
     }
-  }
+  };
 
-  function confirmarEliminarUsuario(docId, nombre) {
+  window.confirmarEliminarUsuario = function(docId, nombre) {
     if (confirm(`¿Eliminar usuario "${nombre}"?`)) {
       db.collection('users').doc(docId).delete()
-        .then(() => { renderUsers(); actualizarEstadisticas(); mostrarNotificacion('✅ Usuario eliminado', 'success'); })
-        .catch(err => mostrarNotificacion('❌ Error: ' + err.message, 'error'));
+        .then(() => { renderUsers(); actualizarEstadisticas(); window.mostrarNotificacion('✅ Usuario eliminado', 'success'); })
+        .catch(err => window.mostrarNotificacion('❌ Error: ' + err.message, 'error'));
     }
-  }
+  };
 });
