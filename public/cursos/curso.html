@@ -1178,15 +1178,6 @@
               console.log('Permission denied for enrollment check (expected if not authenticated)');
             }
           });
-            } else {
-              try { localStorage.removeItem(cacheKey); } catch (_) {}
-              document.getElementById('enrolledState').style.display = 'none';
-              document.getElementById('enrollActions').style.display = '';
-              if (course.schedules && course.schedules.length > 0) {
-                document.getElementById('scheduleSection').style.display = '';
-              }
-            }
-          });
       }
     });
 
