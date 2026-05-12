@@ -613,7 +613,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function crearModalEditarCurso() {
     const html = `
       <div id="modalEditarCurso" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;overflow-y:auto;padding:40px 20px;">
-        <div style="background:#fff;padding:32px;border-radius:14px;box-shadow:0 10px 40px rgba(15,23,42,0.2);width:90%;max-width:550px;margin:auto;" onclick="event.stopPropagation();">
+        <div style="background:#fff;padding:32px;border-radius:14px;box-shadow:0 10px 40px rgba(15,23,42,0.2);width:90%;max-width:700px;margin:auto;" onclick="event.stopPropagation();">
           <h3 style="margin-bottom:20px;color:#1565c0;font-size:20px;font-weight:700;">✏️ Editar Curso</h3>
           <form id="formEditarCurso">
             <div style="margin-bottom:16px;">
@@ -638,6 +638,18 @@ document.addEventListener('DOMContentLoaded', function () {
               <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Descripción</label>
               <textarea id="editCursoDesc" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;min-height:80px;"></textarea>
             </div>
+            
+            <!-- SECCIÓN DE TEMARIO/SUBTEMAS -->
+            <div style="margin-bottom:16px;padding:16px;background:#f7f9fc;border-radius:8px;border:1px solid #e2e8f0;">
+              <label style="display:block;margin-bottom:12px;color:#334155;font-weight:600;font-size:14px;">📚 Temario (Temas y Subtemas)</label>
+              <div id="editTemarioContainer" style="display:flex;flex-direction:column;gap:12px;">
+                <!-- Los temas se cargarán aquí dinámicamente -->
+              </div>
+              <button type="button" id="btnAgregarTema" style="margin-top:12px;background:#3b82f6;color:#fff;border:none;padding:8px 12px;border-radius:6px;font-weight:600;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;">
+                <span style="font-size:16px;">+</span>Agregar Tema
+              </button>
+            </div>
+            
             <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding-top:16px;border-top:1px solid #dce3ed;">
               <button type="button" id="btnCancelarEditar" style="background:#f3f4f6;color:#334155;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;">Cancelar</button>
               <button type="submit" style="background:#1565c0;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;">Guardar cambios</button>
@@ -652,21 +664,104 @@ document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('modalEditarCurso');
     const form = document.getElementById('formEditarCurso');
     const btnCancelar = document.getElementById('btnCancelarEditar');
+    const btnAgregarTema = document.getElementById('btnAgregarTema');
+    const temarioContainer = document.getElementById('editTemarioContainer');
 
     function cerrarModal() { modal.style.display = 'none'; }
     
     btnCancelar.addEventListener('click', cerrarModal);
-    modal.addEventListener('click', cerrarModal); // Cerrar al hacer clic en el overlay
+    modal.addEventListener('click', cerrarModal);
+    
+    // Función para renderizar un tema con sus subtemas
+    function renderTema(temarioData, index) {
+      const tema = temarioData[index];
+      const html = `
+        <div style="background:#fff;padding:12px;border-radius:8px;border:1px solid #dce3ed;position:relative;">
+          <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <input type="text" class="temaTitle" placeholder="Nombre del tema" value="${tema.titulo}" style="flex:1;padding:8px;border:1px solid #dce3ed;border-radius:6px;font-size:13px;">
+            <button type="button" onclick="this.closest('[data-tema]').remove()" style="background:#dc2626;color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Eliminar</button>
+          </div>
+          <div style="margin-left:8px;padding-left:12px;border-left:3px solid #3b82f6;">
+            <div class="subtemasList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
+              ${tema.temas.map((subtema, i) => `
+                <div style="display:flex;gap:8px;">
+                  <input type="text" class="subtema" placeholder="Subtema" value="${subtema}" style="flex:1;padding:6px 8px;border:1px solid #dce3ed;border-radius:4px;font-size:12px;">
+                  <button type="button" onclick="this.parentElement.remove()" style="background:#f3f4f6;color:#dc2626;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px;">×</button>
+                </div>
+              `).join('')}
+            </div>
+            <button type="button" class="btnAgregarSubtema" style="background:#e0f2fe;color:#0284c7;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;">+ Subtema</button>
+          </div>
+        </div>
+      `;
+      
+      const el = document.createElement('div');
+      el.setAttribute('data-tema', index);
+      el.innerHTML = html;
+      
+      el.querySelector('.btnAgregarSubtema').addEventListener('click', (e) => {
+        e.preventDefault();
+        const subtemaList = el.querySelector('.subtemasList');
+        const newSubtema = document.createElement('div');
+        newSubtema.style.cssText = 'display:flex;gap:8px;';
+        newSubtema.innerHTML = `
+          <input type="text" class="subtema" placeholder="Nuevo subtema" style="flex:1;padding:6px 8px;border:1px solid #dce3ed;border-radius:4px;font-size:12px;">
+          <button type="button" onclick="this.parentElement.remove()" style="background:#f3f4f6;color:#dc2626;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px;">×</button>
+        `;
+        subtemaList.appendChild(newSubtema);
+      });
+      
+      return el;
+    }
+    
+    // Función para cargar los temas en la UI
+    window.cargarTemarioEnModal = function(temario) {
+      temarioContainer.innerHTML = '';
+      if (temario && Array.isArray(temario)) {
+        temario.forEach((tema, index) => {
+          temarioContainer.appendChild(renderTema(temario, index));
+        });
+      }
+    };
+    
+    btnAgregarTema.addEventListener('click', (e) => {
+      e.preventDefault();
+      const nuevoTema = { titulo: '', temas: [] };
+      const index = temarioContainer.children.length;
+      const temarioList = [];
+      
+      temarioContainer.querySelectorAll('[data-tema]').forEach((el, i) => {
+        temarioList.push({
+          titulo: el.querySelector('.temaTitle').value,
+          temas: Array.from(el.querySelectorAll('.subtema')).map(s => s.value)
+        });
+      });
+      temarioList.push(nuevoTema);
+      
+      window.cargarTemarioEnModal(temarioList);
+    });
     
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const docId = form.dataset.docId;
+      
+      // Recopilar el temario actualizado
+      const temario = [];
+      temarioContainer.querySelectorAll('[data-tema]').forEach((el) => {
+        const titulo = el.querySelector('.temaTitle').value;
+        const temas = Array.from(el.querySelectorAll('.subtema')).map(s => s.value.trim()).filter(s => s);
+        if (titulo.trim()) {
+          temario.push({ titulo: titulo.trim(), temas });
+        }
+      });
+
       const updates = {
         name: document.getElementById('editCursoNombre').value,
         fecha: document.getElementById('editCursoFecha').value,
         temaPrincipal: document.getElementById('editCursoTema').value,
         precio: parseFloat(document.getElementById('editCursoPrecio').value) || 0,
-        desc: document.getElementById('editCursoDesc').value
+        desc: document.getElementById('editCursoDesc').value,
+        temario: temario.length > 0 ? temario : []
       };
 
       try {
@@ -719,6 +814,14 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('editCursoTema').value = curso.temaPrincipal || '';
       document.getElementById('editCursoPrecio').value = curso.precio || 0;
       document.getElementById('editCursoDesc').value = curso.desc || '';
+      
+      // Cargar el temario si existe
+      if (curso.temario && Array.isArray(curso.temario)) {
+        window.cargarTemarioEnModal(curso.temario);
+      } else {
+        window.cargarTemarioEnModal([]);
+      }
+      
       document.getElementById('formEditarCurso').dataset.docId = docId;
       modalEditarCurso.style.display = 'flex';
     }).catch(err => {
