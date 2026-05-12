@@ -4,7 +4,10 @@ service cloud.firestore {
 
     // Helper: is the current user the admin?
     function isAdmin() {
-      return request.auth != null && request.auth.token.email == 'fq.ingenieros.empresa@gmail.com';
+      return request.auth != null && (
+        request.auth.token.email == 'fq.ingenieros.empresa@gmail.com' ||
+        request.auth.uid == 'IkBbQ9TIwcMniKQynSfPotmCqz62'
+      );
     }
 
     match /users/{userId} {
