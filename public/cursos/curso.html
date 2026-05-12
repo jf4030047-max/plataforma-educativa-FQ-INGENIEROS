@@ -237,6 +237,10 @@
       
       const section = document.getElementById('recordingSection');
       const video = document.getElementById('courseRecording');
+      
+      // Guard: si los elementos no existen en el DOM, no continuar
+      if (!section || !video) return;
+      
       db.collection('recordings')
         .where('courseId', '==', courseId)
         .orderBy('uploadedAt', 'desc')
@@ -253,7 +257,7 @@
         })
         .catch(error => {
           console.error('Error cargando grabación:', error);
-          section.style.display = 'none';
+          if (section) section.style.display = 'none';
         });
     }
     // Llamar después de renderizar el curso
