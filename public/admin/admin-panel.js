@@ -585,13 +585,13 @@ document.addEventListener('DOMContentLoaded', function () {
   renderUltimasMatriculaciones();
   renderEstudiantesPorCurso();
   
-  // Actualizar datos cada 30 segundos
+  // Actualizar datos cada 30 segundos (EXCEPTO renderCourses para permitir edición/eliminación)
   setInterval(function() {
     actualizarEstadisticas();
     renderPagosPendientes();
     renderUltimasMatriculaciones();
     renderEstudiantesPorCurso();
-    renderCourses(); // Actualizar cursos también
+    // NO incluir renderCourses() aquí - usar botón de actualizar manual
   }, 30000);
   
   // Botón para actualizar pagos manualmente
