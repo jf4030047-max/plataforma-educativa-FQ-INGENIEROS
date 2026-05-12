@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function crearModalEditarCurso() {
     const html = `
       <div id="modalEditarCurso" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;">
-        <div style="background:#fff;padding:32px;border-radius:14px;box-shadow:0 10px 40px rgba(15,23,42,0.2);width:90%;max-width:500px;">
+        <div style="background:#fff;padding:32px;border-radius:14px;box-shadow:0 10px 40px rgba(15,23,42,0.2);width:90%;max-width:500px;" onclick="event.stopPropagation();">
           <h3 style="margin-bottom:20px;color:#1565c0;font-size:20px;">✏️ Editar Curso</h3>
           <form id="formEditarCurso">
             <div style="margin-bottom:16px;">
@@ -268,7 +268,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('formEditarCurso');
     const btnCancelar = document.getElementById('btnCancelarEditar');
 
-    btnCancelar.addEventListener('click', () => modal.style.display = 'none');
+    function cerrarModal() { modal.style.display = 'none'; }
+    
+    btnCancelar.addEventListener('click', cerrarModal);
+    modal.addEventListener('click', cerrarModal); // Cerrar al hacer clic en el overlay
     
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -282,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       try {
         await db.collection('courses').doc(docId).update(updates);
-        modal.style.display = 'none';
+        cerrarModal();
         renderCourses();
         actualizarEstadisticas();
         mostrarNotificacion('✅ Curso actualizado correctamente', 'success');
