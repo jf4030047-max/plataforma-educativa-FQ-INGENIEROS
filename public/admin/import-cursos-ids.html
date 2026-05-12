@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Importador de Cursos - FQ INGENIEROS</title>
+  <style>
+    body { font-family: 'Inter', sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+    .container { background: #f0f0f0; padding: 30px; border-radius: 8px; }
+    h1 { color: #1565c0; }
+    textarea { width: 100%; height: 100px; padding: 10px; margin: 10px 0; font-family: monospace; }
+    button { background: #1565c0; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #0f3a69; }
+    .progress { margin: 20px 0; }
+    .status { padding: 10px; border-radius: 5px; margin: 10px 0; }
+    .success { background: #dcfce7; color: #16a34a; }
+    .error { background: #fee2e2; color: #dc2626; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Importador de Cursos con IDs Específicos</h1>
+    <button onclick="importarCursos()">Importar Cursos</button>
+    <div class="progress" id="progress" style="display:none;">
+      <div id="status"></div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+
+  <script>
+    async function importarCursos() {
+      if (typeof firebase === 'undefined' || !firebase.firestore) {
+        alert('Firebase no está disponible');
+        return;
+      }
+
+      const db = firebase.firestore();
+      const statusDiv = document.getElementById('status');
+      const progressDiv = document.getElementById('progress');
+      progressDiv.style.display = 'block';
+
+      // Datos de cursos con IDs específicos
+      const cursos = [
+        {
+          id: 'sst-obras-civiles',
+          name: 'Seguridad y Salud en el Trabajo en Obras Civiles',
+          price: 0,
+          priceLabel: 'Gratis',
+          desc: 'Conoce los fundamentos de la Seguridad y Salud en el Trabajo aplicados a obras civiles',
+          duration: '1 hora',
+          sessions: 1,
+          modality: 'En vivo + Grabado',
+          status: 'disponible',
+          active: true
+        },
+        {
+          id: 'topografia-civil-3d',
+          name: 'Topografía en Civil 3D',
+          price: 50,
+          priceLabel: 'S/ 50',
+          desc: 'Aprende topografía aplicada a proyectos civiles con herramientas 3D',
+          duration: '8 horas',
+          sessions: 8,
+          modality: 'En vivo + Grabado',
+          status: 'disponible',
+          active: true
+        },
+        {
+          id: 'supervision-obra',
+          name: 'Supervisión de Obra',
+          price: 120,
+          priceLabel: 'S/ 120',
+          desc: 'Técnicas y normas para supervisión de proyectos civiles',
+          duration: '4 horas',
+          sessions: 4,
+          modality: 'En vivo',
+          status: 'proximamente',
+          active: false
+        }
+      ];
+
+      try {
+        for (const curso of cursos) {
+          statusDiv.innerHTML += `<div class="status">Importando ${curso.name}...</div>`;
+          
+          // Usar set() con merge para no sobrescribir datos existentes
+          await db.collection('courses').doc(curso.id).set({
+            id: curso.id,
+            name: curso.name,
+            price: curso.price,
+            priceLabel: curso.priceLabel,
+            desc: curso.desc,
+            duration: curso.duration,
+            sessions: curso.sessions,
+            modality: curso.modality,
+            status: curso.status,
+            active: curso.active,
+            updatedAt: new Date()
+          }, { merge: true });
+
+          statusDiv.innerHTML += `<div class="status success">✓ ${curso.name} importado</div>`;
+        }
+
+        statusDiv.innerHTML += `<div class="status success"><strong>¡Importación completada!</strong> Todos los cursos están disponibles con los IDs correctos.</div>`;
+      } catch (error) {
+        statusDiv.innerHTML += `<div class="status error">Error: ${error.message}</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
