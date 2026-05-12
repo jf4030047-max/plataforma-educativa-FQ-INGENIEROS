@@ -233,6 +233,8 @@
   <script>
     // Mostrar grabación si existe en Firestore
     function showCourseRecording(courseId) {
+      if (!db) return; // Guard: si db no está disponible, no cargar grabación
+      
       const section = document.getElementById('recordingSection');
       const video = document.getElementById('courseRecording');
       db.collection('recordings')
@@ -248,6 +250,10 @@
           } else {
             section.style.display = 'none';
           }
+        })
+        .catch(error => {
+          console.error('Error cargando grabación:', error);
+          section.style.display = 'none';
         });
     }
     // Llamar después de renderizar el curso
@@ -736,6 +742,13 @@
           document.getElementById('enrollActions').style.display = '';
           return;
         }
+        
+        // Guard: si db no está disponible, no cargar estado de inscripción desde Firestore
+        if (!db) {
+          console.log('[DEBUG] Firestore no disponible, usando estado local');
+          return;
+        }
+        
         var docId = user.uid + '_' + courseId;
         // Primero, revisar localStorage para experiencia instantánea
         // Ya no se usa localStorage para mostrar botones, solo Firestore
@@ -781,6 +794,12 @@
        ══════════════════════════════════════════════ */
     function handleEnroll() {
       if (!course) return;
+      
+      // Guard: si db no está disponible, mostrar error
+      if (!db) {
+        FQNotify.toast('No hay conexión a la base de datos', 'error');
+        return;
+      }
 
       var user = auth.currentUser;
       if (!user) {
@@ -938,6 +957,13 @@
           };
           document.getElementById('cancelToastYes').onclick = function() {
             toast.remove();
+            
+            // Guard: si db no está disponible
+            if (!db) {
+              FQNotify.toast('No hay conexión a la base de datos', 'error');
+              return;
+            }
+            
             var authInstance = window.auth || firebase.auth();
             var user = authInstance.currentUser;
             if (!user) {
