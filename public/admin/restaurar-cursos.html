@@ -127,11 +127,56 @@
           status: 'disponible',
           active: true,
           temario: [
-            'Fundamentos de SST',
-            'Marco legal peruano',
-            'Identificación de peligros y riesgos',
-            'Investigación de incidentes',
-            'Análisis de riesgos'
+            {
+              titulo: 'Introducción a la SST',
+              temas: [
+                'Reseña histórica de la Seguridad y Salud en el Trabajo',
+                'Historia de la SST en el Perú',
+                'Términos y definiciones'
+              ]
+            },
+            {
+              titulo: 'Marco Legal en el Perú',
+              temas: [
+                'Ley N° 29783 y su reglamento D.S. 005-2012-TR',
+                'Leyes de SST',
+                'Resoluciones Ministeriales',
+                'Aplicación en diferentes sectores',
+                'Organismos competentes en el Perú',
+                'Modificatorias',
+                'Principios de la ley'
+              ]
+            },
+            {
+              titulo: 'Identificación de Peligros y Riesgos',
+              temas: [
+                'Conceptos de peligro y riesgo',
+                'Clasificación de peligros',
+                'Métodos de identificación',
+                'Matriz de riesgos',
+                'Evaluación de riesgos'
+              ]
+            },
+            {
+              titulo: 'Investigación de Incidentes',
+              temas: [
+                'Tipos de incidentes y accidentes',
+                'Causas de incidentes',
+                'Metodología de investigación',
+                'Reporte de incidentes',
+                'Prevención de recurrencia'
+              ]
+            },
+            {
+              titulo: 'Análisis de Riesgos',
+              temas: [
+                'Conceptos básicos',
+                'Proceso de análisis',
+                'Elaboración de ART',
+                'Registros y documentación',
+                'Medidas de control'
+              ]
+            }
           ],
           includes: [
             { icon: 'videocam', text: 'Clases en vivo por Zoom' },
@@ -165,21 +210,59 @@
         {
           id: 'topografia-civil-3d',
           name: 'Topografía en Civil 3D',
-          price: 150,
-          priceLabel: 'S/ 150',
-          priceDisplay: 'S/ 150',
-          desc: 'Aprende a utilizar Civil 3D para proyectos topográficos',
+          price: 200,
+          priceLabel: 'S/ 200',
+          priceDisplay: 'S/ 200',
+          desc: 'Aprende topografía aplicada a proyectos civiles con herramientas 3D. Domina el levantamiento topográfico, el modelado de superficies y el uso de Civil 3D para diseño de infraestructura.',
           duration: '8 horas',
           sessions: 8,
           modality: 'En vivo + Grabado',
           status: 'disponible',
           active: true,
           temario: [
-            'Fundamentos de Topografía',
-            'Levantamiento Topográfico',
-            'AutoCAD Civil 3D',
-            'Modelado de superficies TIN',
-            'Diseño de alineamientos y perfiles'
+            {
+              titulo: 'Módulo 1: Fundamentos de Topografía',
+              temas: [
+                'Conceptos básicos de topografía',
+                'Equipos e instrumentos topográficos',
+                'Sistemas de coordenadas y georreferenciación'
+              ]
+            },
+            {
+              titulo: 'Módulo 2: Levantamiento Topográfico',
+              temas: [
+                'Métodos de levantamiento',
+                'Uso de estación total',
+                'Uso de GPS diferencial',
+                'Procesamiento de datos de campo'
+              ]
+            },
+            {
+              titulo: 'Módulo 3: Modelamiento 3D',
+              temas: [
+                'Introducción al modelamiento digital del terreno',
+                'Curvas de nivel y superficies',
+                'Software Civil 3D - Interfaz y herramientas',
+                'Creación de superficies desde puntos'
+              ]
+            },
+            {
+              titulo: 'Módulo 4: Diseño Vial y Explanaciones',
+              temas: [
+                'Alineamientos horizontales y verticales',
+                'Secciones transversales',
+                'Cálculo de volúmenes de corte y relleno',
+                'Diseño de rasantes'
+              ]
+            }
+          ],
+          includes: [
+            { icon: 'videocam', text: 'Sesiones en vivo' },
+            { icon: 'play_circle', text: 'Acceso a grabaciones' },
+            { icon: 'description', text: 'Material de apoyo y plantillas' },
+            { icon: 'workspace_premium', text: 'Certificado digital' },
+            { icon: 'forum', text: 'Grupo de WhatsApp' },
+            { icon: 'quiz', text: 'Examen de certificación' }
           ]
         }
       ];
