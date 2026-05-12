@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actualizar Cursos | FQ INGENIEROS</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f1f5f9;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #0f172a;
+      margin-bottom: 24px;
+      font-size: 28px;
+    }
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: #2563eb;
+    }
+    .btn-primary:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+    }
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .btn-secondary:hover {
+      background: #cbd5e1;
+    }
+    #status {
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      display: none;
+      font-weight: 500;
+    }
+    .status.loading {
+      background: #bfdbfe;
+      color: #1e40af;
+      display: block;
+    }
+    .status.success {
+      background: #dcfce7;
+      color: #166534;
+      display: block;
+    }
+    .status.error {
+      background: #fee2e2;
+      color: #991b1b;
+      display: block;
+    }
+    .course-item {
+      background: #f8fafc;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      border-left: 4px solid #3b82f6;
+    }
+    .course-item strong {
+      color: #0f172a;
+    }
+    .course-item p {
+      margin: 4px 0;
+      color: #64748b;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Actualizar Información de Cursos</h1>
+    <p style="color: #64748b; margin-bottom: 24px;">Actualiza los cursos en Firestore con los datos más recientes (fecha viernes 22 de mayo).</p>
+    
+    <div id="status"></div>
+    
+    <div class="button-group">
+      <button class="btn-primary" id="initBtn" onclick="initializeCourses()">Inicializar/Actualizar Cursos</button>
+      <button class="btn-secondary" onclick="window.location.href='panel.html'">Volver al Panel</button>
+    </div>
+    
+    <div>
+      <h3 style="color: #0f172a; margin-bottom: 16px;">Cursos a actualizar:</h3>
+      <div class="course-item">
+        <strong>Seguridad y Salud en el Trabajo en Obras Civiles</strong>
+        <p>ID: sst-obras-civiles</p>
+        <p>Fecha: Viernes 22 de mayo, 2026</p>
+        <p>Horarios: 5:00 p.m. – 6:00 p.m. | 7:00 p.m. – 8:00 p.m.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-compat/app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-compat/firestore.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+
+  <script>
+    const COURSES_TO_UPDATE = [
+      {
+        id: 'sst-obras-civiles',
+        name: 'Seguridad y Salud en el Trabajo en Obras Civiles',
+        updateData: {
+          schedules: [
+            { id: 'h1', label: 'Viernes (Opción 1)', detail: '5:00 p.m. — 6:00 p.m. • Viernes 22 de mayo' },
+            { id: 'h2', label: 'Viernes (Opción 2)', detail: '7:00 p.m. — 8:00 p.m. • Viernes 22 de mayo' }
+          ],
+          startDate: '2026-05-22',
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }
+      }
+    ];
+
+    function showStatus(message, type = 'info') {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`;
+    }
+
+    async function initializeCourses() {
+      const btn = document.getElementById('initBtn');
+      btn.disabled = true;
+
+      try {
+        showStatus('Verificando autenticación...', 'loading');
+        
+        const user = auth.currentUser;
+        if (!user) {
+          showStatus('❌ Error: No estás autenticado. Por favor, inicia sesión en el admin panel primero.', 'error');
+          btn.disabled = false;
+          return;
+        }
+
+        showStatus('Actualizando cursos en Firestore...', 'loading');
+
+        let updatedCount = 0;
+        for (const course of COURSES_TO_UPDATE) {
+          try {
+            await db.collection('courses').doc(course.id).update(course.updateData);
+            updatedCount++;
+            console.log(`✓ Curso "${course.name}" actualizado`);
+          } catch (err) {
+            console.error(`Error actualizando ${course.id}:`, err);
+            throw err;
+          }
+        }
+
+        showStatus(`✅ Éxito: ${updatedCount} curso(s) actualizado(s) correctamente con la nueva información (viernes 22 de mayo).`, 'success');
+      } catch (error) {
+        console.error('Error:', error);
+        showStatus(`❌ Error: ${error.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    window.addEventListener('load', function() {
+      if (auth.currentUser) {
+        console.log('Usuario autenticado:', auth.currentUser.email);
+      }
+    });
+  </script>
+</body>
+</html>
