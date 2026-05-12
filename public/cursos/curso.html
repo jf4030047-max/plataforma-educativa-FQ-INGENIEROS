@@ -549,17 +549,29 @@
           const data = doc.data();
           // Detectar fallback: por ID exacto o por keyword en nombre/id
           var fb = FALLBACK_DATA[doc.id] || {};
-          // Buscar slug alternativo en FALLBACK_DATA si el ID de Firestore no está en fallback
           var slugId = null;
+          
+          // Buscar slug alternativo basado en el nombre del curso
           if (!fb.temario) {
+            var docName = (data.name || '').toLowerCase();
+            // Buscar en FALLBACK_DATA por coincidencia de nombre
             for (var key in FALLBACK_DATA) {
               if (key !== doc.id && typeof FALLBACK_DATA[key] === 'object') {
-                if (key.indexOf('sst') !== -1 && doc.id.indexOf('sst') !== -1) {
+                // SST coincidencia
+                if (key === 'sst-obras-civiles' && docName.indexOf('seguridad') !== -1) {
+                  slugId = key;
+                  fb = FALLBACK_DATA[key];
+                  console.log('Mapeando ' + doc.id + ' -> ' + slugId);
+                  break;
+                }
+                // Topografía coincidencia
+                if (key === 'topografia-civil-3d' && docName.indexOf('topograf') !== -1) {
                   slugId = key;
                   fb = FALLBACK_DATA[key];
                   break;
                 }
-                if (key.indexOf('topograf') !== -1 && (doc.id + ' ' + (data.name || '')).toLowerCase().indexOf('topograf') !== -1) {
+                // Supervisión coincidencia
+                if (key === 'supervision-obra' && docName.indexOf('supervisi') !== -1) {
                   slugId = key;
                   fb = FALLBACK_DATA[key];
                   break;
