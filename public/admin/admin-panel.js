@@ -170,6 +170,108 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // ========== ESTUDIANTES POR CURSO ==========
+  function renderEstudiantesPorCurso() {
+    const container = document.getElementById('estudiantesPorCursoContent');
+    if (!container) return;
+    
+    db.collection('courses').get().then(cursosSnap => {
+      if (cursosSnap.empty) {
+        container.innerHTML = '<div style="color:#64748b;padding:16px;">No hay cursos registrados.</div>';
+        return;
+      }
+
+      const cursosData = {};
+      const cursosPromesas = [];
+
+      // Obtener datos de cada curso
+      cursosSnap.forEach(cursoDoc => {
+        const curso = cursoDoc.data();
+        cursosData[cursoDoc.id] = { name: curso.name || 'Sin nombre', estudiantes: [] };
+        
+        // Para cada curso, obtener sus matriculaciones
+        cursosPromesas.push(
+          db.collection('enrollments').where('courseId', '==', cursoDoc.id).get().then(enrollSnap => {
+            enrollSnap.forEach(enrollDoc => {
+              const enroll = enrollDoc.data();
+              cursosData[cursoDoc.id].estudiantes.push({
+                nombre: enroll.userName || 'Usuario',
+                email: enroll.userEmail || 'N/A',
+                fecha: enroll.enrolledAt ? new Date(enroll.enrolledAt.toDate ? enroll.enrolledAt.toDate() : enroll.enrolledAt).toLocaleDateString('es-PE') : 'N/A'
+              });
+            });
+          })
+        );
+      });
+
+      Promise.all(cursosPromesas).then(() => {
+        let html = `
+          <div style="display:grid;gap:20px;">
+        `;
+
+        Object.keys(cursosData).forEach(cursoId => {
+          const curso = cursosData[cursoId];
+          const cantEstudiantes = curso.estudiantes.length;
+          const colorBadge = cantEstudiantes === 0 ? '#f1f5f9' : cantEstudiantes < 5 ? '#fef3c7' : '#dcfce7';
+          const colorTexto = cantEstudiantes === 0 ? '#94a3b8' : cantEstudiantes < 5 ? '#b45309' : '#16a34a';
+
+          html += `
+            <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;background:#fff;">
+              <div style="background:#f7f9fc;padding:16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;">
+                <div>
+                  <h4 style="margin:0;color:#1565c0;font-size:16px;font-weight:600;">${curso.name}</h4>
+                  <p style="margin:4px 0 0 0;color:#64748b;font-size:13px;">ID: ${cursoId}</p>
+                </div>
+                <span style="background:${colorBadge};color:${colorTexto};padding:8px 12px;border-radius:6px;font-weight:600;font-size:13px;">
+                  ${cantEstudiantes} estudiante${cantEstudiantes !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <div style="padding:12px;">
+          `;
+
+          if (curso.estudiantes.length === 0) {
+            html += '<div style="color:#94a3b8;padding:12px;text-align:center;font-size:13px;">Sin matriculaciones</div>';
+          } else {
+            html += `
+              <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                <thead>
+                  <tr style="background:#f1f5f9;border-bottom:1px solid #e2e8f0;">
+                    <th style="text-align:left;padding:10px 8px;font-weight:600;color:#64748b;">Estudiante</th>
+                    <th style="text-align:left;padding:10px 8px;font-weight:600;color:#64748b;">Correo</th>
+                    <th style="text-align:left;padding:10px 8px;font-weight:600;color:#64748b;">Fecha Matrícula</th>
+                  </tr>
+                </thead>
+                <tbody>
+            `;
+
+            curso.estudiantes.forEach(est => {
+              html += `
+                <tr style="border-bottom:1px solid #f1f5f9;">
+                  <td style="padding:10px 8px;"><strong>${est.nombre}</strong></td>
+                  <td style="padding:10px 8px;color:#64748b;font-size:12px;">${est.email}</td>
+                  <td style="padding:10px 8px;color:#64748b;">${est.fecha}</td>
+                </tr>
+              `;
+            });
+
+            html += `
+                </tbody>
+              </table>
+            `;
+          }
+
+          html += `
+              </div>
+            </div>
+          `;
+        });
+
+        html += '</div>';
+        container.innerHTML = html;
+      });
+    });
+  }
+
   // ========== FUNCIÓN PARA VERIFICAR PAGO ==========
   window.verificarPago = function(paymentId) {
     if (!confirm('¿Aprobar este pago?')) return;
@@ -399,12 +501,14 @@ document.addEventListener('DOMContentLoaded', function () {
   actualizarEstadisticas();
   renderPagosPendientes();
   renderUltimasMatriculaciones();
+  renderEstudiantesPorCurso();
   
   // Actualizar datos cada 30 segundos
   setInterval(function() {
     actualizarEstadisticas();
     renderPagosPendientes();
     renderUltimasMatriculaciones();
+    renderEstudiantesPorCurso();
   }, 30000);
   
   // Botón para actualizar pagos manualmente
