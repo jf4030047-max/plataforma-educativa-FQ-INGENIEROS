@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Importar Cursos | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f7f9fc; color: #334155; min-height: 100vh; padding: 40px 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(15,23,42,0.06); }
+    h1 { color: #1565c0; margin-bottom: 8px; font-size: 24px; }
+    .desc { color: #64748b; margin-bottom: 24px; font-size: 14px; }
+    .status { padding: 12px; border-radius: 8px; margin-bottom: 16px; display: none; }
+    .status.success { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
+    .status.error { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+    .status.loading { background: #eff6ff; color: #0284c7; border: 1px solid #bfdbfe; }
+    button { background: #1565c0; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: background 0.2s; }
+    button:hover { background: #0f3a69; }
+    button:disabled { background: #cbd5e1; cursor: not-allowed; }
+    .progress { margin-top: 16px; }
+    .progress-bar { background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; }
+    .progress-fill { background: #16a34a; height: 100%; width: 0%; transition: width 0.3s; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📚 Importar Cursos</h1>
+    <p class="desc">Importa automáticamente los cursos desde el archivo de datos al panel de administrador. Asegúrate de estar autenticado.</p>
+    
+    <div class="status" id="status"></div>
+    
+    <button id="btnImportar">🚀 Importar Cursos</button>
+    
+    <div class="progress" id="progress" style="display: none;">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <p style="margin-top: 8px; font-size: 12px; color: #64748b;">Procesando... <span id="progressText">0/0</span></p>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+
+  <script>
+    const btnImportar = document.getElementById('btnImportar');
+    const statusDiv = document.getElementById('status');
+    const progressDiv = document.getElementById('progress');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+
+    const CURSOS_DATA = [
+      {
+        id: 'sst-obras-civiles',
+        name: 'Seguridad y Salud en el Trabajo en Obras Civiles',
+        price: 0,
+        fecha: '2026-06-15',
+        temaPrincipal: 'Seguridad',
+        desc: 'Conoce los fundamentos de la Seguridad y Salud en el Trabajo aplicados a obras civiles'
+      },
+      {
+        id: 'topografia-civil3d',
+        name: 'Topografía en Civil 3D',
+        price: 150,
+        fecha: '2026-06-20',
+        temaPrincipal: 'Topografía',
+        desc: 'Aprende a utilizar Civil 3D para proyectos topográficos'
+      },
+      {
+        id: 'supervision-obra',
+        name: 'Supervisión de Obra',
+        price: 120,
+        fecha: '2026-07-01',
+        temaPrincipal: 'Supervisión',
+        desc: 'Técnicas y normas para supervising de proyectos civiles'
+      }
+    ];
+
+    function mostrarEstado(mensaje, tipo) {
+      statusDiv.textContent = mensaje;
+      statusDiv.className = `status ${tipo}`;
+      statusDiv.style.display = 'block';
+    }
+
+    btnImportar.addEventListener('click', async function() {
+      if (typeof firebase === 'undefined' || !firebase.firestore) {
+        mostrarEstado('❌ Firebase no está cargado', 'error');
+        return;
+      }
+
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+
+      // Verificar autenticación
+      if (!auth.currentUser) {
+        mostrarEstado('❌ Debes estar autenticado', 'error');
+        setTimeout(() => window.location.href = '../auth/login.html', 2000);
+        return;
+      }
+
+      // Verificar si es admin
+      const userDoc = await db.collection('users').doc(auth.currentUser.uid).get();
+      const userData = userDoc.data();
+      if (userData?.rol !== 'admin' && auth.currentUser.email !== 'fq.ingenieros.empresa@gmail.com') {
+        mostrarEstado('❌ Solo administradores pueden importar cursos', 'error');
+        return;
+      }
+
+      btnImportar.disabled = true;
+      mostrarEstado('⏳ Importando cursos...', 'loading');
+      progressDiv.style.display = 'block';
+
+      let importados = 0;
+      const total = CURSOS_DATA.length;
+
+      for (let i = 0; i < total; i++) {
+        const curso = CURSOS_DATA[i];
+        try {
+          await db.collection('courses').doc(curso.id).set({
+            name: curso.name,
+            price: curso.price,
+            fecha: curso.fecha,
+            temaPrincipal: curso.temaPrincipal,
+            desc: curso.desc,
+            active: true,
+            createdAt: new Date()
+          });
+          importados++;
+          progressFill.style.width = ((i + 1) / total * 100) + '%';
+          progressText.textContent = `${i + 1}/${total}`;
+        } catch (err) {
+          console.error(`Error importando ${curso.name}:`, err);
+        }
+      }
+
+      btnImportar.disabled = false;
+      progressDiv.style.display = 'none';
+      mostrarEstado(`✅ ${importados}/${total} cursos importados correctamente`, 'success');
+      
+      setTimeout(() => {
+        window.location.href = '/admin/panel.html';
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
