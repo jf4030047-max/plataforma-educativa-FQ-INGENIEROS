@@ -191,6 +191,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // Cerrar modal al hacer click fuera
+  if (modalAgregarCurso) {
+    modalAgregarCurso.addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.style.display = 'none';
+      }
+    });
+  }
+
   if (formAgregarCurso) {
     formAgregarCurso.addEventListener('submit', function(e) {
       e.preventDefault();
@@ -198,26 +207,114 @@ document.addEventListener('DOMContentLoaded', function () {
       const fecha = document.querySelector('input[name="fecha"]').value;
       const tema = document.querySelector('input[name="temaPrincipal"]').value;
       const precio = parseFloat(document.querySelector('input[name="precio"]').value);
+      const desc = document.querySelector('textarea[name="desc"]').value;
 
       db.collection('courses').add({
         name: nombre,
         fecha: fecha,
         temaPrincipal: tema,
         precio: precio,
+        desc: desc,
         active: true,
         createdAt: new Date()
       }).then(() => {
-        alert('✅ Curso agregado correctamente');
         modalAgregarCurso.style.display = 'none';
         renderCourses();
         actualizarEstadisticas();
-      }).catch(err => alert('❌ Error: ' + err.message));
+        mostrarNotificacion('✅ Curso creado exitosamente', 'success');
+      }).catch(err => mostrarNotificacion('❌ Error: ' + err.message, 'error'));
     });
   }
 
   // ========== INICIAR ==========
   renderUsers();
   actualizarEstadisticas();
+
+  // Crear modal para editar curso
+  function crearModalEditarCurso() {
+    const html = `
+      <div id="modalEditarCurso" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;">
+        <div style="background:#fff;padding:32px;border-radius:14px;box-shadow:0 10px 40px rgba(15,23,42,0.2);width:90%;max-width:500px;">
+          <h3 style="margin-bottom:20px;color:#1565c0;font-size:20px;">✏️ Editar Curso</h3>
+          <form id="formEditarCurso">
+            <div style="margin-bottom:16px;">
+              <label style="display:block;margin-bottom:6px;color:#334155;font-weight:500;font-size:14px;">Nombre del curso</label>
+              <input type="text" id="editCursoNombre" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;" required>
+            </div>
+            <div style="margin-bottom:16px;">
+              <label style="display:block;margin-bottom:6px;color:#334155;font-weight:500;font-size:14px;">Fecha</label>
+              <input type="date" id="editCursoFecha" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;">
+            </div>
+            <div style="margin-bottom:16px;">
+              <label style="display:block;margin-bottom:6px;color:#334155;font-weight:500;font-size:14px;">Tema principal</label>
+              <input type="text" id="editCursoTema" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;">
+            </div>
+            <div style="margin-bottom:16px;">
+              <label style="display:block;margin-bottom:6px;color:#334155;font-weight:500;font-size:14px;">Precio</label>
+              <input type="number" id="editCursoPrecio" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;" step="0.01">
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;">
+              <button type="button" id="btnCancelarEditar" style="background:#f3f4f6;color:#334155;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;">Cancelar</button>
+              <button type="submit" style="background:#1565c0;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;">Guardar cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+    
+    const modal = document.getElementById('modalEditarCurso');
+    const form = document.getElementById('formEditarCurso');
+    const btnCancelar = document.getElementById('btnCancelarEditar');
+
+    btnCancelar.addEventListener('click', () => modal.style.display = 'none');
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const docId = form.dataset.docId;
+      const updates = {
+        name: document.getElementById('editCursoNombre').value,
+        fecha: document.getElementById('editCursoFecha').value,
+        temaPrincipal: document.getElementById('editCursoTema').value,
+        precio: parseFloat(document.getElementById('editCursoPrecio').value) || 0
+      };
+
+      try {
+        await db.collection('courses').doc(docId).update(updates);
+        modal.style.display = 'none';
+        renderCourses();
+        actualizarEstadisticas();
+        mostrarNotificacion('✅ Curso actualizado correctamente', 'success');
+      } catch (err) {
+        mostrarNotificacion('❌ Error: ' + err.message, 'error');
+      }
+    });
+
+    return modal;
+  }
+
+  const modalEditarCurso = crearModalEditarCurso();
+
+  function mostrarNotificacion(mensaje, tipo) {
+    const notif = document.createElement('div');
+    notif.textContent = mensaje;
+    notif.style.cssText = `
+      position:fixed;
+      top:20px;
+      right:20px;
+      padding:12px 20px;
+      border-radius:8px;
+      background:${tipo === 'success' ? '#dcfce7' : '#fee2e2'};
+      color:${tipo === 'success' ? '#16a34a' : '#dc2626'};
+      border:1px solid ${tipo === 'success' ? '#86efac' : '#fca5a5'};
+      z-index:2000;
+      font-weight:600;
+      font-size:14px;
+    `;
+    document.body.appendChild(notif);
+    setTimeout(() => notif.remove(), 3000);
+  }
 
   // Exponemos funciones globales para botones de acciones
   window.editarCurso = editarCurso;
@@ -226,19 +323,22 @@ document.addEventListener('DOMContentLoaded', function () {
   window.confirmarEliminarUsuario = confirmarEliminarUsuario;
 
   function editarCurso(docId) {
-    const nuevoNombre = prompt('Nombre del curso:');
-    if (nuevoNombre) {
-      db.collection('courses').doc(docId).update({ name: nuevoNombre })
-        .then(() => { alert('✅ Curso actualizado'); renderCourses(); actualizarEstadisticas(); })
-        .catch(err => alert('❌ Error: ' + err.message));
-    }
+    db.collection('courses').doc(docId).get().then(doc => {
+      const curso = doc.data();
+      document.getElementById('editCursoNombre').value = curso.name || '';
+      document.getElementById('editCursoFecha').value = curso.fecha || '';
+      document.getElementById('editCursoTema').value = curso.temaPrincipal || '';
+      document.getElementById('editCursoPrecio').value = curso.precio || 0;
+      document.getElementById('formEditarCurso').dataset.docId = docId;
+      modalEditarCurso.style.display = 'flex';
+    });
   }
 
   function confirmarEliminarCurso(docId, nombre) {
-    if (confirm(`¿Eliminar curso "${nombre}"?`)) {
+    if (confirm(`¿Eliminar curso "${nombre}"? Esta acción no se puede deshacer.`)) {
       db.collection('courses').doc(docId).delete()
-        .then(() => { alert('✅ Curso eliminado'); renderCourses(); actualizarEstadisticas(); })
-        .catch(err => alert('❌ Error: ' + err.message));
+        .then(() => { renderCourses(); actualizarEstadisticas(); mostrarNotificacion('✅ Curso eliminado', 'success'); })
+        .catch(err => mostrarNotificacion('❌ Error: ' + err.message, 'error'));
     }
   }
 
@@ -246,16 +346,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const nuevoNombre = prompt('Nombre del usuario:');
     if (nuevoNombre) {
       db.collection('users').doc(docId).update({ nombre: nuevoNombre })
-        .then(() => { alert('✅ Usuario actualizado'); renderUsers(); actualizarEstadisticas(); })
-        .catch(err => alert('❌ Error: ' + err.message));
+        .then(() => { renderUsers(); actualizarEstadisticas(); mostrarNotificacion('✅ Usuario actualizado', 'success'); })
+        .catch(err => mostrarNotificacion('❌ Error: ' + err.message, 'error'));
     }
   }
 
   function confirmarEliminarUsuario(docId, nombre) {
     if (confirm(`¿Eliminar usuario "${nombre}"?`)) {
       db.collection('users').doc(docId).delete()
-        .then(() => { alert('✅ Usuario eliminado'); renderUsers(); actualizarEstadisticas(); })
-        .catch(err => alert('❌ Error: ' + err.message));
+        .then(() => { renderUsers(); actualizarEstadisticas(); mostrarNotificacion('✅ Usuario eliminado', 'success'); })
+        .catch(err => mostrarNotificacion('❌ Error: ' + err.message, 'error'));
     }
   }
 });

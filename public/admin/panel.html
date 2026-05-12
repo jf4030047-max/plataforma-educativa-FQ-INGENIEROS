@@ -270,10 +270,11 @@
       color: var(--color-text);
       font-family: inherit;
       outline: none;
-      transition: border-color .2s;
+      transition: border-color .2s, background .2s;
     }
     .form-control:focus {
       border-color: var(--color-sidebar-accent);
+      background: #fff;
     }
     .btn-primary {
       background: var(--color-sidebar-accent);
@@ -287,20 +288,70 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: background .2s;
+      transition: background .2s, transform .1s;
     }
     .btn-primary:hover {
       background: var(--color-primary-dark);
+      transform: translateY(-2px);
     }
-    @media (max-width: 1100px) {
-      .admin-layout { grid-template-columns: 1fr; }
-      .admin-content { padding: 24px 4vw; }
+    .btn-primary:active {
+      transform: translateY(0);
     }
-    @media (max-width: 700px) {
-      .admin-content { padding: 12px 2vw; }
-      .stats-row { flex-direction: column; gap: 10px; }
-      .stat-card { max-width: 100%; }
-      .admin-section { padding: 16px 6px; }
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--color-border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-bottom: 0;
+    }
+    th {
+      background: linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%);
+      color: var(--color-muted);
+      font-weight: 700;
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 2px solid var(--color-border);
+    }
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--color-text);
+    }
+    tr:hover {
+      background: #f7f9fc;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    .action-buttons button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      transition: background .2s, color .2s;
+    }
+    .action-buttons .edit-btn {
+      color: #0284c7;
+    }
+    .action-buttons .edit-btn:hover {
+      background: #e0f2fe;
+    }
+    .action-buttons .delete-btn {
+      color: #dc2626;
+    }
+    .action-buttons .delete-btn:hover {
+      background: #fee2e2;
     }
   </style>
     </head>
@@ -380,42 +431,36 @@
               <div style="color:#64748b;font-size:14px;margin-bottom:18px;">Administra los cursos activos, edita información y agrega nuevos cursos fácilmente.</div>
               <div id="cursosContent">Cargando cursos...</div>
               <!-- Modal para agregar curso -->
-              <div id="modalAgregarCurso" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.18);z-index:1000;align-items:center;justify-content:center;">
-                <div style="background:#fff;padding:32px 28px 24px 28px;border-radius:14px;box-shadow:0 4px 32px rgba(15,23,42,0.10);min-width:320px;max-width:90vw;">
-                  <h4 style="margin-bottom:18px;font-size:17px;color:var(--color-sidebar-accent);display:flex;align-items:center;gap:8px;">
-                    <span class="material-icons-round" style="font-size:20px;">add_circle</span>Nuevo curso
-                  </h4>
+              <div id="modalAgregarCurso" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;overflow-y:auto;padding:40px 20px;">
+                <div style="background:#fff;padding:32px;border-radius:14px;box-shadow:0 10px 40px rgba(15,23,42,0.2);width:100%;max-width:550px;margin:auto;">
+                  <h3 style="margin-bottom:6px;color:#1565c0;font-size:22px;font-weight:700;">➕ Nuevo Curso</h3>
+                  <p style="color:#64748b;font-size:14px;margin-bottom:24px;">Ingresa los detalles del nuevo curso que deseas crear.</p>
                   <form id="formAgregarCurso">
-                    <div style="margin-bottom:14px;">
-                      <label>Nombre del curso</label>
-                      <input type="text" name="nombre" class="form-control" required>
+                    <div style="margin-bottom:16px;">
+                      <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Nombre del curso *</label>
+                      <input type="text" name="nombre" class="form-control" placeholder="Ej: Introducción a Python" required>
                     </div>
-                    <div style="margin-bottom:14px;">
-                      <label>Fecha</label>
-                      <input type="date" name="fecha" class="form-control" required>
-                    </div>
-                    <div style="margin-bottom:14px;">
-                      <label>Tema principal</label>
-                      <input type="text" name="temaPrincipal" id="temaPrincipal" class="form-control" placeholder="Ejemplo: Matemáticas" required>
-                    </div>
-                    <div style="margin-bottom:14px;">
-                      <label>Precio</label>
-                      <input type="number" name="precio" class="form-control" placeholder="Ejemplo: 120" min="0" step="0.01" required>
-                    </div>
-                    <div style="margin-bottom:18px;">
-                      <label>Subtemas</label>
-                      <div id="subtemasInputContainer" style="display:flex;flex-wrap:wrap;gap:6px 8px;padding:6px 0 0 0;margin-bottom:6px;"></div>
-                      <div style="display:flex;gap:8px;">
-                        <input type="text" id="subtemaInput" class="form-control" placeholder="Agregar subtema y presiona Enter" style="flex:1;min-width:0;">
-                        <button type="button" id="btnAgregarSubtema" class="btn-primary" style="padding:7px 14px;font-size:13px;display:flex;align-items:center;gap:5px;">
-                          <span class="material-icons-round" style="font-size:16px;">add</span>Agregar
-                        </button>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                      <div>
+                        <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Fecha de inicio *</label>
+                        <input type="date" name="fecha" class="form-control" required>
                       </div>
-                      <input type="hidden" name="subtemas" id="subtemasHidden">
+                      <div>
+                        <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Precio *</label>
+                        <input type="number" name="precio" class="form-control" placeholder="0.00" min="0" step="0.01" required>
+                      </div>
                     </div>
-                    <div style="display:flex;justify-content:flex-end;gap:10px;">
+                    <div style="margin-bottom:16px;">
+                      <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Tema principal *</label>
+                      <input type="text" name="temaPrincipal" class="form-control" placeholder="Ej: Programación" required>
+                    </div>
+                    <div style="margin-bottom:16px;">
+                      <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Descripción</label>
+                      <textarea name="desc" class="form-control" placeholder="Describe brevemente el contenido del curso" style="resize:vertical;min-height:80px;"></textarea>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:24px;padding-top:16px;border-top:1px solid #dce3ed;">
                       <button type="button" id="btnCancelarModal" class="btn-primary" style="background:#f3f4f6;color:#334155;">Cancelar</button>
-                      <button type="submit" class="btn-primary">Guardar</button>
+                      <button type="submit" class="btn-primary">Crear curso</button>
                     </div>
                   </form>
                 </div>
