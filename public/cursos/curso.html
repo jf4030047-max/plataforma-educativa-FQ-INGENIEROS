@@ -1027,9 +1027,10 @@
             }
           }
         })
-        .catch(function() {
-          /* Offline: trust localStorage cache, don't wipe UI */
-          if (!navigator.onLine) return;
+        .catch(function(error) {
+          /* Offline or permission denied: trust localStorage cache, don't wipe UI */
+          if (!navigator.onLine || error.code === 'permission-denied') return;
+          console.error('Enrollment check error:', error);
         });
     });
 
@@ -1068,6 +1069,13 @@
                   ts: Date.now()
                 }));
               } catch (_) {}
+            }
+          })
+          .catch(function(error) {
+            if (error.code === 'permission-denied') {
+              console.log('Permission denied for enrollment check (expected if not authenticated)');
+            }
+          });
             } else {
               try { localStorage.removeItem(cacheKey); } catch (_) {}
               document.getElementById('enrolledState').style.display = 'none';
