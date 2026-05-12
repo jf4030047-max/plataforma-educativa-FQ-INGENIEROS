@@ -121,8 +121,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-compat/app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-compat/firestore.js"></script>
   <script src="../assets/js/firebase-config.js"></script>
 
   <script>
@@ -135,8 +133,7 @@
             { id: 'h1', label: 'Viernes (Opción 1)', detail: '5:00 p.m. — 6:00 p.m. • Viernes 22 de mayo' },
             { id: 'h2', label: 'Viernes (Opción 2)', detail: '7:00 p.m. — 8:00 p.m. • Viernes 22 de mayo' }
           ],
-          startDate: '2026-05-22',
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          startDate: '2026-05-22'
         }
       }
     ];
@@ -154,21 +151,22 @@
       try {
         showStatus('Verificando autenticación...', 'loading');
         
-        const user = auth.currentUser;
-        if (!user) {
-          showStatus('❌ Error: No estás autenticado. Por favor, inicia sesión en el admin panel primero.', 'error');
+        if (!firebase.auth().currentUser) {
+          showStatus('❌ Error: No estás autenticado. Por favor, carga esta página desde el panel de administración.', 'error');
           btn.disabled = false;
           return;
         }
 
         showStatus('Actualizando cursos en Firestore...', 'loading');
 
+        const db = firebase.firestore();
         let updatedCount = 0;
+
         for (const course of COURSES_TO_UPDATE) {
           try {
             await db.collection('courses').doc(course.id).update(course.updateData);
-            updatedCount++;
             console.log(`✓ Curso "${course.name}" actualizado`);
+            updatedCount++;
           } catch (err) {
             console.error(`Error actualizando ${course.id}:`, err);
             throw err;
@@ -185,8 +183,8 @@
     }
 
     window.addEventListener('load', function() {
-      if (auth.currentUser) {
-        console.log('Usuario autenticado:', auth.currentUser.email);
+      if (firebase.auth().currentUser) {
+        console.log('Usuario autenticado:', firebase.auth().currentUser.email);
       }
     });
   </script>
