@@ -769,6 +769,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fecha: document.getElementById('editCursoFecha').value,
         temaPrincipal: document.getElementById('editCursoTema').value,
         price: precioValue,
+        priceDisplay: precioValue === 0 ? 'Gratis' : `S/ ${precioValue}`,
         desc: document.getElementById('editCursoDesc').value,
         temario: temario.length > 0 ? temario : []
       };
