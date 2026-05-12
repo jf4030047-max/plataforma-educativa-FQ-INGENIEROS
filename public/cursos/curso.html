@@ -278,6 +278,58 @@
 
     // Cargar cursos desde Firestore
     var FALLBACK_DATA = {
+      'Wa2NuxyWwKyYmaNqP17T': {
+        temario: [
+          { titulo: 'Introducción a la SST', temas: [
+            'Reseña histórica de la Seguridad y Salud en el Trabajo',
+            'Historia de la SST en el Perú',
+            'Términos y definiciones'
+          ]},
+          { titulo: 'Marco Legal en el Perú', temas: [
+            'Ley N° 29783 y su reglamento D.S. 005-2012-TR',
+            'Leyes de SST',
+            'Resoluciones Ministeriales',
+            'Aplicación en diferentes sectores',
+            'Organismos competentes en el Perú',
+            'Modificatorias',
+            'Principios de la ley'
+          ]},
+          { titulo: 'Peligros y Riesgos', temas: [
+            'Peligros',
+            'Riesgos',
+            'Consecuencias',
+            'Jerarquía de control'
+          ]},
+          { titulo: 'Incidentes y Accidentes', temas: [
+            'Tipos',
+            'Causas',
+            'Reportes'
+          ]},
+          { titulo: 'Análisis de Riesgos', temas: [
+            'Conceptos básicos',
+            'Proceso de análisis',
+            'Elaboración',
+            'Registros'
+          ]}
+        ],
+        includes: [
+          { icon: 'videocam', text: '1 sesión en vivo (1 hora)' },
+          { icon: 'play_circle', text: 'Acceso a la grabación después de la capacitación' },
+          { icon: 'description', text: 'Material de apoyo (si aplica)' },
+          { icon: 'verified', text: 'Constancia de participación digital (gratuita)' },
+          { icon: 'workspace_premium', text: 'Certificado opcional (previo examen y pago de S/ 20)' },
+          { icon: 'forum', text: 'Grupo de coordinación opcional (WhatsApp)' }
+        ],
+        schedules: [
+          { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Jueves 23 de abril' },
+          { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Jueves 23 de abril' }
+        ],
+        icon: 'health_and_safety',
+        badge: 'new',
+        badgeLabel: 'Nuevo',
+        modality: 'En vivo + Grabado',
+        tags: ['Seguridad', 'Obras Civiles', 'Normativa']
+      },
       'sst-obras-civiles': {
         temario: [
           { titulo: 'Introducción a la SST', temas: [
