@@ -421,7 +421,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const nombre = c.name || c.nombre || 'Sin nombre';
         const fecha = c.fecha || c.startDate || c.date || '-';
         const tema = c.temaPrincipal || '-';
-        const precio = c.precio || 'Gratis';
+        // Leer precio: primero intenta price, luego precio, luego priceDisplay, sino Gratis
+        let precio = 'Gratis';
+        if (c.price && c.price > 0) {
+          precio = c.price;
+        } else if (c.precio && c.precio > 0) {
+          precio = c.precio;
+        } else if (c.priceDisplay && typeof c.priceDisplay === 'string') {
+          const priceNum = c.priceDisplay.match(/\d+/)?.[0];
+          precio = priceNum || 'Gratis';
+        }
         const desc = c.desc || c.description || 'Sin descripción';
         const activo = c.active !== false; // Por defecto activo
         const id = c.id || '-';
