@@ -622,25 +622,25 @@ document.addEventListener('DOMContentLoaded', function () {
           <form id="formEditarCurso">
             <div style="margin-bottom:16px;">
               <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Nombre del curso</label>
-              <input type="text" id="editCursoNombre" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;" required>
+              <input type="text" id="editCursoNombre" name="nombre" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;" required>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
               <div>
                 <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Fecha</label>
-                <input type="date" id="editCursoFecha" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;">
+                <input type="date" id="editCursoFecha" name="fecha" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;">
               </div>
               <div>
                 <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Precio</label>
-                <input type="number" id="editCursoPrecio" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;" step="0.01">
+                <input type="number" id="editCursoPrecio" name="precio" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;" step="0.01">
               </div>
             </div>
             <div style="margin-bottom:16px;">
               <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Tema principal</label>
-              <input type="text" id="editCursoTema" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;">
+              <input type="text" id="editCursoTema" name="tema" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;">
             </div>
             <div style="margin-bottom:16px;">
               <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Descripción</label>
-              <textarea id="editCursoDesc" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;min-height:80px;"></textarea>
+              <textarea id="editCursoDesc" name="desc" style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;min-height:80px;"></textarea>
             </div>
             
             <!-- SECCIÓN DE TEMARIO/SUBTEMAS -->
@@ -749,6 +749,9 @@ document.addEventListener('DOMContentLoaded', function () {
       e.preventDefault();
       const docId = form.dataset.docId;
       
+      console.log('=== GUARDAR CURSO ===');
+      console.log('DocID:', docId);
+      
       // Recopilar el temario actualizado
       const temario = [];
       temarioContainer.querySelectorAll('[data-tema]').forEach((el) => {
@@ -759,22 +762,29 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
 
+      const precioValue = parseFloat(document.getElementById('editCursoPrecio').value) || 0;
+      
       const updates = {
         name: document.getElementById('editCursoNombre').value,
         fecha: document.getElementById('editCursoFecha').value,
         temaPrincipal: document.getElementById('editCursoTema').value,
-        precio: parseFloat(document.getElementById('editCursoPrecio').value) || 0,
+        price: precioValue,
         desc: document.getElementById('editCursoDesc').value,
         temario: temario.length > 0 ? temario : []
       };
+      
+      console.log('Datos a guardar:', updates);
 
       try {
+        console.log('Intentando guardar...');
         await db.collection('courses').doc(docId).update(updates);
+        console.log('✅ Guardado exitoso');
         cerrarModal();
         renderCourses();
         actualizarEstadisticas();
         window.mostrarNotificacion('✅ Curso actualizado correctamente', 'success');
       } catch (err) {
+        console.error('❌ Error al guardar:', err);
         window.mostrarNotificacion('❌ Error: ' + err.message, 'error');
       }
     });
@@ -806,24 +816,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Exponemos funciones globales para botones de acciones
   window.editarCurso = function(docId) {
+    console.log('Iniciando editarCurso con docId:', docId);
+    
     db.collection('courses').doc(docId).get().then(doc => {
-      const curso = doc.data();
-      document.getElementById('editCursoNombre').value = curso.name || '';
-      document.getElementById('editCursoFecha').value = curso.fecha || '';
-      document.getElementById('editCursoTema').value = curso.temaPrincipal || '';
-      document.getElementById('editCursoPrecio').value = curso.precio || 0;
-      document.getElementById('editCursoDesc').value = curso.desc || '';
-      
-      // Cargar el temario si existe
-      if (curso.temario && Array.isArray(curso.temario)) {
-        window.cargarTemarioEnModal(curso.temario);
-      } else {
-        window.cargarTemarioEnModal([]);
+      console.log('Documento encontrado:', doc.exists);
+      if (!doc.exists) {
+        window.mostrarNotificacion('❌ El curso no existe', 'error');
+        return;
       }
       
-      document.getElementById('formEditarCurso').dataset.docId = docId;
-      document.getElementById('modalEditarCurso').style.display = 'flex';
+      const curso = doc.data();
+      console.log('Datos del curso:', curso);
+      
+      try {
+        document.getElementById('editCursoNombre').value = curso.name || '';
+        document.getElementById('editCursoFecha').value = curso.fecha || '';
+        document.getElementById('editCursoTema').value = curso.temaPrincipal || '';
+        document.getElementById('editCursoPrecio').value = curso.price || curso.precio || 0;
+        document.getElementById('editCursoDesc').value = curso.desc || '';
+        
+        // Cargar el temario si existe
+        if (curso.temario && Array.isArray(curso.temario)) {
+          window.cargarTemarioEnModal(curso.temario);
+        } else {
+          window.cargarTemarioEnModal([]);
+        }
+        
+        document.getElementById('formEditarCurso').dataset.docId = docId;
+        console.log('Abriendo modal...');
+        document.getElementById('modalEditarCurso').style.display = 'flex';
+        console.log('Modal abierto');
+      } catch (err) {
+        console.error('Error al asignar valores:', err);
+        window.mostrarNotificacion('❌ Error al cargar el formulario: ' + err.message, 'error');
+      }
     }).catch(err => {
+      console.error('Error cargando documento:', err);
       window.mostrarNotificacion('❌ Error al cargar datos: ' + err.message, 'error');
     });
   };
