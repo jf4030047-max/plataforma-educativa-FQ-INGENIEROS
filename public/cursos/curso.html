@@ -582,11 +582,15 @@
             slugId = doc.id;
           }
           
+          // Determinar precio correcto (preferir data.price sobre campos derivados)
+          var finalPrice = data.price || 0;
+          var priceLabel = finalPrice === 0 ? 'Gratis' : ('S/ ' + finalPrice);
+          
           var courseObj = {
             id: doc.id,
             name: data.name || '',
-            price: data.price || 0,
-            priceLabel: 'S/ ' + (data.price || 'Gratis'),
+            price: finalPrice,
+            priceLabel: priceLabel,
             desc: data.desc || '',
             duration: data.duration || '',
             sessions: data.sessions || 1,
