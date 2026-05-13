@@ -333,6 +333,9 @@
     let paymentData = null;
     let chatMinimized = false;
 
+    // Get course parameter from URL
+    var courseParam = new URLSearchParams(window.location.search).get('course') || '';
+
     // Base de conocimiento del chat
     const chatKnowledge = {
       saludo: {
