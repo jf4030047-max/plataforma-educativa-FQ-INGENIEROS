@@ -834,7 +834,28 @@ function showChatBadge() {
 	badge.textContent = parseInt(badge.textContent) + 1;
 }
 
-// Iniciar chat cuando el DOM está listo
+// Inicializar chat al cargar
+function initChat() {
+	showSuggestions();
+	addChatMessage('¡Hola! 👋 Soy tu asistente docente. Estoy aquí para ayudarte a gestionar tus cursos y alumnos. ¿En qué puedo ayudarte?', true);
+	
+	var chatInput = document.getElementById('chatInput');
+	if (chatInput) {
+		chatInput.addEventListener('keypress', function(e) {
+			if (e.key === 'Enter') sendChatMessage();
+		});
+	}
+	
+	var chatCloseBtn = document.getElementById('chatCloseBtn');
+	if (chatCloseBtn) {
+		chatCloseBtn.addEventListener('click', function(e) {
+			e.stopPropagation();
+			toggleChat();
+		});
+	}
+}
+
+// Iniciar cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function() {
 	if (db) initProfPanel();
 	setTimeout(initChat, 500);
