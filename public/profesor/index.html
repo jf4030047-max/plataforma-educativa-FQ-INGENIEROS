@@ -533,12 +533,12 @@
 	</div>
 </body>
 <script>
-// ═══ CONFIG: Claves por curso ═══
+// ═══ CONFIG: Claves por curso con profesor ID ═══
 var PROF_CODES = {
-	'20': { name: 'Profesor SST', keywords: ['seguridad', 'sst', 'salud'] },
-	'21': { name: 'Profesor Topografía', keywords: ['topograf'] },
-	'22': { name: 'Profesor Supervisión', keywords: ['supervis'] },
-	'23': { name: 'Profesor Topografía', keywords: ['topograf'] }
+	'20': { name: 'Profesor SST', profesorId: 'prof_001', email: 'profesor.sst@fqingenieros.com' },
+	'21': { name: 'Profesor Topografía', profesorId: 'prof_002', email: 'profesor.topografia@fqingenieros.com' },
+	'22': { name: 'Profesor Supervisión', profesorId: 'prof_003', email: 'profesor.supervision@fqingenieros.com' },
+	'23': { name: 'Profesor Topografía', profesorId: 'prof_002', email: 'profesor.topografia@fqingenieros.com' }
 };
 var currentProf = null;
 var coursesData = [];
@@ -548,10 +548,8 @@ var materialsData = [];
 
 function courseMatchesProf(course) {
 	if (!currentProf) return true;
-	var name = ((course.name || '') + ' ' + (course.id || '')).toLowerCase();
-	return currentProf.keywords.some(function(kw) {
-		return name.indexOf(kw) !== -1;
-	});
+	// Filtrar por profesorId exacto - reemplaza keyword matching
+	return course.profesorId === currentProf.profesorId;
 }
 function myCourses() {
 	if (!currentProf) return coursesData;

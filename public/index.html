@@ -80,6 +80,7 @@
             <li id="sst-time"><span class="material-icons-round">schedule</span> 5:00 p.m. — 6:00 p.m. / 7:00 p.m. — 8:00 p.m.</li>
             <li><span class="material-icons-round">videocam</span> Zoom en vivo + Grabación</li>
             <li><span class="material-icons-round">workspace_premium</span> Constancia incluida</li>
+            <li id="sst-prof" style="display:none"><span class="material-icons-round">person</span> <span id="sst-prof-name"></span></li>
           </ul>
           <div class="course-action" data-course="sst-obras-civiles" id="current-course-action"></div>
 
@@ -91,6 +92,7 @@
             <li id="topo-date"><span class="material-icons-round">calendar_month</span> sábado 9 de mayo, 2026</li>
             <li id="topo-duration"><span class="material-icons-round">schedule</span> 8 horas · En vivo + Grabado</li>
             <li id="topo-price"><span class="material-icons-round">sell</span> S/ 200</li>
+            <li id="topo-prof" style="display:none"><span class="material-icons-round">person</span> <span id="topo-prof-name"></span></li>
           </ul>
           <div class="course-action" data-course="topografia-civil-3d"></div>
 
@@ -131,6 +133,7 @@
               <span><span class="material-icons-round">schedule</span> 1 hora</span>
               <span><span class="material-icons-round">event_seat</span> Cupos disponibles</span>
               <span><span class="material-icons-round">videocam</span> En vivo + Grabado</span>
+              <span id="sst-card-prof" style="display:none"><span class="material-icons-round">person</span> <span id="sst-card-prof-name"></span></span>
             </div>
             <div class="course-action" data-course="sst-obras-civiles"></div>
           </article>
@@ -146,6 +149,7 @@
               <span><span class="material-icons-round">schedule</span> 8 horas</span>
               <span><span class="material-icons-round">event_seat</span> Cupos disponibles</span>
               <span><span class="material-icons-round">videocam</span> En vivo + Grabado</span>
+              <span id="topo-card-prof" style="display:none"><span class="material-icons-round">person</span> <span id="topo-card-prof-name"></span></span>
             </div>
             <div class="course-action" data-course="topografia-civil-3d"></div>
           </article>
@@ -161,6 +165,7 @@
               <span><span class="material-icons-round">schedule</span> 16 horas</span>
               <span><span class="material-icons-round">event_seat</span> Cupos disponibles</span>
               <span><span class="material-icons-round">videocam</span> En vivo + Grabado</span>
+              <span id="super-card-prof" style="display:none"><span class="material-icons-round">person</span> <span id="super-card-prof-name"></span></span>
             </div>
             <div class="course-action" data-course="supervision-obra"></div>
           </article>
@@ -335,11 +340,31 @@
       if(v(f.startDate)&&(el=document.getElementById('topo-date')))el.innerHTML='<span class="material-icons-round">calendar_month</span> '+fmt(v(f.startDate));
       if(v(f.duration)&&(el=document.getElementById('topo-duration')))el.innerHTML='<span class="material-icons-round">schedule</span> '+v(f.duration)+(v(f.modality)?' · '+v(f.modality):'');
       if((el=document.getElementById('topo-price'))){var p=v(f.price);el.innerHTML='<span class="material-icons-round">sell</span> '+(p&&p!=='0'?'S/ '+p:'Precio por definir');}
+      // Mostrar profesor si está disponible
+      if(v(f.profesorNombre)){
+        var prof=v(f.profesorNombre);
+        var el1=document.getElementById('topo-prof');if(el1){el1.style.display='flex';document.getElementById('topo-prof-name').textContent=prof;}
+        var el2=document.getElementById('topo-card-prof');if(el2){el2.style.display='flex';document.getElementById('topo-card-prof-name').textContent=prof;}
+      }
     }).catch(function(){});
     fetch(B+'sst-obras-civiles?t='+Date.now()).then(function(r){return r.json()}).then(function(j){
       var f=j.fields||{};var el;
       if(v(f.startDate)&&(el=document.getElementById('sst-date')))el.innerHTML='<span class="material-icons-round">calendar_month</span> '+fmt(v(f.startDate));
       if(v(f.startTime)&&(el=document.getElementById('sst-time'))){var t=v(f.startTime);if(v(f.endTime))t+=' — '+v(f.endTime);el.innerHTML='<span class="material-icons-round">schedule</span> '+t;}
+      // Mostrar profesor si está disponible
+      if(v(f.profesorNombre)){
+        var prof=v(f.profesorNombre);
+        var el1=document.getElementById('sst-prof');if(el1){el1.style.display='flex';document.getElementById('sst-prof-name').textContent=prof;}
+        var el2=document.getElementById('sst-card-prof');if(el2){el2.style.display='flex';document.getElementById('sst-card-prof-name').textContent=prof;}
+      }
+    }).catch(function(){});
+    fetch(B+'supervision-obra?t='+Date.now()).then(function(r){return r.json()}).then(function(j){
+      var f=j.fields||{};
+      // Mostrar profesor si está disponible
+      if(v(f.profesorNombre)){
+        var prof=v(f.profesorNombre);
+        var el1=document.getElementById('super-card-prof');if(el1){el1.style.display='flex';document.getElementById('super-card-prof-name').textContent=prof;}
+      }
     }).catch(function(){});
   })();
   </script>

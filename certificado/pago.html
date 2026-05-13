@@ -216,6 +216,7 @@
               <div class="info-row"><span class="label">Método seleccionado</span><span class="value highlight" id="selectedMethod">Yape</span></div>
               <div class="info-row"><span class="label">Titular</span><span class="value" id="accountHolder">FQ INGENIEROS E.I.R.L.</span></div>
               <div class="info-row"><span class="label">Número / Cuenta</span><span class="value" id="accountNumber">958 003 888</span></div>
+              <div class="info-row" id="profesorNameRow" style="display:none"><span class="label">👨‍🏫 Profesor</span><span class="value" id="profesorNameValue">—</span></div>
               <div class="info-row"><span class="label">Monto del certificado</span><span class="value highlight" id="certAmount">S/ 20.00</span></div>
               <div class="info-row"><span class="label">Concepto</span><span class="value">Certificado de curso</span></div>
             </div>
@@ -545,6 +546,7 @@
         currentCourse = null;
         document.getElementById('certAmount').textContent = 'S/ 0.00';
         document.getElementById('summaryTotal').innerHTML = '<span class="sl">Total a pagar</span><span class="sv">S/ 0.00</span>';
+        document.getElementById('profesorNameRow').style.display = 'none';
         return;
       }
       
@@ -562,6 +564,14 @@
         
         document.getElementById('certAmount').textContent = priceStr;
         document.getElementById('summaryTotal').innerHTML = '<span class="sl">Total a pagar</span><span class="sv">' + priceStr + '</span>';
+        
+        // Mostrar nombre del profesor si está disponible
+        if (currentCourse.profesorNombre) {
+          document.getElementById('profesorNameRow').style.display = 'flex';
+          document.getElementById('profesorNameValue').textContent = currentCourse.profesorNombre;
+        } else {
+          document.getElementById('profesorNameRow').style.display = 'none';
+        }
       }
     }
 
