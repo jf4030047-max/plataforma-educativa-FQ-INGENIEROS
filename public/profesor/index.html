@@ -94,28 +94,48 @@
 		.code-input{width:200px;padding:14px 20px;border:2px solid #dce3ed;border-radius:12px;font-size:24px;font-weight:700;text-align:center;letter-spacing:8px;font-family:inherit;transition:border-color .2s}
 		.code-input:focus{outline:none;border-color:#d97706}
 		.login-error{color:#dc2626;font-size:13px;margin-top:10px;display:none}
-	/* Chat Widget */
-	.chat-widget{position:fixed;bottom:20px;right:20px;width:360px;max-height:600px;background:#fff;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.2);display:flex;flex-direction:column;z-index:100;overflow:hidden;animation:slideUp .3s ease-out;pointer-events:none}
-	@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-	.chat-header{background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff;padding:20px;display:flex;justify-content:space-between;align-items:center;pointer-events:auto}
-	.chat-header h3{margin:0;font-size:16px;font-weight:700}
-	.chat-close{background:rgba(255,255,255,.2);border:none;color:#fff;cursor:pointer;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .2s;pointer-events:auto}
-	.chat-close:hover{background:rgba(255,255,255,.3)}
-	.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;pointer-events:auto}
-	.chat-message{padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.5;max-width:85%;word-wrap:break-word;animation:fadeIn .3s ease-out}
+	/* Chat Widget - Professional Design */
+	.chat-widget{position:fixed;bottom:20px;right:20px;width:380px;max-height:650px;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.3);display:flex;flex-direction:column;z-index:100;overflow:hidden;animation:slideUp .3s cubic-bezier(.34,.1,.68,1);pointer-events:none;border:1px solid #e0e7ff}
+	@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+	.chat-header{background:linear-gradient(135deg,#d97706 0%,#f59e0b 100%);color:#fff;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;pointer-events:auto;border-bottom:2px solid #ea8c1a}
+	.chat-header h3{margin:0;font-size:16px;font-weight:700;letter-spacing:.3px}
+	.chat-header-icon{font-size:20px;margin-right:8px}
+	.chat-close{background:rgba(255,255,255,.2);border:none;color:#fff;cursor:pointer;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .2s;pointer-events:auto;font-weight:bold}
+	.chat-close:hover{background:rgba(255,255,255,.35);transform:rotate(90deg)}
+	.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;pointer-events:auto;background:#fafbfc}
+	.chat-message{padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.5;max-width:90%;word-wrap:break-word;animation:fadeIn .3s ease-out;box-shadow:0 2px 8px rgba(0,0,0,.06)}
 	@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-	.chat-message.bot{background:#f0f4ff;color:#0f172a;border-left:3px solid #d97706;align-self:flex-start}
-	.chat-message.user{background:#d97706;color:#fff;align-self:flex-end}
-	.chat-input-group{display:flex;gap:8px;padding:12px;border-top:1px solid #dce3ed;pointer-events:auto}
-	.chat-input{flex:1;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:10px;font-size:13px;font-family:inherit;outline:none;transition:all .2s}
-	.chat-input:focus{border-color:#d97706;box-shadow:0 0 0 3px rgba(217,119,6,.1)}
-	.chat-send{background:#d97706;color:#fff;border:none;cursor:pointer;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;transition:all .2s;pointer-events:auto}
-	.chat-send:hover{background:#b45309;transform:scale(1.05)}
-	.chat-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 16px;font-size:12px;pointer-events:auto}
-	.chat-suggestion-btn{padding:6px 10px;background:#f0f4ff;border:1px solid #dce3ed;border-radius:8px;cursor:pointer;color:#d97706;font-weight:500;transition:all .2s;pointer-events:auto}
-	.chat-suggestion-btn:hover{background:#d97706;color:#fff;border-color:#d97706}
-	.chat-badge{position:absolute;top:-8px;right:-8px;background:#dc2626;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;animation:pulse .6s infinite;pointer-events:none}
-	@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+	.chat-message.bot{background:linear-gradient(135deg,#f0f4ff,#eff6ff);color:#0f172a;border-left:4px solid #d97706;align-self:flex-start;font-weight:500}
+	.chat-message.user{background:linear-gradient(135deg,#d97706,#ea8c1a);color:#fff;align-self:flex-end;border-radius:12px 0 12px 12px}
+	.chat-input-group{display:flex;gap:8px;padding:14px;border-top:2px solid #e0e7ff;pointer-events:auto;background:#fff}
+	.chat-input{flex:1;padding:11px 14px;border:1.5px solid #e0e7ff;border-radius:10px;font-size:13px;font-family:inherit;outline:none;transition:all .2s;background:#f8f9fa}
+	.chat-input:focus{border-color:#d97706;box-shadow:0 0 0 3px rgba(217,119,6,.12);background:#fff}
+	.chat-send{background:linear-gradient(135deg,#d97706,#ea8c1a);color:#fff;border:none;cursor:pointer;border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;transition:all .2s;pointer-events:auto;font-weight:700}
+	.chat-send:hover{transform:scale(1.08);box-shadow:0 4px 12px rgba(217,119,6,.3)}
+	.chat-send:active{transform:scale(.95)}
+	.chat-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;font-size:11px;pointer-events:auto;background:#fafbfc;border-top:1px solid #e0e7ff}
+	.chat-suggestion-btn{padding:7px 12px;background:linear-gradient(135deg,#f0f4ff,#eff6ff);border:1.5px solid #dce3ed;border-radius:8px;cursor:pointer;color:#d97706;font-weight:600;transition:all .2s;pointer-events:auto;font-size:12px}
+	.chat-suggestion-btn:hover{background:linear-gradient(135deg,#d97706,#ea8c1a);color:#fff;border-color:#d97706;transform:translateY(-2px);box-shadow:0 4px 12px rgba(217,119,6,.2)}
+	.chat-badge{position:absolute;top:-8px;right:-8px;background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;animation:pulse .6s infinite;pointer-events:none;border:2px solid #fff;box-shadow:0 2px 8px rgba(220,38,38,.3)}
+	@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+	/* Forms & Modals */
+	.form-group{margin-bottom:16px}
+	.form-label{display:block;margin-bottom:6px;font-size:12px;font-weight:700;color:#0f172a;text-transform:uppercase;letter-spacing:.5px}
+	.form-control{width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:10px;font-size:13px;font-family:inherit;background:#f8f9fa;transition:all .2s}
+	.form-control:focus{outline:none;border-color:#d97706;background:#fff;box-shadow:0 0 0 3px rgba(217,119,6,.1)}
+	.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999}
+	.modal-overlay.active{display:flex}
+	.modal-dialog{background:#fff;border-radius:16px;width:90%;max-width:500px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:modalSlide .3s ease-out}
+	@keyframes modalSlide{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+	.modal-dialog h2{font-size:20px;font-weight:800;color:#0f172a;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+	.modal-actions{display:flex;gap:10px;margin-top:20px}
+	.btn{padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .2s;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+	.btn-primary{background:linear-gradient(135deg,#d97706,#ea8c1a);color:#fff}
+	.btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(217,119,6,.3)}
+	.btn-danger{background:#dc2626;color:#fff}
+	.btn-danger:hover{background:#b91c1c;transform:translateY(-2px)}
+	.btn-secondary{background:#e0e7ff;color:#0f172a}
+	.btn-secondary:hover{background:#dce3ed}
 	@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{display:none}.stats-grid{grid-template-columns:1fr}.card-grid{grid-template-columns:1fr}.chat-widget{width:100%;left:0;right:0;bottom:0;border-radius:16px 16px 0 0;max-height:70vh}}
 		@media(max-width:600px){.content{padding:20px 16px}.top-bar{padding:0 16px}}
 	</style>
@@ -362,10 +382,10 @@
 			</div>
 			<nav class="sidebar-nav">
 				<div class="nav-label">Menú</div>
-				<a class="nav-item active" href="#"><span class="material-icons-round">dashboard</span> Panel</a>
-				<a class="nav-item" href="#"><span class="material-icons-round">class</span> Mis Cursos</a>
-				<a class="nav-item" href="#"><span class="material-icons-round">event</span> Sesiones</a>
-				<a class="nav-item" href="#"><span class="material-icons-round">logout</span> <span onclick="logout()">Cerrar sesión</span></a>
+				<a class="nav-item active" onclick="showPanel('dashboard', this)"><span class="material-icons-round">dashboard</span> Panel</a>
+				<a class="nav-item" onclick="showPanel('cursos', this)"><span class="material-icons-round">book</span> Mis Cursos</a>
+				<a class="nav-item" onclick="showPanel('alumnos', this)"><span class="material-icons-round">people</span> Alumnos</a>
+				<a class="nav-item" onclick="logoutProf()"><span class="material-icons-round">logout</span> Cerrar sesión</a>
 			</nav>
 			<div class="sidebar-footer">© 2026 FQ INGENIEROS</div>
 		</aside>
@@ -383,17 +403,56 @@
 						<div class="stat-info"><strong id="statCursos">0</strong><span>Cursos asignados</span></div>
 					</div>
 					<div class="stat-card">
-						<div class="stat-icon blue"><span class="material-icons-round">event</span></div>
-						<div class="stat-info"><strong id="statExamenes">0</strong><span>Sesiones próximas</span></div>
+						<div class="stat-icon blue"><span class="material-icons-round">people</span></div>
+						<div class="stat-info"><strong id="statAlumnos">0</strong><span>Alumnos matriculados</span></div>
 					</div>
 					<div class="stat-card">
 						<div class="stat-icon green"><span class="material-icons-round">check_circle</span></div>
-						<div class="stat-info"><strong id="statAlumnos">0</strong><span>Alumnos activos</span></div>
+						<div class="stat-info"><strong id="statTotal">0</strong><span>Estudiantes totales</span></div>
 					</div>
 				</div>
-				<div class="panel active" id="panel-alumnos">
+
+				<!-- PANEL: DASHBOARD -->
+				<div class="panel active" id="panel-dashboard">
 					<div class="panel-header">
-						<h3>Alumnos <span id="alumnosTotal" style="font-size:15px;color:#64748b;font-weight:500"></span></h3>
+						<h3><span class="material-icons-round" style="color:#d97706">dashboard</span> Mi Panel</h3>
+						<button class="btn btn-amber" onclick="showPanel('cursos', document.querySelector('.nav-item:nth-child(2)'))">
+							<span class="material-icons-round">add_circle</span> Agregar curso
+						</button>
+					</div>
+					<div id="dashboardContent"></div>
+				</div>
+
+				<!-- PANEL: MIS CURSOS -->
+				<div class="panel" id="panel-cursos">
+					<div class="panel-header">
+						<h3><span class="material-icons-round" style="color:#1565c0">book</span> Mis Cursos</h3>
+						<button class="btn btn-primary" onclick="openAddCourseModal()">
+							<span class="material-icons-round">add_circle</span> Nuevo curso
+						</button>
+					</div>
+					<div id="cursosTable" class="table-wrap">
+						<table>
+							<thead>
+								<tr>
+									<th>Curso</th>
+									<th>Alumnos</th>
+									<th>Precio</th>
+									<th>Estado</th>
+									<th>Acciones</th>
+								</tr>
+							</thead>
+							<tbody id="cursosTableBody">
+								<tr><td colspan="5" style="text-align:center;padding:32px;color:#64748b">Cargando cursos...</td></tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<!-- PANEL: ALUMNOS -->
+				<div class="panel" id="panel-alumnos">
+					<div class="panel-header">
+						<h3><span class="material-icons-round" style="color:#16a34a">people</span> Alumnos Matriculados</h3>
 						<div class="search-box">
 							<span class="material-icons-round">search</span>
 							<input type="text" placeholder="Buscar alumno..." id="searchAlumnos" oninput="renderAlumnos()" />
@@ -404,12 +463,14 @@
 							<thead>
 								<tr>
 									<th>Alumno</th>
-									<th>Cursos</th>
-									<th>Registro</th>
+									<th>Email</th>
+									<th>Curso</th>
+									<th>Fecha Inscripción</th>
+									<th>Estado</th>
 								</tr>
 							</thead>
-							<tbody id="alumnosTable">
-								<tr><td colspan="3" style="text-align:center;color:#64748b;padding:32px">Cargando alumnos...</td></tr>
+							<tbody id="alumnosTableBody">
+								<tr><td colspan="5" style="text-align:center;padding:32px;color:#64748b">Cargando alumnos...</td></tr>
 							</tbody>
 						</table>
 					</div>
@@ -421,15 +482,53 @@
 	<!-- Chat Widget -->
 	<div class="chat-widget" id="chatWidget">
 		<div class="chat-header" onclick="toggleChat()">
-			<h3>💬 Asistente del Profesor</h3>
+			<span class="chat-header-icon">💬</span>
+			<h3>Asistente Docente</h3>
 			<button class="chat-close" id="chatCloseBtn">−</button>
-			<span class="chat-badge" id="chatBadge">1</span>
+			<span class="chat-badge" id="chatBadge" style="display:none">1</span>
 		</div>
 		<div class="chat-messages" id="chatMessages"></div>
 		<div class="chat-suggestions" id="chatSuggestions"></div>
 		<div class="chat-input-group">
-			<input type="text" class="chat-input" id="chatInput" placeholder="Pregunta algo..." />
-			<button class="chat-send" onclick="sendChatMessage()"><span class="material-icons-round">send</span></button>
+			<input type="text" class="chat-input" id="chatInput" placeholder="Haz una pregunta..." />
+			<button class="chat-send" onclick="sendChatMessage()"><span class="material-icons-round" style="font-size:18px">send</span></button>
+		</div>
+	</div>
+
+	<!-- MODAL: AGREGAR/EDITAR CURSO -->
+	<div class="modal-overlay" id="courseModal">
+		<div class="modal-dialog">
+			<h2><span class="material-icons-round">edit</span> <span id="courseModalTitle">Nuevo Curso</span></h2>
+			<form id="courseForm" onsubmit="saveCourse(event)">
+				<div class="form-group">
+					<label class="form-label">Nombre del curso</label>
+					<input type="text" class="form-control" id="courseName" placeholder="Ej: Seguridad y Salud" required />
+				</div>
+				<div class="form-group">
+					<label class="form-label">Precio (S/)</label>
+					<input type="number" class="form-control" id="coursePrice" placeholder="0.00" step="0.01" min="0" required />
+				</div>
+				<div class="form-group">
+					<label class="form-label">Descripción</label>
+					<input type="text" class="form-control" id="courseDesc" placeholder="Descripción breve..." />
+				</div>
+				<div class="form-group">
+					<label class="form-label">Duración</label>
+					<input type="text" class="form-control" id="courseDuration" placeholder="Ej: 4 semanas" />
+				</div>
+				<div class="form-group">
+					<label class="form-label">Link Zoom</label>
+					<input type="text" class="form-control" id="courseZoom" placeholder="https://zoom.us/j/..." />
+				</div>
+				<div class="modal-actions">
+					<button type="submit" class="btn btn-primary" style="flex:1">
+						<span class="material-icons-round">save</span> Guardar
+					</button>
+					<button type="button" class="btn btn-secondary" onclick="closeModal('courseModal')" style="flex:1">
+						<span class="material-icons-round">close</span> Cancelar
+					</button>
+				</div>
+			</form>
 		</div>
 	</div>
 </body>
@@ -619,31 +718,27 @@ var chatMinimized = false;
 const chatKnowledge = {
 	saludo: {
 		palabras: ['hola', 'hey', 'buenos', 'ayuda', 'help', 'hi'],
-		respuesta: '¡Hola! 👋 Bienvenido. Aquí puedes:\n\n📊 **Ver dashboard** - Estadísticas de tus cursos\n👥 **Gestionar alumnos** - Control de estudiantes\n📚 **Cursos y sesiones** - Información de clases\n📝 **Materiales** - Recursos pedagógicos\n\n¿En qué puedo ayudarte?'
+		respuesta: '¡Hola! 👋 Bienvenido a tu panel docente. Aquí puedes:\n\n📚 **Ver tus cursos** - Gestiona todos tus cursos\n👥 **Ver alumnos** - Visualiza estudiantes matriculados\n✏️ **Editar cursos** - Modifica detalles y precios\n🗑️ **Eliminar cursos** - Elimina si es necesario\n\n¿En qué puedo ayudarte?'
 	},
 	cursos: {
-		palabras: ['curso', 'cursos', 'mis cursos', 'asignados'],
-		respuesta: '📚 **Tus Cursos:**\n\nDesde el panel puedes ver:\n• Cursos asignados a tu cuenta\n• Cantidad de alumnos por curso\n• Sesiones programadas\n• Enlaces a Zoom\n• Grabaciones disponibles\n\n¿Necesitas más información?'
+		palabras: ['curso', 'cursos', 'mis cursos', 'crear', 'nuevo', 'agregar'],
+		respuesta: '📚 **Gestión de Cursos:**\n\n✅ Puedes:\n• Ver todos tus cursos\n• Crear cursos nuevos\n• Editar información del curso\n• Ver cantidad de alumnos inscritos\n• Agregar link de Zoom\n• Definir precio\n\nHaz clic en "Nuevo curso" para empezar.'
 	},
 	alumnos: {
-		palabras: ['alumno', 'alumnos', 'estudiante', 'estudiantes'],
-		respuesta: '👥 **Gestión de Alumnos:**\n\nPuedes ver:\n• Lista completa de alumnos\n• Cursos en los que están inscritos\n• Fecha de registro\n• Filtrar por nombre o email\n\nBusca un alumno usando el buscador arriba.'
+		palabras: ['alumno', 'alumnos', 'estudiante', 'estudiantes', 'matriculado', 'inscritos'],
+		respuesta: '👥 **Alumnos Matriculados:**\n\nVes:\n• Nombre completo\n• Email del estudiante\n• Cursos en que está inscrito\n• Fecha de inscripción\n• Estado de matrícula\n\nPuedes buscar por nombre o email. Los datos son de solo lectura.'
 	},
-	sesion: {
-		palabras: ['sesión', 'sesiones', 'zoom', 'clase', 'clase en vivo'],
-		respuesta: '🎥 **Sesiones y Zoom:**\n\n• Tu enlace Zoom está disponible en el panel\n• Comparte el link con tus alumnos\n• Las grabaciones se guardan automáticamente\n• Accede a historial de sesiones\n\n¿Necesitas tu enlace de Zoom?'
+	editar: {
+		palabras: ['editar', 'modificar', 'cambiar', 'actualizar', 'precio', 'datos'],
+		respuesta: '✏️ **Cómo Editar un Curso:**\n\n1️⃣ Ve a la pestaña "Mis Cursos"\n2️⃣ Haz clic en "Editar"\n3️⃣ Modifica los datos\n4️⃣ Guarda los cambios\n\nPuedes cambiar:\n• Nombre del curso\n• Precio\n• Descripción\n• Duración\n• Link de Zoom'
 	},
-	material: {
-		palabras: ['material', 'materiales', 'recurso', 'recursos', 'archivo', 'descargar'],
-		respuesta: '📁 **Materiales Pedagógicos:**\n\nGestiona:\n• Documentos y guías de estudio\n• Presentaciones\n• Archivos de referencia\n• Enlaces a recursos externos\n\nTodos accesibles desde la sección de Materiales.'
-	},
-	calificacion: {
-		palabras: ['calificación', 'calificaciones', 'notas', 'calificar', 'examen'],
-		respuesta: '✅ **Calificaciones:**\n\nPuedes:\n• Ver resultados de exámenes\n• Registrar notas\n• Dar retroalimentación\n• Exportar reportes\n\nContacta al administrador para detalles.'
+	eliminar: {
+		palabras: ['eliminar', 'borrar', 'quitar', 'delete', 'borrado'],
+		respuesta: '🗑️ **Cómo Eliminar un Curso:**\n\n⚠️ Importante:\n• Se eliminará permanentemente\n• Los alumnos perderán acceso\n• No se puede deshacer\n• Requiere confirmación\n\n👉 Usa el botón rojo "Eliminar" en la tabla'
 	},
 	problema: {
-		palabras: ['error', 'problema', 'no funciona', 'falla', 'bug', 'ayuda'],
-		respuesta: '🆘 **¿Tienes un problema?**\n\n• ¿No ves tus cursos?\n• ¿Problemas con Zoom?\n• ¿No puedes cargar materiales?\n• ¿Otra cosa?\n\nCuéntame qué sucede exactamente.'
+		palabras: ['error', 'problema', 'no funciona', 'falla', 'bug', 'no puedo', 'ayuda'],
+		respuesta: '🆘 **¿Tienes un problema?**\n\n• ¿No ves tus cursos?\n• ¿No puedes editar?\n• ¿Problemas al crear?\n• ¿No se guardan los cambios?\n• ¿Algo más?\n\nCuéntame exactamente qué sucede y te ayudaré.'
 	}
 };
 
@@ -679,8 +774,8 @@ function showSuggestions() {
 	var suggestions = [
 		{ text: '📚 Mis Cursos', query: 'mis cursos' },
 		{ text: '👥 Alumnos', query: 'alumnos' },
-		{ text: '🎥 Zoom', query: 'zoom' },
-		{ text: '📁 Materiales', query: 'materiales' }
+		{ text: '✏️ Editar', query: 'editar' },
+		{ text: '🗑️ Eliminar', query: 'eliminar' }
 	];
 	
 	suggestionsDiv.innerHTML = suggestions.map(function(s) {
@@ -739,30 +834,253 @@ function showChatBadge() {
 	badge.textContent = parseInt(badge.textContent) + 1;
 }
 
-// Inicializar chat al cargar
-function initChat() {
-	showSuggestions();
-	addChatMessage('¡Hola! 👋 Soy tu asistente. Estoy aquí para ayudarte con cualquier pregunta sobre tus cursos, alumnos y sesiones. ¿En qué puedo ayudarte?', true);
+// Iniciar chat cuando el DOM está listo
+document.addEventListener('DOMContentLoaded', function() {
+	if (db) initProfPanel();
+	setTimeout(initChat, 500);
 	
-	var chatInput = document.getElementById('chatInput');
-	if (chatInput) {
-		chatInput.addEventListener('keypress', function(e) {
-			if (e.key === 'Enter') sendChatMessage();
+	// Cerrar modales al presionar ESC
+	document.addEventListener('keydown', function(e) {
+		if (e.key === 'Escape') {
+			closeModal('courseModal');
+		}
+	});
+	
+	// Cerrar modales al hacer click en el overlay
+	document.querySelectorAll('.modal-overlay').forEach(function(modal) {
+		modal.addEventListener('click', function(e) {
+			if (e.target === this) closeModal(this.id);
 		});
+	});
+});
+
+// ═══ GLOBAL STATE & HELPER FUNCTIONS ═══
+var currentEditingCourseId = null;
+
+function escapeHtml(str) {
+	return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getInitials(name) {
+	return (name || '?').split(' ').map(function(w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
+}
+
+function formatDate(ts) {
+	if (!ts) return '—';
+	var d = ts.toDate ? ts.toDate() : new Date(ts);
+	return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+// ═══ UI & MODAL FUNCTIONS ═══
+function openModal(id) {
+	document.getElementById(id).classList.add('active');
+}
+
+function closeModal(id) {
+	document.getElementById(id).classList.remove('active');
+	if (id === 'courseModal') {
+		document.getElementById('courseForm').reset();
+		currentEditingCourseId = null;
 	}
+}
+
+function openAddCourseModal() {
+	currentEditingCourseId = null;
+	document.getElementById('courseModalTitle').textContent = 'Nuevo Curso';
+	document.getElementById('courseForm').reset();
+	openModal('courseModal');
+}
+
+function openEditCourseModal(courseId) {
+	currentEditingCourseId = courseId;
+	var curso = coursesData.find(function(c) { return c.id === courseId; });
+	if (curso) {
+		document.getElementById('courseModalTitle').textContent = 'Editar: ' + curso.name;
+		document.getElementById('courseName').value = curso.name || '';
+		document.getElementById('coursePrice').value = curso.price || curso.precio || 0;
+		document.getElementById('courseDesc').value = curso.descripción || curso.description || '';
+		document.getElementById('courseDuration').value = curso.duration || '';
+		document.getElementById('courseZoom').value = curso.zoomLink || '';
+		openModal('courseModal');
+	}
+}
+
+// ═══ FIRESTORE CRUD FUNCTIONS ═══
+function saveCourse(e) {
+	e.preventDefault();
 	
-	var chatCloseBtn = document.getElementById('chatCloseBtn');
-	if (chatCloseBtn) {
-		chatCloseBtn.addEventListener('click', function(e) {
-			e.stopPropagation();
-			toggleChat();
+	var courseData = {
+		name: document.getElementById('courseName').value,
+		price: parseFloat(document.getElementById('coursePrice').value) || 0,
+		precio: parseFloat(document.getElementById('coursePrice').value) || 0,
+		descripción: document.getElementById('courseDesc').value,
+		description: document.getElementById('courseDesc').value,
+		duration: document.getElementById('courseDuration').value,
+		zoomLink: document.getElementById('courseZoom').value,
+		updatedAt: new Date()
+	};
+	
+	if (currentEditingCourseId) {
+		db.collection('courses').doc(currentEditingCourseId).update(courseData).then(function() {
+			showNotification('✓ Curso actualizado correctamente', 'success');
+			closeModal('courseModal');
+		}).catch(function(err) {
+			showNotification('✗ Error al actualizar: ' + err.message, 'error');
+		});
+	} else {
+		db.collection('courses').add(courseData).then(function() {
+			showNotification('✓ Curso creado correctamente', 'success');
+			closeModal('courseModal');
+		}).catch(function(err) {
+			showNotification('✗ Error al crear: ' + err.message, 'error');
 		});
 	}
 }
 
-// Iniciar chat cuando el DOM está listo
-document.addEventListener('DOMContentLoaded', function() {
-	setTimeout(initChat, 500);
-});
+function deleteCourse(courseId) {
+	if (confirm('⚠️ ¿Estás seguro de que deseas eliminar este curso? Esta acción no se puede deshacer.')) {
+		db.collection('courses').doc(courseId).delete().then(function() {
+			showNotification('✓ Curso eliminado correctamente', 'success');
+		}).catch(function(err) {
+			showNotification('✗ Error al eliminar: ' + err.message, 'error');
+		});
+	}
+}
+
+// ═══ RENDER FUNCTIONS ═══
+function renderDashboard() {
+	var html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px">';
+	
+	coursesData.slice(0, 3).forEach(function(c) {
+		var enrolled = usersData.filter(function(u) {
+			return u.enrolledCourses && u.enrolledCourses.indexOf(c.id) !== -1;
+		}).length;
+		
+		html += '<div class="course-card">';
+		html += '<h4><span class="material-icons-round" style="color:#d97706">book</span> ' + escapeHtml(c.name) + '</h4>';
+		html += '<div style="display:flex;gap:16px;font-size:13px;color:#64748b;margin:10px 0">';
+		html += '<span><strong>' + enrolled + '</strong> alumnos</span>';
+		html += '<span><strong>S/ ' + (c.price || c.precio || 0).toFixed(2) + '</strong></span>';
+		html += '</div>';
+		html += '<div style="display:flex;gap:8px;margin-top:12px">';
+		html += '<button class="btn btn-sm btn-amber" onclick="openEditCourseModal(\'' + c.id + '\')"><span class="material-icons-round" style="font-size:16px">edit</span> Editar</button>';
+		html += '<button class="btn btn-sm btn-danger" onclick="deleteCourse(\'' + c.id + '\')"><span class="material-icons-round" style="font-size:16px">delete</span></button>';
+		html += '</div>';
+		html += '</div>';
+	});
+	
+	html += '</div>';
+	var dashEl = document.getElementById('dashboardContent');
+	if (dashEl) dashEl.innerHTML = html;
+}
+
+function renderCursos() {
+	var tbody = document.getElementById('cursosTableBody');
+	if (!tbody) return;
+	
+	if (coursesData.length === 0) {
+		tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:#64748b">No hay cursos. <a href="#" onclick="openAddCourseModal();return false" style="color:#d97706;font-weight:700;text-decoration:underline">Crear uno ahora</a></td></tr>';
+		return;
+	}
+	
+	tbody.innerHTML = coursesData.map(function(c) {
+		var enrolled = usersData.filter(function(u) {
+			return u.enrolledCourses && u.enrolledCourses.indexOf(c.id) !== -1;
+		}).length;
+		
+		return '<tr>' +
+			'<td><strong>' + escapeHtml(c.name) + '</strong></td>' +
+			'<td>' + enrolled + '</td>' +
+			'<td>S/ ' + (c.price || c.precio || 0).toFixed(2) + '</td>' +
+			'<td><span class="status-badge passed">Activo</span></td>' +
+			'<td>' +
+				'<button class="action-btn" onclick="openEditCourseModal(\'' + c.id + '\')"><span class="material-icons-round">edit</span></button> ' +
+				'<button class="action-btn" onclick="deleteCourse(\'' + c.id + '\')" style="color:#dc2626"><span class="material-icons-round">delete</span></button>' +
+			'</td>' +
+			'</tr>';
+	}).join('');
+}
+
+function renderAlumnos() {
+	var search = (document.getElementById('searchAlumnos') || {}).value || '';
+	search = search.toLowerCase();
+	
+	var tbody = document.getElementById('alumnosTableBody');
+	if (!tbody) return;
+	
+	var myCoursesIds = coursesData.map(function(c) { return c.id; });
+	var myAlumnos = usersData.filter(function(u) {
+		if (!u.enrolledCourses) return false;
+		return myCoursesIds.some(function(cid) { return u.enrolledCourses.indexOf(cid) !== -1; });
+	});
+	
+	var filtered = myAlumnos.filter(function(u) {
+		if (!search) return true;
+		return ((u.name || '') + ' ' + (u.email || '')).toLowerCase().indexOf(search) !== -1;
+	});
+	
+	if (filtered.length === 0) {
+		tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:#64748b">No se encontraron alumnos.</td></tr>';
+		return;
+	}
+	
+	tbody.innerHTML = filtered.map(function(u) {
+		var cursos = (u.enrolledCourses || []).map(function(cid) {
+			var c = coursesData.find(function(x) { return x.id === cid; });
+			return c ? c.name : cid;
+		}).join(', ') || '—';
+		
+		var regDate = u.createdAt ? formatDate(u.createdAt) : '—';
+		
+		return '<tr>' +
+			'<td><div class="user-cell"><div class="user-avatar">' + getInitials(u.name || u.email) + '</div><div><div class="user-name">' + escapeHtml(u.name || 'Sin nombre') + '</div></div></div></td>' +
+			'<td>' + escapeHtml(u.email) + '</td>' +
+			'<td>' + escapeHtml(cursos) + '</td>' +
+			'<td>' + regDate + '</td>' +
+			'<td><span class="status-badge passed">Matriculado</span></td>' +
+			'</tr>';
+	}).join('');
+}
+
+function updateStats() {
+	var myCoursesIds = coursesData.map(function(c) { return c.id; });
+	var myAlumnos = usersData.filter(function(u) {
+		if (!u.enrolledCourses) return false;
+		return myCoursesIds.some(function(cid) { return u.enrolledCourses.indexOf(cid) !== -1; });
+	});
+	
+	document.getElementById('statCursos').textContent = coursesData.length;
+	document.getElementById('statAlumnos').textContent = myAlumnos.length;
+	document.getElementById('statTotal').textContent = usersData.length;
+}
+
+// ═══ FIRESTORE LISTENERS ═══
+function initProfPanel() {
+	db.collection('courses').onSnapshot(function(snapshot) {
+		coursesData = [];
+		snapshot.forEach(function(doc) {
+			coursesData.push({ id: doc.id, ...doc.data() });
+		});
+		renderDashboard();
+		renderCursos();
+		renderAlumnos();
+		updateStats();
+	});
+	
+	db.collection('users').onSnapshot(function(snapshot) {
+		usersData = [];
+		snapshot.forEach(function(doc) {
+			usersData.push({ id: doc.id, ...doc.data() });
+		});
+		renderAlumnos();
+		updateStats();
+	});
+}
+
+function logoutProf() {
+	sessionStorage.removeItem('prof_auth');
+	window.location.href = '../index.html';
+}
+
 </script>
 </body>
