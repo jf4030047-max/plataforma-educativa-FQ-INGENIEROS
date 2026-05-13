@@ -315,7 +315,7 @@
   <div class="chat-widget" id="chatWidget">
     <div class="chat-header" onclick="toggleChat()">
       <h3>💬 Asistente de Pago</h3>
-      <button class="chat-close" onclick="toggleChat()">−</button>
+      <button class="chat-close" id="chatCloseBtn">−</button>
       <span class="chat-badge" id="chatBadge">1</span>
     </div>
     <div class="chat-messages" id="chatMessages"></div>
@@ -460,6 +460,12 @@
       
       document.getElementById('chatInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') sendChatMessage();
+      });
+      
+      // Agregar manejador al botón de cerrar
+      document.getElementById('chatCloseBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleChat();
       });
     }
 
