@@ -340,7 +340,7 @@
     const chatKnowledge = {
       saludo: {
         palabras: ['hola', 'hey', 'buenos', 'ayuda', 'help', 'hi'],
-        respuesta: '¡Hola! 👋 Soy tu asistente de pago. Puedo ayudarte con:\n• Métodos de pago disponibles\n• Preguntas sobre precios\n• Instrucciones de pago\n• Problemas con el formulario\n\n¿En qué puedo ayudarte?'
+        respuesta: '¡Hola! 👋 Soy tu asistente de pago. Aquí puedes:\n\n✅ Acceder GRATIS a Seguridad y Salud en el Trabajo\n💰 Si quieres certificado → paga S/ 20\n📱 Pagos por Yape, Plin, BCP o transferencia\n\n¿Necesitas ayuda con algo?'
       },
       metodos: {
         palabras: ['método', 'pago', 'yape', 'plin', 'bcp', 'transferencia', 'como pagar'],
@@ -356,7 +356,7 @@
       },
       precio: {
         palabras: ['precio', 'cuanto cuesta', 'costo', 'valor'],
-        respuesta: '💰 **Precios de cursos:**\n\nPrimero selecciona un curso en el formulario y el precio se actualizará automáticamente.\n\nLos precios varían según el curso.\n\n¿Ya seleccionaste tu curso?'
+        respuesta: '💰 **Precios y acceso:**\n\n✅ **Seguridad y Salud en el Trabajo** → ACCESO GRATIS al curso\n💰 Si deseas CERTIFICADO → S/ 20\n\n📚 **Otros cursos** → Acceso + Certificado (precio varía)\n\nSelecciona un curso y verás el precio actual.'
       },
       comprobante: {
         palabras: ['comprobante', 'recibo', 'foto', 'imagen', 'subir'],
@@ -544,13 +544,20 @@
       if (!courseId) {
         currentCourse = null;
         document.getElementById('certAmount').textContent = 'S/ 0.00';
-        document.getElementById('summaryTotal').textContent = 'S/ 0.00';
+        document.getElementById('summaryTotal').innerHTML = '<span class="sl">Total a pagar</span><span class="sv">S/ 0.00</span>';
         return;
       }
       
       currentCourse = allCourses.find(c => c.id === courseId);
       if (currentCourse) {
-        const price = currentCourse.price || currentCourse.precio || 20;
+        // Si es el curso de SST (Seguridad y Salud), es gratis pero el certificado cuesta
+        const isSST = currentCourse.name && currentCourse.name.toLowerCase().includes('seguridad') && currentCourse.name.toLowerCase().includes('salud');
+        
+        let price = currentCourse.price || currentCourse.precio || 20;
+        if (isSST) {
+          price = 0; // El curso es gratis, pero es para obtener el certificado
+        }
+        
         const priceStr = 'S/ ' + parseFloat(price).toFixed(2);
         
         document.getElementById('certAmount').textContent = priceStr;
