@@ -94,7 +94,29 @@
 		.code-input{width:200px;padding:14px 20px;border:2px solid #dce3ed;border-radius:12px;font-size:24px;font-weight:700;text-align:center;letter-spacing:8px;font-family:inherit;transition:border-color .2s}
 		.code-input:focus{outline:none;border-color:#d97706}
 		.login-error{color:#dc2626;font-size:13px;margin-top:10px;display:none}
-		@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{display:none}.stats-grid{grid-template-columns:1fr}.card-grid{grid-template-columns:1fr}}
+	/* Chat Widget */
+	.chat-widget{position:fixed;bottom:20px;right:20px;width:360px;max-height:600px;background:#fff;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.2);display:flex;flex-direction:column;z-index:100;overflow:hidden;animation:slideUp .3s ease-out;pointer-events:none}
+	@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+	.chat-header{background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff;padding:20px;display:flex;justify-content:space-between;align-items:center;pointer-events:auto}
+	.chat-header h3{margin:0;font-size:16px;font-weight:700}
+	.chat-close{background:rgba(255,255,255,.2);border:none;color:#fff;cursor:pointer;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .2s;pointer-events:auto}
+	.chat-close:hover{background:rgba(255,255,255,.3)}
+	.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;pointer-events:auto}
+	.chat-message{padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.5;max-width:85%;word-wrap:break-word;animation:fadeIn .3s ease-out}
+	@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+	.chat-message.bot{background:#f0f4ff;color:#0f172a;border-left:3px solid #d97706;align-self:flex-start}
+	.chat-message.user{background:#d97706;color:#fff;align-self:flex-end}
+	.chat-input-group{display:flex;gap:8px;padding:12px;border-top:1px solid #dce3ed;pointer-events:auto}
+	.chat-input{flex:1;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:10px;font-size:13px;font-family:inherit;outline:none;transition:all .2s}
+	.chat-input:focus{border-color:#d97706;box-shadow:0 0 0 3px rgba(217,119,6,.1)}
+	.chat-send{background:#d97706;color:#fff;border:none;cursor:pointer;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;transition:all .2s;pointer-events:auto}
+	.chat-send:hover{background:#b45309;transform:scale(1.05)}
+	.chat-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 16px;font-size:12px;pointer-events:auto}
+	.chat-suggestion-btn{padding:6px 10px;background:#f0f4ff;border:1px solid #dce3ed;border-radius:8px;cursor:pointer;color:#d97706;font-weight:500;transition:all .2s;pointer-events:auto}
+	.chat-suggestion-btn:hover{background:#d97706;color:#fff;border-color:#d97706}
+	.chat-badge{position:absolute;top:-8px;right:-8px;background:#dc2626;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;animation:pulse .6s infinite;pointer-events:none}
+	@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+	@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{display:none}.stats-grid{grid-template-columns:1fr}.card-grid{grid-template-columns:1fr}.chat-widget{width:100%;left:0;right:0;bottom:0;border-radius:16px 16px 0 0;max-height:70vh}}
 		@media(max-width:600px){.content{padding:20px 16px}.top-bar{padding:0 16px}}
 	</style>
 	<!-- Firebase SDK -->
@@ -395,6 +417,21 @@
 			</div>
 		</main>
 	</div>
+
+	<!-- Chat Widget -->
+	<div class="chat-widget" id="chatWidget">
+		<div class="chat-header" onclick="toggleChat()">
+			<h3>💬 Asistente del Profesor</h3>
+			<button class="chat-close" id="chatCloseBtn">−</button>
+			<span class="chat-badge" id="chatBadge">1</span>
+		</div>
+		<div class="chat-messages" id="chatMessages"></div>
+		<div class="chat-suggestions" id="chatSuggestions"></div>
+		<div class="chat-input-group">
+			<input type="text" class="chat-input" id="chatInput" placeholder="Pregunta algo..." />
+			<button class="chat-send" onclick="sendChatMessage()"><span class="material-icons-round">send</span></button>
+		</div>
+	</div>
 </body>
 <script>
 // ═══ CONFIG: Claves por curso ═══
@@ -575,5 +612,157 @@ function renderAlumnos() {
 			'</tr>';
 	}).join('');
 }
+
+// ═══ CHAT WIDGET ═══
+var chatMinimized = false;
+
+const chatKnowledge = {
+	saludo: {
+		palabras: ['hola', 'hey', 'buenos', 'ayuda', 'help', 'hi'],
+		respuesta: '¡Hola! 👋 Bienvenido. Aquí puedes:\n\n📊 **Ver dashboard** - Estadísticas de tus cursos\n👥 **Gestionar alumnos** - Control de estudiantes\n📚 **Cursos y sesiones** - Información de clases\n📝 **Materiales** - Recursos pedagógicos\n\n¿En qué puedo ayudarte?'
+	},
+	cursos: {
+		palabras: ['curso', 'cursos', 'mis cursos', 'asignados'],
+		respuesta: '📚 **Tus Cursos:**\n\nDesde el panel puedes ver:\n• Cursos asignados a tu cuenta\n• Cantidad de alumnos por curso\n• Sesiones programadas\n• Enlaces a Zoom\n• Grabaciones disponibles\n\n¿Necesitas más información?'
+	},
+	alumnos: {
+		palabras: ['alumno', 'alumnos', 'estudiante', 'estudiantes'],
+		respuesta: '👥 **Gestión de Alumnos:**\n\nPuedes ver:\n• Lista completa de alumnos\n• Cursos en los que están inscritos\n• Fecha de registro\n• Filtrar por nombre o email\n\nBusca un alumno usando el buscador arriba.'
+	},
+	sesion: {
+		palabras: ['sesión', 'sesiones', 'zoom', 'clase', 'clase en vivo'],
+		respuesta: '🎥 **Sesiones y Zoom:**\n\n• Tu enlace Zoom está disponible en el panel\n• Comparte el link con tus alumnos\n• Las grabaciones se guardan automáticamente\n• Accede a historial de sesiones\n\n¿Necesitas tu enlace de Zoom?'
+	},
+	material: {
+		palabras: ['material', 'materiales', 'recurso', 'recursos', 'archivo', 'descargar'],
+		respuesta: '📁 **Materiales Pedagógicos:**\n\nGestiona:\n• Documentos y guías de estudio\n• Presentaciones\n• Archivos de referencia\n• Enlaces a recursos externos\n\nTodos accesibles desde la sección de Materiales.'
+	},
+	calificacion: {
+		palabras: ['calificación', 'calificaciones', 'notas', 'calificar', 'examen'],
+		respuesta: '✅ **Calificaciones:**\n\nPuedes:\n• Ver resultados de exámenes\n• Registrar notas\n• Dar retroalimentación\n• Exportar reportes\n\nContacta al administrador para detalles.'
+	},
+	problema: {
+		palabras: ['error', 'problema', 'no funciona', 'falla', 'bug', 'ayuda'],
+		respuesta: '🆘 **¿Tienes un problema?**\n\n• ¿No ves tus cursos?\n• ¿Problemas con Zoom?\n• ¿No puedes cargar materiales?\n• ¿Otra cosa?\n\nCuéntame qué sucede exactamente.'
+	}
+};
+
+function getAutoResponse(userMessage) {
+	var msg = userMessage.toLowerCase().trim();
+	
+	for (var key in chatKnowledge) {
+		var knowledge = chatKnowledge[key];
+		if (knowledge.palabras.some(function(palabra) { return msg.indexOf(palabra) !== -1; })) {
+			return knowledge.respuesta;
+		}
+	}
+	
+	return '🤔 No estoy seguro de entender tu pregunta. Prueba preguntando sobre:\n• Mis cursos\n• Alumnos\n• Sesiones y Zoom\n• Materiales\n• Calificaciones\n\n¿Puedo ayudarte con algo de eso?';
+}
+
+function addChatMessage(text, isBot) {
+	isBot = isBot !== false;
+	var messagesDiv = document.getElementById('chatMessages');
+	var messageEl = document.createElement('div');
+	messageEl.className = 'chat-message ' + (isBot ? 'bot' : 'user');
+	messageEl.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+	messagesDiv.appendChild(messageEl);
+	messagesDiv.scrollTop = messagesDiv.scrollHeight;
+	
+	if (chatMinimized && isBot) {
+		showChatBadge();
+	}
+}
+
+function showSuggestions() {
+	var suggestionsDiv = document.getElementById('chatSuggestions');
+	var suggestions = [
+		{ text: '📚 Mis Cursos', query: 'mis cursos' },
+		{ text: '👥 Alumnos', query: 'alumnos' },
+		{ text: '🎥 Zoom', query: 'zoom' },
+		{ text: '📁 Materiales', query: 'materiales' }
+	];
+	
+	suggestionsDiv.innerHTML = suggestions.map(function(s) {
+		return '<button class="chat-suggestion-btn" onclick="sendSuggestionMessage(\'' + s.query + '\')">' + s.text + '</button>';
+	}).join('');
+}
+
+function sendSuggestionMessage(query) {
+	addChatMessage(query, false);
+	setTimeout(function() {
+		var response = getAutoResponse(query);
+		addChatMessage(response, true);
+		showSuggestions();
+	}, 300);
+}
+
+function sendChatMessage() {
+	var input = document.getElementById('chatInput');
+	var message = input.value.trim();
+	
+	if (!message) return;
+	
+	addChatMessage(message, false);
+	input.value = '';
+	
+	setTimeout(function() {
+		var response = getAutoResponse(message);
+		addChatMessage(response, true);
+		showSuggestions();
+	}, 300);
+}
+
+function toggleChat() {
+	var widget = document.getElementById('chatWidget');
+	chatMinimized = !chatMinimized;
+	
+	if (chatMinimized) {
+		widget.style.width = 'auto';
+		widget.style.maxHeight = '56px';
+		document.getElementById('chatMessages').style.display = 'none';
+		document.getElementById('chatSuggestions').style.display = 'none';
+		document.getElementById('chatInput').parentElement.style.display = 'none';
+	} else {
+		widget.style.width = '360px';
+		widget.style.maxHeight = '600px';
+		document.getElementById('chatMessages').style.display = 'flex';
+		document.getElementById('chatSuggestions').style.display = 'flex';
+		document.getElementById('chatInput').parentElement.style.display = 'flex';
+		document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+	}
+}
+
+function showChatBadge() {
+	var badge = document.getElementById('chatBadge');
+	badge.style.display = 'flex';
+	badge.textContent = parseInt(badge.textContent) + 1;
+}
+
+// Inicializar chat al cargar
+function initChat() {
+	showSuggestions();
+	addChatMessage('¡Hola! 👋 Soy tu asistente. Estoy aquí para ayudarte con cualquier pregunta sobre tus cursos, alumnos y sesiones. ¿En qué puedo ayudarte?', true);
+	
+	var chatInput = document.getElementById('chatInput');
+	if (chatInput) {
+		chatInput.addEventListener('keypress', function(e) {
+			if (e.key === 'Enter') sendChatMessage();
+		});
+	}
+	
+	var chatCloseBtn = document.getElementById('chatCloseBtn');
+	if (chatCloseBtn) {
+		chatCloseBtn.addEventListener('click', function(e) {
+			e.stopPropagation();
+			toggleChat();
+		});
+	}
+}
+
+// Iniciar chat cuando el DOM está listo
+document.addEventListener('DOMContentLoaded', function() {
+	setTimeout(initChat, 500);
+});
 </script>
 </body>
