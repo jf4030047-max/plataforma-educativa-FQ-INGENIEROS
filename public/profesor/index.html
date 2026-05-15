@@ -326,7 +326,11 @@
 			setTimeout(function() {
 				var botEl = document.createElement('div');
 				botEl.className = 'chat-message bot';
-				botEl.textContent = '👋 Hola profesor. ¿En qué puedo ayudarte?';
+				if (currentProf) {
+					botEl.textContent = '👋 Hola ' + currentProf.name + '. ¿En qué puedo ayudarte?';
+				} else {
+					botEl.textContent = '👋 Ingresa tu código de acceso (Topografía: 21) para continuar.';
+				}
 				messagesDiv.appendChild(botEl);
 				messagesDiv.scrollTop = messagesDiv.scrollHeight;
 			}, 500);
@@ -340,6 +344,24 @@
 			e.stopPropagation();
 			toggleChat();
 		});
+
+		// Mensaje inicial del chat
+		setTimeout(function() {
+			if (!currentProf) {
+				addChatMessage('👋 ¡Bienvenido! Por favor ingresa tu código de acceso.\n\n📌 Topografía: código 21\n📌 SST: código 20\n📌 Supervisión: código 22', true);
+			} else {
+				addChatMessage('👋 ¡Hola ' + currentProf.name + '! ¿En qué puedo ayudarte?', true);
+			}
+		}, 300);
+
+		function addChatMessage(text, isBot) {
+			var messagesDiv = document.getElementById('chatMessages');
+			var messageEl = document.createElement('div');
+			messageEl.className = 'chat-message ' + (isBot ? 'bot' : 'user');
+			messageEl.textContent = text;
+			messagesDiv.appendChild(messageEl);
+			messagesDiv.scrollTop = messagesDiv.scrollHeight;
+		}
 	</script>
 </body>
 </html>
