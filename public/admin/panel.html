@@ -9,8 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
   <link href="../assets/css/notifications.css" rel="stylesheet" />
-  <script src="../assets/js/auth-ui.js"></script>
-  <script src="../assets/js/notifications.js"></script>
   <style>
     :root {
       --color-primary: #1565c0;
@@ -388,9 +386,12 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+  <script src="../assets/js/auth-ui.js"></script>
   <script>
     // Validar que sea ADMINISTRADOR antes de cargar el panel
     const ADMIN_EMAILS = ['fq.ingenieros.empresa@gmail.com'];
+    let adminValidated = false;
     
     firebase.auth().onAuthStateChanged(function(user) {
       if (!user) {
@@ -432,7 +433,6 @@
           </div>
           <script>
             function cambiarCuenta() {
-              // Redirigir al selector de cuentas
               window.location.href = '../auth/account-selector.html?redirect=' + encodeURIComponent(window.location.href);
             }
             function cerrarSesion() {
@@ -445,7 +445,10 @@
         return;
       }
 
-      // Es administrador: cargar el panel completo
+      // Es administrador: marcar como validado y cargar el panel
+      adminValidated = true;
+      
+      // Cargar admin-panel.js solo después de validar
       const script = document.createElement('script');
       script.src = 'admin-panel.js';
       document.body.appendChild(script);
