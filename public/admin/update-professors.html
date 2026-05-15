@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actualizar Profesores - FQ INGENIEROS</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f0f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+    .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 500px; text-align: center; }
+    h1 { color: #333; margin-bottom: 20px; }
+    .status { padding: 15px; margin: 15px 0; border-radius: 8px; font-weight: bold; }
+    .loading { background: #e3f2fd; color: #1565c0; }
+    .success { background: #e8f5e9; color: #2e7d32; }
+    .error { background: #ffebee; color: #c62828; }
+    .log { background: #f5f5f5; padding: 20px; border-radius: 8px; text-align: left; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px; }
+    .log-entry { margin: 5px 0; }
+    .log-success { color: #2e7d32; }
+    .log-error { color: #c62828; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔄 Actualizar Profesores</h1>
+    <div class="status loading" id="status">Conectando a Firestore...</div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../../assets/js/firebase-config.js"></script>
+
+  <script>
+    const logEl = document.getElementById('log');
+    const statusEl = document.getElementById('status');
+
+    function log(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry' + (type === 'success' ? ' log-success' : type === 'error' ? ' log-error' : '');
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(message);
+    }
+
+    function updateStatus(message, type = 'loading') {
+      statusEl.className = 'status ' + type;
+      statusEl.textContent = message;
+    }
+
+    // Datos de profesores por curso
+    const profesores = {
+      'sst-obras-civiles': {
+        profesorId: 'prof_001',
+        profesorNombre: 'Profesor SST'
+      },
+      'topografia-civil-3d': {
+        profesorId: 'prof_002',
+        profesorNombre: 'Profesor Topografía'
+      },
+      'supervision-obra': {
+        profesorId: 'prof_003',
+        profesorNombre: 'Profesor Supervisión'
+      }
+    };
+
+    async function actualizarProfesores() {
+      try {
+        log('Iniciando actualización de profesores...');
+        
+        const db = firebase.firestore();
+        let actualizados = 0;
+
+        for (const [courseId, profesorData] of Object.entries(profesores)) {
+          try {
+            log(`Actualizando curso: ${courseId}...`);
+            
+            await db.collection('courses').doc(courseId).update({
+              profesorId: profesorData.profesorId,
+              profesorNombre: profesorData.profesorNombre
+            });
+            
+            log(`✓ ${courseId} actualizado con ${profesorData.profesorNombre}`, 'success');
+            actualizados++;
+          } catch (error) {
+            log(`✗ Error en ${courseId}: ${error.message}`, 'error');
+          }
+        }
+
+        if (actualizados === Object.keys(profesores).length) {
+          updateStatus(`✅ ¡Éxito! ${actualizados} cursos actualizados correctamente`, 'success');
+          log('Actualización completada exitosamente');
+        } else {
+          updateStatus(`⚠️ Se actualizaron ${actualizados}/${Object.keys(profesores).length} cursos`, 'error');
+        }
+      } catch (error) {
+        updateStatus(`❌ Error general: ${error.message}`, 'error');
+        log(`Error: ${error.message}`, 'error');
+      }
+    }
+
+    // Esperar a que Firebase esté listo y ejecutar
+    setTimeout(() => {
+      log('Firebase listo, iniciando actualización...');
+      actualizarProfesores();
+    }, 1500);
+  </script>
+</body>
+</html>
