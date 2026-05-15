@@ -389,15 +389,49 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="../assets/js/firebase-config.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      if (typeof auth === 'undefined') return;
-      auth.onAuthStateChanged(function(user) {
-        if (!user) {
-          window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
-        }
-      });
+    // Validar que sea ADMINISTRADOR antes de cargar el panel
+    const ADMIN_EMAILS = ['fq.ingenieros.empresa@gmail.com'];
+    
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user) {
+        // No autenticado: redirigir a login
+        window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+        return;
+      }
+
+      // Validar que sea administrador
+      const isAdmin = ADMIN_EMAILS.includes(user.email);
+      
+      if (!isAdmin) {
+        // No es administrador: mostrar acceso denegado
+        document.body.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f7f9fc;padding:20px;">
+            <div style="text-align:center;background:#fff;padding:40px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);max-width:500px;">
+              <div style="font-size:48px;margin-bottom:16px;">🔒</div>
+              <h1 style="font-size:24px;font-weight:700;color:#0f172a;margin-bottom:8px;">Acceso Denegado</h1>
+              <p style="font-size:16px;color:#64748b;margin-bottom:20px;">
+                Este panel solo es accesible para administradores autorizados.
+              </p>
+              <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-bottom:20px;font-size:14px;">
+                <strong style="color:#1565c0;">Tu email:</strong> ${user.email}
+              </div>
+              <button onclick="location.href='../dashboard/index.html'" style="background:#1565c0;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px;margin-right:10px;">
+                Ir al Dashboard
+              </button>
+              <button onclick="firebase.auth().signOut(); window.location.href='../auth/login.html'" style="background:#f3f4f6;color:#334155;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px;">
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Es administrador: cargar el panel completo
+      const script = document.createElement('script');
+      script.src = 'admin-panel.js';
+      document.body.appendChild(script);
     });
   </script>
-  <script src="admin-panel.js"></script>
 </body>
 </html>
