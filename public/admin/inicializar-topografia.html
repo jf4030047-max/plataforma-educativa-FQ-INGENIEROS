@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicializar Curso Topografía | FQ INGENIEROS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f7f9fc; color: #334155; padding: 20px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .card { background: #fff; border: 1px solid #dce3ed; border-radius: 14px; padding: 32px; margin-bottom: 20px; }
+    .header h1 { font-size: 28px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+    .header p { color: #64748b; font-size: 15px; }
+    .info-box { background: #eff6ff; border-left: 4px solid #1565c0; padding: 16px; border-radius: 8px; margin: 16px 0; }
+    .info-box strong { color: #0f3a69; }
+    .structure { background: #f7f9fc; padding: 16px; border-radius: 8px; margin: 16px 0; }
+    .structure ul { list-style: none; padding-left: 0; }
+    .structure li { padding: 8px 0; display: flex; align-items: center; gap: 10px; }
+    .structure li::before { content: '✓'; color: #16a34a; font-weight: 700; font-size: 16px; }
+    .btn { background: #1565c0; color: #fff; border: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 15px; }
+    .btn:hover { background: #1e88e5; }
+    .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn-secondary:hover { background: #cbd5e0; }
+    .btn-group { display: flex; gap: 10px; }
+    .status { padding: 16px; border-radius: 8px; margin: 16px 0; display: none; }
+    .status.success { background: #d1fae5; border: 1px solid #86efac; color: #065f46; }
+    .status.error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; }
+    .status.loading { background: #dbeafe; border: 1px solid #93c5fd; color: #1565c0; }
+    .log { background: #000; color: #0f0; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto; margin: 16px 0; }
+    .disabled { opacity: 0.5; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card header">
+      <h1>🎓 Inicializar Curso Topografía en Civil 3D</h1>
+      <p>Sistema de evaluaciones progresivas con desbloqueo automático</p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-bottom: 16px;">📋 Estructura del Curso</h2>
+      
+      <div class="info-box">
+        <strong>Total: 5 evaluaciones → 100% de progreso</strong><br>
+        Cada evaluación se completa para desbloquear la siguiente
+      </div>
+
+      <div class="structure">
+        <h3 style="margin-bottom: 12px;">Evaluaciones:</h3>
+        <ul>
+          <li>Evaluación Tema 1: Conceptos Básicos <strong>(20%)</strong></li>
+          <li>Evaluación Tema 2: Medición y Equipos <strong>(20%)</strong></li>
+          <li>Evaluación Tema 3: Cálculos y Proyecciones <strong>(20%)</strong></li>
+          <li>Evaluación Tema 4: Aplicaciones Civil 3D <strong>(20%)</strong></li>
+          <li>Evaluación Final: Examen Integrador <strong>(20% - Desbloqueada después de Tema 4)</strong></li>
+        </ul>
+      </div>
+
+      <div class="info-box">
+        <strong>🔓 Desbloqueo automático:</strong><br>
+        La evaluación final se desbloquea automáticamente cuando el estudiante completa la evaluación del Tema 4 con 70%+
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-bottom: 16px;">⚙️ Inicialización</h2>
+      
+      <p style="margin-bottom: 16px; color: #475569;">
+        Haz click en el botón para crear el curso y las 5 evaluaciones en Firebase:
+      </p>
+
+      <div class="btn-group">
+        <button class="btn" id="initBtn" onclick="inicializarCurso()">
+          ✨ Crear Curso y Evaluaciones
+        </button>
+        <button class="btn btn-secondary" id="testBtn" onclick="testearSistema()" style="display:none;">
+          🧪 Testar Sistema
+        </button>
+      </div>
+
+      <div id="status" class="status"></div>
+      <div id="log" class="log" style="display: none;"></div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-bottom: 16px;">📖 Cómo Funciona</h2>
+      
+      <h3 style="margin-top: 16px; margin-bottom: 8px;">1️⃣ Para el Estudiante:</h3>
+      <ul style="margin-left: 20px; color: #475569; line-height: 1.8;">
+        <li>✓ Accede a: <code>/sesiones/panel-evaluaciones.html</code></li>
+        <li>✓ Ve todas las evaluaciones disponibles</li>
+        <li>✓ Completa las evaluaciones en orden (primero Tema 1, 2, 3, 4)</li>
+        <li>✓ Cuando completa Tema 4, se desbloquea automáticamente la Final</li>
+        <li>✓ El progreso sube 20% con cada evaluación completada</li>
+        <li>✓ Al completar la Final, llega a 100%</li>
+      </ul>
+
+      <h3 style="margin-top: 16px; margin-bottom: 8px;">2️⃣ Progreso del Curso:</h3>
+      <div style="margin-left: 20px; color: #475569; line-height: 2;">
+        <div>📊 0% → Inicial</div>
+        <div>📊 20% → Después de completar Tema 1</div>
+        <div>📊 40% → Después de completar Tema 2</div>
+        <div>📊 60% → Después de completar Tema 3</div>
+        <div>📊 80% → Después de completar Tema 4</div>
+        <div>📊 100% → Después de completar Final (completa el curso ✅)</div>
+      </div>
+
+      <h3 style="margin-top: 16px; margin-bottom: 8px;">3️⃣ Evaluaciones Bloqueadas:</h3>
+      <p style="color: #475569; margin-left: 20px;">
+        Solo la "Evaluación Final" comienza bloqueada 🔒<br>
+        Se desbloquea automáticamente cuando se completa la evaluación del Tema 4
+      </p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-bottom: 16px;">🔗 Enlaces Importantes</h2>
+      <ul style="list-style: none; color: #475569;">
+        <li>📝 <strong>Panel de Evaluaciones:</strong> <a href="../sesiones/panel-evaluaciones.html" target="_blank" style="color: #1565c0;">Ver Panel</a></li>
+        <li>📊 <strong>Dashboard del Estudiante:</strong> <a href="../dashboard/index.html" target="_blank" style="color: #1565c0;">Ver Dashboard</a></li>
+        <li>⚙️ <strong>Admin Panel:</strong> <a href="../admin/panel.html" target="_blank" style="color: #1565c0;">Panel Administrador</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/topografia-course-setup.js"></script>
+
+  <script>
+    function log(msg, type = 'info') {
+      const logEl = document.getElementById('log');
+      logEl.style.display = 'block';
+      const timestamp = new Date().toLocaleTimeString('es-PE');
+      logEl.innerHTML += `[${timestamp}] ${msg}\n`;
+      logEl.scrollTop = logEl.scrollHeight;
+      console.log(msg);
+    }
+
+    function showStatus(msg, type = 'loading') {
+      const status = document.getElementById('status');
+      status.textContent = msg;
+      status.className = `status ${type}`;
+      status.style.display = 'block';
+    }
+
+    async function inicializarCurso() {
+      try {
+        // Verificar autenticación
+        const user = firebase.auth().currentUser;
+        if (!user) {
+          showStatus('❌ Debes estar autenticado', 'error');
+          window.location.href = '../auth/login.html';
+          return;
+        }
+
+        document.getElementById('initBtn').disabled = true;
+        showStatus('⏳ Inicializando curso...', 'loading');
+        log('Iniciando proceso de creación...');
+
+        // Inicializar
+        await window.initializeTopografiaCourse();
+
+        showStatus('✅ ¡Curso inicializado correctamente! Ahora puedes acceder al panel de evaluaciones', 'success');
+        log('✅ Proceso completado exitosamente');
+        
+        document.getElementById('testBtn').style.display = 'inline-block';
+      } catch (error) {
+        log(`❌ Error: ${error.message}`, 'error');
+        showStatus(`❌ Error: ${error.message}`, 'error');
+        document.getElementById('initBtn').disabled = false;
+      }
+    }
+
+    async function testearSistema() {
+      try {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+          showStatus('❌ No estás autenticado', 'error');
+          return;
+        }
+
+        showStatus('🧪 Testeando sistema...', 'loading');
+        log('Iniciando test...');
+        
+        const db = firebase.firestore();
+        
+        // Test 1: Verificar curso existe
+        log('Test 1: Verificando curso...');
+        const courseSnap = await db.collection('courses').doc('topografia-civil-3d').get();
+        if (courseSnap.exists) {
+          log('✅ Curso existe en Firestore');
+        } else {
+          log('❌ Curso no existe');
+        }
+
+        // Test 2: Verificar evaluaciones
+        log('Test 2: Contando evaluaciones...');
+        const examsSnap = await db.collection('exams').where('courseId', '==', 'topografia-civil-3d').get();
+        log(`✅ Encontradas ${examsSnap.size} evaluaciones`);
+        
+        examsSnap.forEach(doc => {
+          const data = doc.data();
+          log(`   - ${data.name} (${data.percentage}%)`);
+        });
+
+        showStatus('✅ Sistema testeado correctamente', 'success');
+      } catch (error) {
+        log(`❌ Error en test: ${error.message}`, 'error');
+        showStatus(`❌ Error en test: ${error.message}`, 'error');
+      }
+    }
+
+    // Verificar si está autenticado
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user) {
+        showStatus('⚠️ Necesitas autenticarte como administrador', 'error');
+        document.getElementById('initBtn').disabled = true;
+      }
+    });
+  </script>
+</body>
+</html>

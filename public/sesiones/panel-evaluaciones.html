@@ -1,0 +1,236 @@
+<!-- Archivo: public/sesiones/panel-evaluaciones.html -->
+<!-- Panel de evaluaciones progresivas para Topografía -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evaluaciones del Curso | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link href="../assets/css/header.css" rel="stylesheet" />
+  <link href="../assets/css/notifications.css" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f7f9fc; color: #334155; }
+    .container { width: min(1000px, 92%); margin: 0 auto; padding: 20px 0; }
+    
+    .page { padding: 88px 0 60px; }
+    
+    /* Progress bar */
+    .progress-section { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 24px; }
+    .progress-label { font-size: 14px; font-weight: 600; color: #0f172a; margin-bottom: 12px; }
+    .progress-bar { width: 100%; height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #1565c0, #1e88e5); transition: width .3s; }
+    .progress-text { font-size: 28px; font-weight: 800; color: #0f172a; margin-top: 12px; }
+    
+    /* Evaluation cards */
+    .exams-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+    .exam-card { background: #fff; border: 1.5px solid #dce3ed; border-radius: 14px; overflow: hidden; transition: all .2s; }
+    .exam-card:hover:not(.locked) { border-color: #1565c0; box-shadow: 0 4px 16px rgba(21,101,192,.15); }
+    
+    .exam-card-header { padding: 20px; border-bottom: 1px solid #f1f5f9; }
+    .exam-type-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px; }
+    .exam-type-badge.tema { background: #dbeafe; color: #1565c0; }
+    .exam-type-badge.final { background: #fef3c7; color: #92400e; }
+    
+    .exam-title { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .exam-subtitle { font-size: 13px; color: #64748b; }
+    
+    .exam-card-body { padding: 16px 20px; }
+    .exam-description { font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 12px; }
+    
+    .exam-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .exam-percentage { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
+    .exam-percentage.completed { color: #16a34a; }
+    .exam-percentage.pending { color: #64748b; }
+    
+    .exam-card-footer { padding: 16px 20px; border-top: 1px solid #f1f5f9; }
+    
+    /* Button styles */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all .2s; font-family: inherit; }
+    .btn-primary { background: #1565c0; color: #fff; width: 100%; }
+    .btn-primary:hover { background: #1e88e5; }
+    .btn-secondary { background: #f3f4f6; color: #334155; width: 100%; }
+    .btn-secondary:hover { background: #e5e7eb; }
+    .btn-locked { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; width: 100%; }
+    .btn-completed { background: #d1fae5; color: #065f46; width: 100%; }
+    
+    .status-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; }
+    .status-badge.completed { background: #d1fae5; color: #065f46; }
+    .status-badge.pending { background: #fffbeb; color: #92400e; }
+    .status-badge.locked { background: #f1f5f9; color: #64748b; }
+    
+    /* Locked card styling */
+    .exam-card.locked { opacity: 0.7; background: #f9fafb; }
+    .exam-card.locked .exam-card-header { background: #f7f9fc; }
+    
+    .lock-message { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 6px; margin: 12px 0; font-size: 12px; color: #92400e; display: flex; align-items: flex-start; gap: 8px; }
+    .lock-message .material-icons-round { font-size: 18px; flex-shrink: 0; }
+    
+    /* Completion indicator */
+    .completion-indicator { font-size: 20px; margin-left: auto; }
+    
+    @media (max-width: 768px) {
+      .exams-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header"></header>
+  
+  <div class="page">
+    <div class="container">
+      <div class="progress-section">
+        <div class="progress-label">Progreso del Curso</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        <div class="progress-text" id="progressText">0%</div>
+        <small style="color: #64748b;">Completarás el 100% al terminar todas las evaluaciones</small>
+      </div>
+
+      <h1 style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 24px;">
+        Evaluaciones del Curso
+      </h1>
+
+      <div class="exams-grid" id="examsContainer">
+        <p style="text-align: center; color: #64748b; padding: 40px;">Cargando evaluaciones...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/topografia-course-setup.js"></script>
+
+  <script>
+    let currentUser = null;
+    let courseId = new URLSearchParams(window.location.search).get('course') || 'topografia-civil-3d';
+
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user) {
+        window.location.href = '../auth/login.html';
+        return;
+      }
+      currentUser = user;
+      loadEvaluations();
+    });
+
+    async function loadEvaluations() {
+      const db = firebase.firestore();
+      const container = document.getElementById('examsContainer');
+
+      try {
+        // Obtener todas las evaluaciones del curso
+        const examsSnap = await db.collection('exams')
+          .where('courseId', '==', courseId)
+          .orderBy('id')
+          .get();
+
+        if (examsSnap.empty) {
+          container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 40px;">No hay evaluaciones disponibles</p>';
+          return;
+        }
+
+        // Obtener progreso del usuario
+        const userExamsSnap = await db.collection('exams')
+          .where('courseId', '==', courseId)
+          .where('userId', '==', currentUser.uid)
+          .get();
+
+        const completedExams = {};
+        let totalProgress = 0;
+
+        userExamsSnap.forEach(doc => {
+          const data = doc.data();
+          if (data.percentage && data.percentage >= 70) {
+            completedExams[doc.id] = data;
+            totalProgress += 20;  // Cada evaluación suma 20%
+          }
+        });
+
+        // Actualizar barra de progreso
+        document.getElementById('progressFill').style.width = totalProgress + '%';
+        document.getElementById('progressText').textContent = totalProgress + '%';
+
+        // Renderizar tarjetas de evaluaciones
+        let html = '';
+        examsSnap.forEach(doc => {
+          const exam = doc.data();
+          const isCompleted = completedExams[doc.id] !== undefined;
+          const isLocked = exam.requiredFor && !completedExams[exam.requiredFor];
+
+          html += `
+            <div class="exam-card ${isLocked ? 'locked' : ''}">
+              <div class="exam-card-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span class="exam-type-badge ${exam.type}">${exam.type === 'final' ? '🏆 FINAL' : '📝 TEMA'}</span>
+                  ${isCompleted ? '<span class="status-badge completed"><span class="material-icons-round" style="font-size: 14px;">check_circle</span> Completado</span>' : ''}
+                </div>
+                <div class="exam-title">${exam.name}</div>
+                <div class="exam-subtitle">${exam.tema}</div>
+              </div>
+
+              <div class="exam-card-body">
+                <p class="exam-description">${exam.description}</p>
+                
+                <div class="exam-meta">
+                  <span class="exam-percentage ${isCompleted ? 'completed' : 'pending'}">
+                    ${exam.percentage}% de avance
+                  </span>
+                </div>
+
+                ${isLocked ? `
+                  <div class="lock-message">
+                    <span class="material-icons-round">lock</span>
+                    <span>${getUnlockMessage(exam)}</span>
+                  </div>
+                ` : ''}
+              </div>
+
+              <div class="exam-card-footer">
+                ${isLocked ? `
+                  <button class="btn btn-locked" disabled>
+                    <span class="material-icons-round">lock</span> Bloqueado
+                  </button>
+                ` : isCompleted ? `
+                  <button class="btn btn-completed" disabled>
+                    <span class="material-icons-round">check</span> Completado
+                  </button>
+                ` : `
+                  <button class="btn btn-primary" onclick="startExam('${doc.id}')">
+                    <span class="material-icons-round">play_arrow</span> Iniciar Evaluación
+                  </button>
+                `}
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      } catch (error) {
+        console.error('Error cargando evaluaciones:', error);
+        container.innerHTML = '<p style="text-align: center; color: #dc2626; padding: 40px;">Error al cargar las evaluaciones</p>';
+      }
+    }
+
+    function getUnlockMessage(exam) {
+      if (exam.requiredFor === 'topo-eval-tema-4') {
+        return 'Se desbloquea después de completar la evaluación del Tema 4';
+      }
+      return 'Esta evaluación está bloqueada';
+    }
+
+    function startExam(examId) {
+      // Redirigir a la evaluación
+      window.location.href = `../certificado/examen.html?exam=${examId}&course=${courseId}`;
+    }
+  </script>
+</body>
+</html>
