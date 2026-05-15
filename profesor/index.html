@@ -189,6 +189,9 @@
         <a class="nav-item" onclick="showPanel('examenes',this)">
           <span class="material-icons-round">quiz</span> Exámenes
         </a>
+        <a class="nav-item" onclick="showPanel('evaluacion',this)">
+          <span class="material-icons-round">grading</span> Evaluar Exámenes
+        </a>
         <a class="nav-item" onclick="showPanel('material',this)">
           <span class="material-icons-round">attach_file</span> Material de Apoyo
         </a>
@@ -278,6 +281,14 @@
               <tbody id="examsTable"></tbody>
             </table>
           </div>
+        </div>
+
+        <!-- ═══ EVALUAR EXÁMENES ═══ -->
+        <div class="panel" id="panel-evaluacion">
+          <div class="panel-header">
+            <h3>Evaluar exámenes de alumnos</h3>
+          </div>
+          <div id="evaluacionContent"></div>
         </div>
 
         <!-- ═══ MATERIAL DE APOYO ═══ -->
@@ -448,6 +459,7 @@
         });
         renderDashboard();
         renderExams();
+        renderEvaluacion();
       });
 
       // Materials listener
@@ -784,7 +796,6 @@
       });
     }
 
-    // ═══ EXÁMENES ═══
     function renderExams() {
       var tbody = document.getElementById('examsTable');
       if (!tbody) return;
@@ -807,6 +818,249 @@
           '<td>' + formatDate(e.createdAt) + '</td>' +
           '</tr>';
       }).join('');
+    }
+
+    // ═══ EVALUAR EXÁMENES ═══
+    var editingExamId = null;
+
+    function renderEvaluacion() {
+      var container = document.getElementById('evaluacionContent');
+      if (!container) return;
+
+      var exams = myExams();
+      if (exams.length === 0) {
+        container.innerHTML = '<div class="empty-state"><span class="material-icons-round">quiz</span><p>No hay exámenes para evaluar.</p></div>';
+        return;
+      }
+
+      var html = '<div class="table-wrap"><table><thead><tr>' +
+        '<th>Alumno</th><th>Resultado</th><th>Evaluación - Subir Archivo</th><th>Comentarios</th><th>Acciones</th>' +
+        '</tr></thead><tbody>';
+
+      exams.forEach(function(e) {
+        var status = e.percentage >= 70 ? 'passed' : 'failed';
+        var statusLabel = status === 'passed' ? 'Aprobado' : 'Desaprobado';
+        var hasDoc = e.evaluationDocUrl ? '✓ Subido' : 'Sin archivo';
+        var docStatus = e.evaluationDocUrl ? 'color:#16a34a;font-weight:600' : 'color:#94a3b8';
+        
+        html += '<tr>' +
+          '<td><div class="user-cell"><div class="user-avatar">' + getInitials(e.userEmail || '?') + '</div><div><div class="user-name">' + escapeHtml(e.userEmail) + '</div><div class="user-email">' + escapeHtml(getCourseName(e.courseId)) + '</div></div></div></td>' +
+          '<td><span class="status-badge ' + status + '">' + statusLabel + ' (' + e.percentage + '%)</span></td>' +
+          '<td style="display:flex;align-items:center;gap:8px">' +
+          '<label style="cursor:pointer;display:flex;align-items:center;gap:4px;padding:6px 10px;background:#f1f5f9;border-radius:6px;font-size:12px;color:#1565c0;font-weight:500">' +
+          '<input type="file" id="evalFile_' + e.id + '" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display:none" onchange="uploadEvaluationDoc(\'' + e.id + '\')" />' +
+          '<span class="material-icons-round" style="font-size:16px">upload_file</span> Subir' +
+          '</label>' +
+          '<span style="' + docStatus + ';font-size:12px">' + hasDoc + '</span>' +
+          '</td>' +
+          '<td><textarea id="evalComment_' + e.id + '" placeholder="Comentarios..." style="width:100%;padding:6px 10px;border:1px solid #dce3ed;border-radius:6px;font-size:12px;font-family:inherit;min-height:40px;resize:vertical">' + 
+          escapeHtml(e.evaluationComments || '') + 
+          '</textarea></td>' +
+          '<td><button class="action-btn" onclick="saveQuickEvaluation(\'' + e.id + '\')"><span class="material-icons-round" style="font-size:16px">save</span> Guardar</button></td>' +
+          '</tr>';
+      });
+
+      html += '</tbody></table></div>';
+      container.innerHTML = html;
+    }
+
+    function openEvaluationForm(examId) {
+      editingExamId = examId;
+      var exam = examsData.find(function(e) { return e.id === examId; });
+      if (!exam) return;
+
+      var container = document.getElementById('evaluacionContent');
+      var modal = '<div style="background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:22px;margin-bottom:20px">' +
+        '<h4 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:16px">Evaluar examen - ' + escapeHtml(exam.userEmail) + '</h4>' +
+        '<div class="card-grid">' +
+        '<div>' +
+        '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Resultado del alumno</label>' +
+        '<div style="padding:10px 12px;background:#f1f5f9;border-radius:8px;font-size:13px;font-weight:600">' + 
+        exam.percentage + '% - ' + (exam.percentage >= 70 ? 'APROBADO' : 'DESAPROBADO') +
+        '</div>' +
+        '</div>' +
+        '<div>' +
+        '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Fecha del examen</label>' +
+        '<div style="padding:10px 12px;background:#f1f5f9;border-radius:8px;font-size:13px">' + formatDate(exam.completedAt) + '</div>' +
+        '</div>' +
+        '<div style="grid-column:1/-1">' +
+        '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Comentarios/Retroalimentación</label>' +
+        '<textarea id="evalComments" placeholder="Ej: Buen desempeño, mejorar en..." style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit;min-height:80px;resize:vertical">' + 
+        escapeHtml(exam.evaluationComments || '') + 
+        '</textarea>' +
+        '</div>' +
+        '<div style="grid-column:1/-1">' +
+        '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Subir documento de evaluación (PDF, imagen, etc.)</label>' +
+        '<input type="file" id="evalFile" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="width:100%;padding:10px 12px;border:1.5px dashed #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />' +
+        '<p style="font-size:11px;color:#64748b;margin-top:4px">Archivos aceptados: PDF, imágenes, DOC (máx. 10 MB)</p>' +
+        '</div>' +
+        '<div style="grid-column:1/-1;display:flex;gap:10px">' +
+        '<button class="btn-sm btn-amber" onclick="saveEvaluation()" style="flex:1"><span class="material-icons-round" style="font-size:16px">save</span> Guardar evaluación</button>' +
+        '<button class="btn-sm btn-outline-sm" onclick="renderEvaluacion()" style="flex:1">Cancelar</button>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+
+      container.innerHTML = modal + '<div id="evaluacionList"></div>';
+      renderEvaluacionList();
+    }
+
+    function uploadEvaluationDoc(examId) {
+      var fileInput = document.getElementById('evalFile_' + examId);
+      var file = fileInput ? fileInput.files[0] : null;
+      if (!file) return;
+
+      if (file.size > 10 * 1024 * 1024) {
+        FQNotify.toast('Archivo muy grande (máx. 10 MB)', 'error');
+        return;
+      }
+
+      FQNotify.toast('Subiendo archivo...', 'info');
+
+      var storageRef = firebase.storage().ref('exam-evaluations/' + examId + '_' + Date.now() + '_' + file.name);
+      storageRef.put(file).then(function(snapshot) {
+        return snapshot.ref.getDownloadURL();
+      }).then(function(url) {
+        return db.collection('exams').doc(examId).update({
+          evaluationDocUrl: url,
+          evaluationDocName: file.name,
+          evaluatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }).then(function() {
+        FQNotify.toast('Archivo subido correctamente.', 'success');
+        renderEvaluacion();
+      }).catch(function(err) {
+        FQNotify.toast('Error al subir: ' + err.message, 'error');
+      });
+    }
+
+    function saveQuickEvaluation(examId) {
+      var comments = (document.getElementById('evalComment_' + examId) || {}).value || '';
+      
+      db.collection('exams').doc(examId).update({
+        evaluationComments: comments.trim(),
+        evaluatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function() {
+        FQNotify.toast('Evaluación guardada.', 'success');
+        renderEvaluacion();
+      }).catch(function(err) {
+        FQNotify.toast('Error: ' + err.message, 'error');
+      });
+    }
+
+    function openEvaluationForm_old(examId) {
+      editingExamId = examId;
+      var exam = examsData.find(function(e) { return e.id === examId; });
+      if (!exam) return;
+
+      var container = document.getElementById('evaluacionContent');
+      var modal = '<div style="background:#fff;border:1px solid #dce3ed;border-radius:14px;padding:22px;margin-bottom:20px">' +
+        '<h4 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:16px">Evaluar examen - ' + escapeHtml(exam.userEmail) + '</h4>' +
+        '<div class="card-grid">' +
+        '<div>' +
+        '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Resultado del alumno</label>' +
+        '<div style="padding:10px 12px;background:#f1f5f9;border-radius:8px;font-size:13px;font-weight:600">' + 
+        exam.percentage + '% - ' + (exam.percentage >= 70 ? 'APROBADO' : 'DESAPROBADO') +
+        '</div>' +
+        '</div>' +
+        '<div>' +
+        '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Fecha del examen</label>' +
+        '<div style="padding:10px 12px;background:#f1f5f9;border-radius:8px;font-size:13px">' + formatDate(exam.completedAt) + '</div>' +
+        '</div>' +
+        '<div style="grid-column:1/-1">' +
+        '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Comentarios/Retroalimentación</label>' +
+        '<textarea id="evalComments" placeholder="Ej: Buen desempeño, mejorar en..." style="width:100%;padding:10px 12px;border:1.5px solid #dce3ed;border-radius:8px;font-size:13px;font-family:inherit;min-height:80px;resize:vertical">' + 
+        escapeHtml(exam.evaluationComments || '') + 
+        '</textarea>' +
+        '</div>' +
+        '<div style="grid-column:1/-1">' +
+        '<label style="font-size:12px;font-weight:600;color:#334155;display:block;margin-bottom:6px">Subir documento de evaluación (PDF, imagen, etc.)</label>' +
+        '<input type="file" id="evalFile" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="width:100%;padding:10px 12px;border:1.5px dashed #dce3ed;border-radius:8px;font-size:13px;font-family:inherit" />' +
+        '<p style="font-size:11px;color:#64748b;margin-top:4px">Archivos aceptados: PDF, imágenes, DOC (máx. 10 MB)</p>' +
+        '</div>' +
+        '<div style="grid-column:1/-1;display:flex;gap:10px">' +
+        '<button class="btn-sm btn-amber" onclick="saveEvaluation()" style="flex:1"><span class="material-icons-round" style="font-size:16px">save</span> Guardar evaluación</button>' +
+        '<button class="btn-sm btn-outline-sm" onclick="renderEvaluacion()" style="flex:1">Cancelar</button>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+
+      container.innerHTML = modal + '<div id="evaluacionList"></div>';
+      renderEvaluacionList();
+    }
+
+    function saveEvaluation() {
+      if (!editingExamId) return;
+
+      var exam = examsData.find(function(e) { return e.id === editingExamId; });
+      if (!exam) return;
+
+      var comments = document.getElementById('evalComments').value.trim();
+      var fileInput = document.getElementById('evalFile');
+      var file = fileInput ? fileInput.files[0] : null;
+
+      // Save comments immediately
+      db.collection('exams').doc(editingExamId).update({
+        evaluationComments: comments,
+        evaluatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function() {
+        FQNotify.toast('Evaluación guardada.', 'success');
+
+        // If there's a file, upload it to Storage
+        if (file) {
+          var storageRef = firebase.storage().ref('exam-evaluations/' + editingExamId + '_' + Date.now() + '_' + file.name);
+          storageRef.put(file).then(function(snapshot) {
+            return snapshot.ref.getDownloadURL();
+          }).then(function(url) {
+            // Save the file URL
+            return db.collection('exams').doc(editingExamId).update({
+              evaluationDocUrl: url,
+              evaluationDocName: file.name
+            });
+          }).then(function() {
+            FQNotify.toast('Documento subido correctamente.', 'success');
+            editingExamId = null;
+            renderEvaluacion();
+          }).catch(function(err) {
+            FQNotify.toast('Error al subir documento: ' + err.message, 'error');
+          });
+        } else {
+          editingExamId = null;
+          renderEvaluacion();
+        }
+      }).catch(function(err) {
+        FQNotify.toast('Error: ' + err.message, 'error');
+      });
+    }
+
+    function renderEvaluacionList() {
+      var container = document.getElementById('evaluacionList');
+      if (!container) return;
+
+      var evaluated = examsData.filter(function(e) {
+        return (e.evaluationComments || e.evaluationDocUrl) && myCourses().map(function(c) { return c.id; }).indexOf(e.courseId) !== -1;
+      });
+
+      if (evaluated.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:13px;padding:16px">Sin evaluaciones registradas aún.</p>';
+        return;
+      }
+
+      var html = '<div style="margin-top:20px"><h4 style="font-size:14px;font-weight:700;color:#0f172a;margin-bottom:12px">Evaluaciones registradas</h4>';
+      evaluated.forEach(function(e) {
+        html += '<div class="material-item">' +
+          '<span class="material-icons-round">grading</span>' +
+          '<div class="mat-info"><div class="mat-name">' + escapeHtml(e.userEmail) + '</div>' +
+          '<div class="mat-url">' + escapeHtml(e.evaluationComments || 'Sin comentarios') + '</div></div>';
+        
+        if (e.evaluationDocUrl) {
+          html += '<a href="' + escapeHtml(e.evaluationDocUrl) + '" target="_blank" rel="noopener" class="action-btn"><span class="material-icons-round" style="font-size:16px">download</span></a>';
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+      
+      container.innerHTML = container.innerHTML + html;
     }
 
     // ═══ MATERIAL DE APOYO ═══
