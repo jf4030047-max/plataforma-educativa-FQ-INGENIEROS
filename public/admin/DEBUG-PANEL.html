@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Panel Admin | FQ INGENIEROS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f0f4f8; color: #1a202c; padding: 20px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .header { background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .header h1 { display: flex; align-items: center; gap: 10px; color: #1565c0; }
+    .section { background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .section h2 { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: #0f172a; border-bottom: 2px solid #1565c0; padding-bottom: 8px; }
+    .info-box { background: #f7f9fc; border-left: 4px solid #1565c0; padding: 12px; margin: 10px 0; border-radius: 4px; font-size: 13px; }
+    .info-box.success { border-left-color: #16a34a; background: #f0fdf4; }
+    .info-box.error { border-left-color: #dc2626; background: #fef2f2; }
+    .info-box.warning { border-left-color: #ea580c; background: #fffbeb; }
+    .key { font-weight: 600; color: #334155; }
+    .value { font-family: 'Courier New', monospace; color: #0f172a; }
+    button { background: #1565c0; color: #fff; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-family: inherit; margin: 5px 5px 5px 0; }
+    button:hover { background: #0f3a69; }
+    button.secondary { background: #e2e8f0; color: #334155; }
+    button.secondary:hover { background: #cbd5e0; }
+    .test-result { background: #f7f9fc; padding: 10px; border-radius: 4px; margin: 5px 0; font-size: 13px; font-family: monospace; }
+    .log-container { background: #000; color: #0f0; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><span class="material-icons-round">bug_report</span> Panel de Diagnóstico - Admin</h1>
+      <p>Herramienta para verificar por qué el panel del administrador no realiza cambios</p>
+    </div>
+
+    <div class="section">
+      <h2>🔐 Estado de Autenticación</h2>
+      <div id="authStatus"></div>
+      <button onclick="checkAuth()">Verificar autenticación</button>
+      <button class="secondary" onclick="logout()">Cerrar sesión</button>
+    </div>
+
+    <div class="section">
+      <h2>📊 Verificación de Firebase</h2>
+      <div id="firebaseStatus"></div>
+      <button onclick="testFirebase()">Probar conexión Firebase</button>
+    </div>
+
+    <div class="section">
+      <h2>🔒 Verificación de Permisos</h2>
+      <div id="permissionsStatus"></div>
+      <button onclick="checkPermissions()">Verificar permisos</button>
+    </div>
+
+    <div class="section">
+      <h2>📝 Test de Lectura/Escritura</h2>
+      <div id="readWriteStatus"></div>
+      <button onclick="testRead()">Leer cursos</button>
+      <button onclick="testWrite()">Crear documento test</button>
+      <button onclick="testUpdate()">Actualizar documento test</button>
+      <button onclick="cleanupTest()">Limpiar test</button>
+    </div>
+
+    <div class="section">
+      <h2>🐛 Console Log</h2>
+      <div class="log-container" id="logContainer"></div>
+      <button onclick="clearLog()" class="secondary">Limpiar log</button>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+
+  <script>
+    let logs = [];
+
+    function log(msg, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString('es-PE');
+      const logMsg = `[${timestamp}] ${msg}`;
+      logs.push(logMsg);
+      console.log(logMsg);
+      updateLogDisplay();
+    }
+
+    function updateLogDisplay() {
+      const container = document.getElementById('logContainer');
+      container.textContent = logs.join('\n');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function clearLog() {
+      logs = [];
+      updateLogDisplay();
+    }
+
+    async function checkAuth() {
+      const status = document.getElementById('authStatus');
+      status.innerHTML = '<p>Verificando...</p>';
+      
+      firebase.auth().onAuthStateChanged(async function(user) {
+        if (user) {
+          log('✅ Usuario autenticado: ' + user.email, 'success');
+          let isAdmin = user.email === 'fq.ingenieros.empresa@gmail.com' || user.uid === 'IkBbQ9TIwcMniKQynSfPotmCqz62';
+          status.innerHTML = `
+            <div class="info-box success">
+              <div><span class="key">Usuario:</span> <span class="value">${user.email}</span></div>
+              <div><span class="key">UID:</span> <span class="value">${user.uid}</span></div>
+              <div><span class="key">Es Admin:</span> <span class="value">${isAdmin ? '✅ SÍ' : '❌ NO'}</span></div>
+              <div><span class="key">Email verificado:</span> <span class="value">${user.emailVerified ? '✅ SÍ' : '❌ NO'}</span></div>
+            </div>
+          `;
+        } else {
+          log('❌ No hay usuario autenticado', 'error');
+          status.innerHTML = `
+            <div class="info-box error">
+              <span class="key">Error:</span> No hay usuario autenticado. Por favor inicia sesión primero.
+            </div>
+          `;
+        }
+      });
+    }
+
+    function logout() {
+      firebase.auth().signOut().then(() => {
+        log('Sesión cerrada', 'info');
+        window.location.href = '../auth/login.html';
+      });
+    }
+
+    function testFirebase() {
+      const status = document.getElementById('firebaseStatus');
+      status.innerHTML = '<p>Probando...</p>';
+      
+      try {
+        log('Firebase App: ' + (firebase.app() ? '✅ Inicializado' : '❌ No inicializado'), 'info');
+        log('Firestore: ' + (firebase.firestore() ? '✅ Disponible' : '❌ No disponible'), 'info');
+        
+        const db = firebase.firestore();
+        db.collection('courses').limit(1).get().then(snap => {
+          log(`✅ Firebase Firestore funciona. Cursos en DB: ${snap.docs.length}`, 'success');
+          status.innerHTML = `
+            <div class="info-box success">
+              <div>Firebase está correctamente configurado</div>
+              <div><span class="key">Cursos encontrados:</span> <span class="value">${snap.docs.length}</span></div>
+            </div>
+          `;
+        }).catch(err => {
+          log('❌ Error en Firestore: ' + err.message, 'error');
+          status.innerHTML = `<div class="info-box error">Error: ${err.message}</div>`;
+        });
+      } catch (err) {
+        log('❌ Error: ' + err.message, 'error');
+        status.innerHTML = `<div class="info-box error">Error: ${err.message}</div>`;
+      }
+    }
+
+    function checkPermissions() {
+      const status = document.getElementById('permissionsStatus');
+      status.innerHTML = '<p>Verificando permisos...</p>';
+      
+      firebase.auth().onAuthStateChanged(async user => {
+        if (!user) {
+          status.innerHTML = '<div class="info-box error">No hay usuario autenticado</div>';
+          return;
+        }
+
+        let isAdmin = user.email === 'fq.ingenieros.empresa@gmail.com' || user.uid === 'IkBbQ9TIwcMniKQynSfPotmCqz62';
+        log('Admin check: ' + (isAdmin ? 'SÍ' : 'NO'), isAdmin ? 'success' : 'warning');
+        
+        status.innerHTML = `
+          <div class="info-box ${isAdmin ? 'success' : 'warning'}">
+            <div><span class="key">¿Es administrador?</span> <span class="value">${isAdmin ? '✅ SÍ' : '❌ NO'}</span></div>
+            <div><span class="key">Según las reglas:</span> <span class="value">Solo admins pueden editar cursos directamente</span></div>
+          </div>
+        `;
+      });
+    }
+
+    function testRead() {
+      const status = document.getElementById('readWriteStatus');
+      status.innerHTML = '<p>Leyendo...</p>';
+      
+      firebase.auth().onAuthStateChanged(async user => {
+        if (!user) {
+          status.innerHTML = '<div class="info-box error">No autenticado</div>';
+          return;
+        }
+
+        try {
+          const db = firebase.firestore();
+          const snap = await db.collection('courses').limit(5).get();
+          log(`✅ Lectura exitosa: ${snap.docs.length} cursos`, 'success');
+          
+          let html = '<div class="info-box success">✅ Lectura funcionando correctamente. Cursos:';
+          snap.docs.forEach(doc => {
+            html += `<div>• ${doc.data().name}</div>`;
+          });
+          html += '</div>';
+          status.innerHTML = html;
+        } catch (err) {
+          log('❌ Error de lectura: ' + err.message, 'error');
+          status.innerHTML = `<div class="info-box error">Error: ${err.message}</div>`;
+        }
+      });
+    }
+
+    function testWrite() {
+      const status = document.getElementById('readWriteStatus');
+      status.innerHTML = '<p>Escribiendo...</p>';
+      
+      firebase.auth().onAuthStateChanged(async user => {
+        if (!user) {
+          status.innerHTML = '<div class="info-box error">No autenticado</div>';
+          return;
+        }
+
+        try {
+          const db = firebase.firestore();
+          const testDocRef = await db.collection('courses').add({
+            name: '[TEST] Documento de prueba ' + new Date().getTime(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            testDoc: true
+          });
+          log('✅ Escritura exitosa: ' + testDocRef.id, 'success');
+          status.innerHTML = `<div class="info-box success">✅ Escritura funcionando. Doc ID: ${testDocRef.id}</div>`;
+        } catch (err) {
+          log('❌ Error de escritura: ' + err.message, 'error');
+          status.innerHTML = `<div class="info-box error">Error: ${err.message}</div>`;
+        }
+      });
+    }
+
+    function testUpdate() {
+      const status = document.getElementById('readWriteStatus');
+      status.innerHTML = '<p>Buscando documento de prueba...</p>';
+      
+      firebase.auth().onAuthStateChanged(async user => {
+        if (!user) {
+          status.innerHTML = '<div class="info-box error">No autenticado</div>';
+          return;
+        }
+
+        try {
+          const db = firebase.firestore();
+          const snap = await db.collection('courses').where('testDoc', '==', true).limit(1).get();
+          
+          if (snap.empty) {
+            log('❌ No hay documento de prueba. Crea uno primero.', 'warning');
+            status.innerHTML = '<div class="info-box warning">No se encontró documento de prueba. Primero ejecuta "Crear documento test"</div>';
+            return;
+          }
+
+          const docId = snap.docs[0].id;
+          await db.collection('courses').doc(docId).update({
+            name: '[TEST] Actualizado ' + new Date().getTime(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          
+          log('✅ Actualización exitosa: ' + docId, 'success');
+          status.innerHTML = `<div class="info-box success">✅ Actualización funcionando. Doc: ${docId}</div>`;
+        } catch (err) {
+          log('❌ Error de actualización: ' + err.message, 'error');
+          status.innerHTML = `<div class="info-box error">Error: ${err.message}</div>`;
+        }
+      });
+    }
+
+    function cleanupTest() {
+      const status = document.getElementById('readWriteStatus');
+      status.innerHTML = '<p>Eliminando...</p>';
+      
+      firebase.auth().onAuthStateChanged(async user => {
+        if (!user) {
+          status.innerHTML = '<div class="info-box error">No autenticado</div>';
+          return;
+        }
+
+        try {
+          const db = firebase.firestore();
+          const snap = await db.collection('courses').where('testDoc', '==', true).get();
+          
+          let deleted = 0;
+          snap.docs.forEach(doc => {
+            doc.ref.delete();
+            deleted++;
+          });
+          
+          log(`✅ Eliminación exitosa: ${deleted} documentos`, 'success');
+          status.innerHTML = `<div class="info-box success">✅ Se eliminaron ${deleted} documentos de prueba</div>`;
+        } catch (err) {
+          log('❌ Error de eliminación: ' + err.message, 'error');
+          status.innerHTML = `<div class="info-box error">Error: ${err.message}</div>`;
+        }
+      });
+    }
+
+    // Auto-check al cargar
+    window.addEventListener('load', () => {
+      log('Panel de diagnóstico cargado', 'info');
+      checkAuth();
+      testFirebase();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurador de Datos de Cursos - FQ INGENIEROS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #1565c0;
+      --color-success: #16a34a;
+      --color-danger: #dc2626;
+      --color-warning: #f59e0b;
+      --color-bg: #f7f9fc;
+      --color-text: #334155;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--color-bg);
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { color: var(--color-primary); margin-bottom: 10px; }
+    p { color: #64748b; margin-bottom: 20px; }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin: 10px 0;
+    }
+    button:hover { background: #0f3a69; }
+    button:disabled { background: #cbd5e1; cursor: not-allowed; }
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .success { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
+    .error { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+    .info { background: #dbeafe; color: #0284c7; border: 1px solid #93c5fd; }
+    .progress { display: flex; align-items: center; gap: 10px; }
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid #e0e7ff;
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 Restaurador de Datos de Cursos</h1>
+    <p>Haz clic en el botón para restaurar todos los cursos con sus datos completos a Firestore.</p>
+    
+    <button id="btnRestaurarar" onclick="restaurarCursos()">
+      ⚡ Restaurar Cursos Ahora
+    </button>
+    
+    <div id="status"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+
+  <script>
+    const statusDiv = document.getElementById('status');
+    const btnRestaurar = document.getElementById('btnRestaurarar');
+
+    function mostrarStatus(mensaje, tipo) {
+      const div = document.createElement('div');
+      div.className = `status ${tipo}`;
+      div.innerHTML = mensaje;
+      statusDiv.appendChild(div);
+      console.log(mensaje);
+    }
+
+    async function restaurarCursos() {
+      if (typeof firebase === 'undefined' || !firebase.firestore) {
+        mostrarStatus('❌ Error: Firebase no está disponible', 'error');
+        return;
+      }
+
+      btnRestaurar.disabled = true;
+      statusDiv.innerHTML = '';
+
+      const db = firebase.firestore();
+
+      // Datos completos de cursos
+      const cursos = [
+        {
+          id: 'Wa2NuxyWwKyYmaNqP17T',
+          name: 'Seguridad y Salud en el Trabajo en Obras Civiles',
+          price: 0,
+          priceLabel: 'Gratis',
+          priceDisplay: 'Gratis',
+          desc: 'Conoce los fundamentos de la Seguridad y Salud en el Trabajo aplicados a obras civiles, incluyendo marco legal peruano, identificación de peligros y riesgos, investigación de incidentes y elaboración de análisis de riesgos según normativa vigente.',
+          duration: '1 hora',
+          sessions: 1,
+          modality: 'En vivo + Grabado',
+          fecha: '2026-05-22',
+          startDate: '2026-05-22',
+          startTime: '5:00 p.m.',
+          endTime: '6:00 p.m.',
+          tags: ['Seguridad', 'Obras Civiles', 'Normativa'],
+          status: 'disponible',
+          active: true,
+          temario: [
+            {
+              titulo: 'Introducción a la SST',
+              temas: [
+                'Reseña histórica de la Seguridad y Salud en el Trabajo',
+                'Historia de la SST en el Perú',
+                'Términos y definiciones'
+              ]
+            },
+            {
+              titulo: 'Marco Legal en el Perú',
+              temas: [
+                'Ley N° 29783 y su reglamento D.S. 005-2012-TR',
+                'Leyes de SST',
+                'Resoluciones Ministeriales',
+                'Aplicación en diferentes sectores',
+                'Organismos competentes en el Perú',
+                'Modificatorias',
+                'Principios de la ley'
+              ]
+            },
+            {
+              titulo: 'Identificación de Peligros y Riesgos',
+              temas: [
+                'Conceptos de peligro y riesgo',
+                'Clasificación de peligros',
+                'Métodos de identificación',
+                'Matriz de riesgos',
+                'Evaluación de riesgos'
+              ]
+            },
+            {
+              titulo: 'Investigación de Incidentes',
+              temas: [
+                'Tipos de incidentes y accidentes',
+                'Causas de incidentes',
+                'Metodología de investigación',
+                'Reporte de incidentes',
+                'Prevención de recurrencia'
+              ]
+            },
+            {
+              titulo: 'Análisis de Riesgos',
+              temas: [
+                'Conceptos básicos',
+                'Proceso de análisis',
+                'Elaboración de ART',
+                'Registros y documentación',
+                'Medidas de control'
+              ]
+            }
+          ],
+          includes: [
+            { icon: 'videocam', text: 'Clases en vivo por Zoom' },
+            { icon: 'play_circle', text: 'Grabaciones disponibles' },
+            { icon: 'description', text: 'Material descargable' },
+            { icon: 'workspace_premium', text: 'Constancia de participación' }
+          ],
+          schedules: [
+            { id: 'sst-schedule-1', label: 'Viernes (Opción 1)', detail: '5:00 p.m. — 6:00 p.m.' },
+            { id: 'sst-schedule-2', label: 'Viernes (Opción 2)', detail: '7:00 p.m. — 8:00 p.m.' }
+          ]
+        },
+        {
+          id: 'supervision-obra',
+          name: 'Supervisión de Obra',
+          price: 120,
+          priceLabel: 'S/ 120',
+          priceDisplay: 'S/ 120',
+          desc: 'Técnicas y normas para supervisión de proyectos civiles',
+          duration: '4 horas',
+          sessions: 4,
+          modality: 'En vivo + Grabado',
+          status: 'proximamente',
+          active: false,
+          temario: [
+            'Normas de Supervisión',
+            'Control de Calidad',
+            'Seguridad en Obra'
+          ]
+        },
+        {
+          id: 'topografia-civil-3d',
+          name: 'Topografía en Civil 3D',
+          price: 200,
+          priceLabel: 'S/ 200',
+          priceDisplay: 'S/ 200',
+          desc: 'Aprende topografía aplicada a proyectos civiles con herramientas 3D. Domina el levantamiento topográfico, el modelado de superficies y el uso de Civil 3D para diseño de infraestructura.',
+          duration: '8 horas',
+          sessions: 8,
+          modality: 'En vivo + Grabado',
+          status: 'disponible',
+          active: true,
+          temario: [
+            {
+              titulo: 'Módulo 1: Fundamentos de Topografía',
+              temas: [
+                'Conceptos básicos de topografía',
+                'Equipos e instrumentos topográficos',
+                'Sistemas de coordenadas y georreferenciación'
+              ]
+            },
+            {
+              titulo: 'Módulo 2: Levantamiento Topográfico',
+              temas: [
+                'Métodos de levantamiento',
+                'Uso de estación total',
+                'Uso de GPS diferencial',
+                'Procesamiento de datos de campo'
+              ]
+            },
+            {
+              titulo: 'Módulo 3: Modelamiento 3D',
+              temas: [
+                'Introducción al modelamiento digital del terreno',
+                'Curvas de nivel y superficies',
+                'Software Civil 3D - Interfaz y herramientas',
+                'Creación de superficies desde puntos'
+              ]
+            },
+            {
+              titulo: 'Módulo 4: Diseño Vial y Explanaciones',
+              temas: [
+                'Alineamientos horizontales y verticales',
+                'Secciones transversales',
+                'Cálculo de volúmenes de corte y relleno',
+                'Diseño de rasantes'
+              ]
+            }
+          ],
+          includes: [
+            { icon: 'videocam', text: 'Sesiones en vivo' },
+            { icon: 'play_circle', text: 'Acceso a grabaciones' },
+            { icon: 'description', text: 'Material de apoyo y plantillas' },
+            { icon: 'workspace_premium', text: 'Certificado digital' },
+            { icon: 'forum', text: 'Grupo de WhatsApp' },
+            { icon: 'quiz', text: 'Examen de certificación' }
+          ]
+        }
+      ];
+
+      mostrarStatus('<div class="progress"><div class="spinner"></div><span>Restaurando cursos...</span></div>', 'info');
+
+      try {
+        let count = 0;
+        for (const curso of cursos) {
+          await db.collection('courses').doc(curso.id).set(curso, { merge: true });
+          count++;
+          mostrarStatus(`✅ ${count}/${cursos.length}: ${curso.name}`, 'success');
+        }
+
+        mostrarStatus('<strong>✅ ¡Restauración completada!</strong><br>Todos los cursos han sido restaurados con sus datos completos.<br>Por favor, recarga la página para ver los cambios.', 'success');
+      } catch (error) {
+        mostrarStatus(`❌ Error: ${error.message}`, 'error');
+      }
+
+      btnRestaurar.disabled = false;
+    }
+  </script>
+</body>
+</html>
