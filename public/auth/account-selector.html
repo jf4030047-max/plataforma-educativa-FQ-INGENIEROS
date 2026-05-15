@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seleccionar Cuenta | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link href="/assets/css/notifications.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/assets/css/header.css" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,sans-serif;background:#f7f9fc;color:#334155;min-height:100vh;display:flex;flex-direction:column}
+    .page{flex:1;display:flex;align-items:center;justify-content:center;padding:36px 16px}
+    .card{background:#fff;border:1px solid #dce3ed;border-radius:18px;width:100%;max-width:480px;padding:40px 36px;box-shadow:0 4px 24px rgba(15,23,42,.06)}
+    .card-header{text-align:center;margin-bottom:28px}
+    .card-header .icon{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#1565c0,#1e88e5);display:inline-grid;place-items:center;margin-bottom:14px}
+    .card-header .icon .material-icons-round{font-size:28px;color:#fff}
+    .card-header h1{font-size:24px;font-weight:800;color:#0f172a;margin-bottom:6px}
+    .card-header p{font-size:14px;color:#64748b}
+    
+    .accounts-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+    .account-option{background:#f7f9fc;border:2px solid #dce3ed;border-radius:12px;padding:16px 20px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px}
+    .account-option:hover{border-color:#1565c0;background:#eff6ff;box-shadow:0 2px 8px rgba(21,101,192,.15)}
+    .account-option.active{border-color:#1565c0;background:#eff6ff;box-shadow:0 4px 12px rgba(21,101,192,.2)}
+    .account-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1565c0,#1e88e5);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;flex-shrink:0}
+    .account-info{flex:1}
+    .account-email{font-weight:600;color:#0f172a;font-size:14px;display:block;margin-bottom:2px;word-break:break-all}
+    .account-type{font-size:12px;color:#64748b;display:flex;align-items:center;gap:4px}
+    .account-badge{background:#1565c0;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+    .account-check{color:#16a34a;font-size:20px;display:none}
+    .account-option.active .account-check{display:block}
+    
+    .divider{display:flex;align-items:center;gap:12px;margin:20px 0;font-size:12px;color:#64748b}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:#dce3ed}
+    
+    .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border-radius:10px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all .2s;font-family:inherit}
+    .btn-primary{background:#1565c0;color:#fff}
+    .btn-primary:hover{background:#1e88e5;box-shadow:0 4px 18px rgba(21,101,192,.3)}
+    .btn-secondary{background:#e2e8f0;color:#334155;border:1.5px solid #cbd5e0}
+    .btn-secondary:hover{background:#cbd5e0}
+    .btn-group{display:flex;gap:10px;margin-top:16px}
+    .btn-group .btn{flex:1}
+    
+    .card-footer{text-align:center;font-size:13px;color:#64748b}
+    .card-footer a{color:#1565c0;text-decoration:none;font-weight:600}
+    .card-footer a:hover{text-decoration:underline}
+    
+    .page-footer{text-align:center;padding:18px;color:#64748b;font-size:12px;border-top:1px solid #dce3ed}
+    @media(max-width:480px){.card{padding:28px 20px}}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <div class="card-header">
+        <div class="icon"><span class="material-icons-round">account_circle</span></div>
+        <h1>Selecciona tu cuenta</h1>
+        <p>Elige la cuenta con la que deseas continuar</p>
+      </div>
+      
+      <div class="accounts-list" id="accountsList">
+        <p style="text-align:center;color:#64748b;padding:20px">Cargando cuentas...</p>
+      </div>
+      
+      <div class="divider">o</div>
+      
+      <button class="btn btn-secondary" onclick="loginWithNewAccount()">
+        <span class="material-icons-round">add</span> Otra cuenta
+      </button>
+      
+      <button id="continueBtn" class="btn btn-primary" style="margin-top:12px;display:none" onclick="continueWithSelected()">
+        <span class="material-icons-round">arrow_forward</span> Continuar
+      </button>
+      
+      <div id="loginError" class="alert alert-error" style="display:none;margin-top:12px"></div>
+      
+      <div class="card-footer" style="margin-top:24px">
+        <a href="/auth/login.html">Volver al login</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="/assets/js/firebase-config.js"></script>
+  <script>
+    let selectedEmail = null;
+    const redirect = new URLSearchParams(window.location.search).get('redirect') || '/index.html';
+
+    // Obtener cuentas disponibles del dispositivo/navegador
+    firebase.auth().fetchSignInMethodsForEmail = function() {
+      // Nota: Firebase no proporciona acceso directo a las cuentas cached
+      // Usaremos un enfoque alternativo con Google Sign-In
+      return this.currentUser;
+    };
+
+    // Cuando carga la página
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        // Ya hay una sesión activa, mostrar opciones
+        renderAccountSelector(user);
+      } else {
+        // No hay sesión, cargar cuentas de Google disponibles
+        initializeGoogleAccounts();
+      }
+    });
+
+    function renderAccountSelector(currentUser) {
+      const container = document.getElementById('accountsList');
+      
+      let html = `
+        <div class="account-option active" onclick="selectAccount('${currentUser.email}', this)" data-email="${currentUser.email}">
+          <div class="account-avatar">${getInitials(currentUser.email)}</div>
+          <div class="account-info">
+            <span class="account-email">${currentUser.email}</span>
+            <span class="account-type">
+              ${currentUser.email === 'fq.ingenieros.empresa@gmail.com' ? '<span class="account-badge">ADMIN</span>' : '<span>Cuenta activa</span>'}
+            </span>
+          </div>
+          <span class="account-check material-icons-round">check_circle</span>
+        </div>
+      `;
+      
+      container.innerHTML = html;
+      selectedEmail = currentUser.email;
+      document.getElementById('continueBtn').style.display = 'flex';
+    }
+
+    function initializeGoogleAccounts() {
+      const container = document.getElementById('accountsList');
+      
+      // Crear un botón para iniciar sesión con Google que permita seleccionar cuenta
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({
+        'prompt': 'select_account'  // Fuerza el selector de cuentas
+      });
+
+      html = `
+        <div style="text-align:center;padding:20px;">
+          <p style="margin-bottom:16px;color:#64748b">Necesitas iniciar sesión primero</p>
+          <button onclick="loginWithGoogle()" class="btn btn-primary" style="width:100%">
+            <img src="/assets/img/google-logo.svg" alt="Google" style="width:18px;height:18px">
+            Iniciar con Google
+          </button>
+        </div>
+      `;
+      container.innerHTML = html;
+    }
+
+    function getInitials(email) {
+      const parts = email.split('@')[0].split('.');
+      return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+    }
+
+    function selectAccount(email, element) {
+      document.querySelectorAll('.account-option').forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+      selectedEmail = email;
+      document.getElementById('continueBtn').style.display = 'flex';
+    }
+
+    function continueWithSelected() {
+      if (!selectedEmail) {
+        document.getElementById('loginError').textContent = 'Por favor selecciona una cuenta';
+        document.getElementById('loginError').style.display = 'flex';
+        return;
+      }
+      window.location.href = redirect;
+    }
+
+    function loginWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({
+        'prompt': 'select_account'
+      });
+
+      firebase.auth().signInWithPopup(provider)
+        .then(result => {
+          renderAccountSelector(result.user);
+        })
+        .catch(error => {
+          document.getElementById('loginError').textContent = 'Error: ' + error.message;
+          document.getElementById('loginError').style.display = 'flex';
+        });
+    }
+
+    function loginWithNewAccount() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({
+        'prompt': 'select_account'
+      });
+
+      firebase.auth().signInWithPopup(provider)
+        .then(result => {
+          renderAccountSelector(result.user);
+        })
+        .catch(error => {
+          document.getElementById('loginError').textContent = 'Error: ' + error.message;
+          document.getElementById('loginError').style.display = 'flex';
+        });
+    }
+  </script>
+</body>
+</html>
