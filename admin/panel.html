@@ -97,302 +97,70 @@
     .admin-badge .material-icons-round { font-size: 16px; }
     .btn-logout { background: none; border: none; color: #dc2626; cursor: pointer; font-size: 16px; display: flex; align-items: center; gap: 6px; font-weight: 600; }
     .btn-logout .material-icons-round { font-size: 20px; }
-    .admin-content {
-      flex: 1;
-      padding: 32px 40px;
-      overflow-y: auto;
-      max-height: calc(100vh - 100px);
-    }
-    .stat-cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-bottom: 32px;
-    }
-    .stat-card {
-      background: #fff;
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(15,23,42,0.08);
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      border-left: 4px solid var(--color-primary);
-    }
-    .stat-icon {
-      font-size: 32px;
-      padding: 12px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
+    .admin-content { flex: 1; padding: 32px 40px; overflow-y: auto; max-height: calc(100vh - 100px); }
+    .stat-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px; }
+    .stat-card { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 1px 3px rgba(15,23,42,0.08); display: flex; align-items: flex-start; gap: 16px; border-left: 4px solid var(--color-primary); }
+    .stat-icon { font-size: 32px; padding: 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .stat-value { font-size: 24px; font-weight: 700; color: var(--color-text); margin-bottom: 6px; }
     .stat-label { font-size: 13px; color: var(--color-muted); }
     .admin-section { margin-bottom: 32px; }
     .admin-section h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--color-text); display: flex; align-items: center; gap: 8px; }
     .admin-section h3 .material-icons-round { font-size: 20px; color: var(--color-sidebar-accent); background: #e3f0fa; padding: 6px; border-radius: 8px; }
-    .btn-primary {
-      background: var(--color-primary);
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .btn-primary { background: var(--color-primary); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; display: inline-flex; align-items: center; gap: 8px; }
     .btn-primary:hover { background: var(--color-primary-dark); }
-    .form-control {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1.5px solid var(--color-border);
-      border-radius: 8px;
-      font-size: 14px;
-      font-family: inherit;
-    }
+    .form-control { width: 100%; padding: 10px 12px; border: 1.5px solid var(--color-border); border-radius: 8px; font-size: 14px; font-family: inherit; }
     table { width: 100%; border-collapse: collapse; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(15,23,42,0.04); }
     thead { background: #f7f9fc; }
     th { padding: 12px 8px; color: #64748b; font-weight: 700; text-align: left; font-size: 13px; }
     td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; }
     tbody tr:hover { background: #f7f9fc; }
-    .tab-btn {
-      flex: 1;
-      padding: 14px 0;
-      font-size: 16px;
-      font-weight: 600;
-      border: none;
-      background: #f7f9fc;
-      color: #64748b;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-    }
+    .tab-btn { flex: 1; padding: 14px 0; font-size: 16px; font-weight: 600; border: none; background: #f7f9fc; color: #64748b; cursor: pointer; transition: background 0.2s, color 0.2s; }
     .tab-btn.active { background: #e3f0fa; color: #1565c0; }
     @media (max-width: 1024px) { .stat-cards { grid-template-columns: 1fr; } }
+    .access-denied {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #f7f9fc;
+      padding: 20px;
+    }
+    .access-denied-card {
+      text-align: center;
+      background: #fff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 500px;
+    }
+    .access-denied-icon { font-size: 48px; margin-bottom: 16px; }
+    .access-denied-title { font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+    .access-denied-text { font-size: 16px; color: #64748b; margin-bottom: 20px; }
+    .access-denied-email { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; margin-bottom: 24px; font-size: 14px; }
+    .access-denied-email strong { color: #1565c0; }
+    .access-denied-email .email { font-size: 16px; font-weight: 600; color: #0f172a; }
+    .btn-denied { padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; margin-bottom: 10px; width: 100%; border: none; font-family: inherit; }
+    .btn-denied.primary { background: #1565c0; color: #fff; }
+    .btn-denied.secondary { background: #e2e8f0; color: #334155; }
+    .btn-denied.danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
   </style>
 </head>
 <body>
-  <div class="admin-layout">
-    <aside class="admin-sidebar">
-      <div class="sidebar-header">
-        <img src="../../_ca1bc5d1-4cda-4d5a-b5a0-6631012b8b6f.jfif" alt="FQ Ingenieros" />
-        <div>
-          <strong>FQ INGENIEROS</strong>
-          <span>Admin</span>
-        </div>
-      </div>
-      <ul class="sidebar-menu">
-        <li><a href="panel.html" class="active" id="menuPanel"><span class="material-icons-round">dashboard</span> Panel Principal</a></li>
-        <li><a href="#" id="menuCursos"><span class="material-icons-round">school</span> Gestionar Cursos</a></li>
-        <li><a href="usuarios.html" id="menuUsuarios"><span class="material-icons-round">people</span> Gestionar Usuarios</a></li>
-        <li><a href="../dashboard/index.html"><span class="material-icons-round">bar_chart</span> Reportes</a></li>
-      </ul>
-      <div class="sidebar-footer">Plataforma Educativa FQ INGENIEROS © 2026</div>
-    </aside>
-    <main class="admin-main">
-      <header class="admin-topbar">
-        <h2><span class="material-icons-round">admin_panel_settings</span> Panel del Administrador</h2>
-        <div class="admin-topbar-right">
-          <div class="admin-badge"><span class="material-icons-round">verified_user</span> Administrador</div>
-          <button class="btn-logout" onclick="firebase.auth().signOut();"><span class="material-icons-round">logout</span> Salir</button>
-        </div>
-      </header>
-      <div class="admin-content">
-        <div class="stat-cards">
-          <div class="stat-card">
-            <span class="material-icons-round stat-icon" style="background:#e3f0fa;color:#1565c0;">school</span>
-            <div>
-              <div class="stat-value" id="statCursos">0</div>
-              <div class="stat-label">Cursos activos</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <span class="material-icons-round stat-icon" style="background:#e0e7ff;color:#4f46e5;">people</span>
-            <div>
-              <div class="stat-value" id="statUsuarios">0</div>
-              <div class="stat-label">Usuarios registrados</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <span class="material-icons-round stat-icon" style="background:#dcfce7;color:#16a34a;">attach_money</span>
-            <div>
-              <div class="stat-value" id="statIngresos">S/ 0</div>
-              <div class="stat-label">Ingresos mes</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="stat-cards">
-          <div class="stat-card">
-            <span class="material-icons-round stat-icon" style="background:#fef3c7;color:#d97706;">task_alt</span>
-            <div>
-              <div class="stat-value" id="statMatriculaciones">0</div>
-              <div class="stat-label">Matriculaciones este mes</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <span class="material-icons-round stat-icon" style="background:#fecaca;color:#dc2626;">pending_actions</span>
-            <div>
-              <div class="stat-value" id="statPagosPendientes">0</div>
-              <div class="stat-label">Pagos por verificar</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <span class="material-icons-round stat-icon" style="background:#c7d2fe;color:#6366f1;">verified_user</span>
-            <div>
-              <div class="stat-value" id="statCertificados">0</div>
-              <div class="stat-label">Certificados emitidos</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="admin-section" style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(15,23,42,0.08);margin-bottom:32px;">
-          <h3 style="margin-top:0;"><span class="material-icons-round">info</span> Información del Sistema</h3>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;font-size:13px;color:#64748b;">
-            <div><strong style="color:#334155;">Plataforma:</strong> FQ INGENIEROS Educativa</div>
-            <div><strong style="color:#334155;">Versión:</strong> 1.0 MVP</div>
-            <div><strong style="color:#334155;">Última actualización:</strong> 12 Mayo 2026</div>
-            <div><strong style="color:#334155;">Estado:</strong> <span style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:4px;font-weight:600;">Operativo</span></div>
-            <div><strong style="color:#334155;">Estudiantes activos:</strong> <span id="estudiantesActivos">0</span></div>
-            <div><strong style="color:#334155;">Tasa de ocupación:</strong> <span id="tasaOcupacion">0%</span></div>
-          </div>
-        </div>
-
-        <div class="admin-section" style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(15,23,42,0.08);margin-bottom:32px;">
-          <h3 style="margin-top:0;"><span class="material-icons-round">schedule</span> 📅 Horarios por Día de la Semana</h3>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:16px;">
-            <div style="background:#e3f0fa;padding:16px;border-radius:8px;border-left:4px solid #1565c0;">
-              <div style="font-weight:700;color:#1565c0;margin-bottom:8px;">📍 Lunes</div>
-              <div style="font-size:12px;color:#64748b;">Sin clases programadas</div>
-            </div>
-            <div style="background:#e3f0fa;padding:16px;border-radius:8px;border-left:4px solid #1565c0;">
-              <div style="font-weight:700;color:#1565c0;margin-bottom:8px;">📍 Martes</div>
-              <div style="font-size:12px;color:#64748b;">Sin clases programadas</div>
-            </div>
-            <div style="background:#e3f0fa;padding:16px;border-radius:8px;border-left:4px solid #1565c0;">
-              <div style="font-weight:700;color:#1565c0;margin-bottom:8px;">📍 Miércoles</div>
-              <div style="font-size:12px;color:#64748b;">Sin clases programadas</div>
-            </div>
-            <div style="background:#e3f0fa;padding:16px;border-radius:8px;border-left:4px solid #1565c0;">
-              <div style="font-weight:700;color:#1565c0;margin-bottom:8px;">📍 Jueves</div>
-              <div style="font-size:12px;color:#64748b;">Sin clases programadas</div>
-            </div>
-            <div style="background:#dcfce7;padding:16px;border-radius:8px;border-left:4px solid #16a34a;">
-              <div style="font-weight:700;color:#16a34a;margin-bottom:8px;">📍 Viernes</div>
-              <div style="font-size:12px;color:#64748b;">
-                <strong>SST - Obras Civiles</strong><br/>
-                5:00 p.m. - 6:00 p.m.<br/>
-                7:00 p.m. - 8:00 p.m.<br/>
-                <span style="color:#16a34a;font-weight:600;">22 de Mayo 2026</span>
-              </div>
-            </div>
-            <div style="background:#f3f4f6;padding:16px;border-radius:8px;border-left:4px solid #94a3b8;">
-              <div style="font-weight:700;color:#64748b;margin-bottom:8px;">📍 Sábado</div>
-              <div style="font-size:12px;color:#64748b;">Topografía en Civil 3D (Por confirmar)</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="admin-section" style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(15,23,42,0.08);margin-bottom:32px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-            <h3 style="margin:0;"><span class="material-icons-round">payment</span> Pagos Pendientes de Verificación</h3>
-            <button id="btnRefreshPagos" class="btn-primary" style="font-size:12px;padding:8px 12px;">
-              <span class="material-icons-round" style="font-size:16px;">refresh</span>Actualizar
-            </button>
-          </div>
-          <div id="pagosPendientesContent">Cargando pagos...</div>
-        </div>
-        
-        <div class="admin-section" style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(15,23,42,0.08);margin-bottom:32px;">
-          <h3 style="margin-top:0;"><span class="material-icons-round">trending_up</span> Últimas Matriculaciones</h3>
-          <div id="ultimasMatriculacionesContent">Cargando matriculaciones...</div>
-        </div>
-        
-        <div class="admin-section" style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(15,23,42,0.08);margin-bottom:32px;">
-          <h3 style="margin-top:0;"><span class="material-icons-round">school</span> Estudiantes por Curso</h3>
-          <div id="estudiantesPorCursoContent">Cargando datos...</div>
-        </div>
-        
-        <div style="display:flex;gap:0;margin-bottom:24px;">
-          <button id="tabUsuarios" class="tab-btn active" style="border-radius:10px 0 0 0;">Usuarios</button>
-          <button id="tabCursos" class="tab-btn" style="border-radius:0 10px 0 0;">Cursos</button>
-        </div>
-        <div class="admin-section" id="usuariosSection">
-          <h3><span class="material-icons-round">people</span> Usuarios</h3>
-          <div id="usuariosContent">Cargando usuarios...</div>
-        </div>
-        <div class="admin-section" id="cursosSection" style="display:none">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-            <h3 style="margin:0;">
-              <span class="material-icons-round" style="font-size:22px;background:#e3f0fa;padding:6px;border-radius:8px;">play_circle</span>
-              Cursos
-            </h3>
-            <div style="display:flex;gap:8px;">
-              <button id="btnRefreshCursos" class="btn-primary" style="font-size:12px;padding:8px 12px;background:#f3f4f6;color:#334155;display:flex;align-items:center;gap:6px;">
-                <span class="material-icons-round" style="font-size:16px;">refresh</span>Actualizar
-              </button>
-              <button id="btnAgregarCurso" class="btn-primary">
-                <span class="material-icons-round" style="font-size:18px;">add</span>Agregar curso
-              </button>
-            </div>
-          </div>
-          <div style="color:#64748b;font-size:14px;margin-bottom:18px;">Administra los cursos activos, edita información y agrega nuevos cursos fácilmente.</div>
-          <div id="cursosContent">Cargando cursos...</div>
-          <!-- Modal para agregar curso -->
-          <div id="modalAgregarCurso" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;overflow-y:auto;padding:40px 20px;">
-            <div style="background:#fff;padding:32px;border-radius:14px;box-shadow:0 10px 40px rgba(15,23,42,0.2);width:100%;max-width:550px;margin:auto;" onclick="event.stopPropagation();">
-              <h3 style="margin-bottom:6px;color:#1565c0;font-size:22px;font-weight:700;">➕ Nuevo Curso</h3>
-              <p style="color:#64748b;font-size:14px;margin-bottom:24px;">Ingresa los detalles del nuevo curso que deseas crear.</p>
-              <form id="formAgregarCurso">
-                <div style="margin-bottom:16px;">
-                  <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Nombre del curso *</label>
-                  <input type="text" name="nombre" class="form-control" placeholder="Ej: Introducción a Python" required>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-                  <div>
-                    <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Fecha de inicio *</label>
-                    <input type="date" name="fecha" class="form-control" required>
-                  </div>
-                  <div>
-                    <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Precio *</label>
-                    <input type="number" name="precio" class="form-control" placeholder="0.00" min="0" step="0.01" required>
-                  </div>
-                </div>
-                <div style="margin-bottom:16px;">
-                  <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Tema principal *</label>
-                  <input type="text" name="temaPrincipal" class="form-control" placeholder="Ej: Programación" required>
-                </div>
-                <div style="margin-bottom:16px;">
-                  <label style="display:block;margin-bottom:6px;color:#334155;font-weight:600;font-size:14px;">Descripción</label>
-                  <textarea name="desc" class="form-control" placeholder="Describe brevemente el contenido del curso" style="resize:vertical;min-height:80px;"></textarea>
-                </div>
-                <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:24px;padding-top:16px;border-top:1px solid #dce3ed;">
-                  <button type="button" id="btnCancelarModal" class="btn-primary" style="background:#f3f4f6;color:#334155;">Cancelar</button>
-                  <button type="submit" class="btn-primary">Crear curso</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
+  <div id="admin-app">
+    <!-- Admin Panel Content -->
   </div>
+
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="../assets/js/firebase-config.js"></script>
   <script src="../assets/js/notifications.js"></script>
   <script src="../assets/js/auth-ui.js"></script>
+
   <script>
     // Validar que sea ADMINISTRADOR antes de cargar el panel
     const ADMIN_EMAILS = ['fq.ingenieros.empresa@gmail.com'];
-    let adminValidated = false;
-    
+
     firebase.auth().onAuthStateChanged(function(user) {
       if (!user) {
         // No autenticado: redirigir a login
@@ -402,60 +170,44 @@
 
       // Validar que sea administrador
       const isAdmin = ADMIN_EMAILS.includes(user.email);
-      
+
       if (!isAdmin) {
-        // No es administrador: mostrar acceso denegado con opción de cambiar cuenta
-        document.body.innerHTML = `
-          <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f7f9fc;padding:20px;">
-            <div style="text-align:center;background:#fff;padding:40px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);max-width:500px;">
-              <div style="font-size:48px;margin-bottom:16px;">🔒</div>
-              <h1 style="font-size:24px;font-weight:700;color:#0f172a;margin-bottom:8px;">Acceso Denegado</h1>
-              <p style="font-size:16px;color:#64748b;margin-bottom:20px;">
-                Este panel solo es accesible para administradores autorizados.
-              </p>
-              <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px;margin-bottom:24px;font-size:14px;">
-                <strong style="color:#1565c0;">Cuenta actual:</strong><br>
-                <span style="font-size:16px;font-weight:600;color:#0f172a;">${user.email}</span>
-              </div>
-              <p style="font-size:13px;color:#64748b;margin-bottom:20px;">
-                Si tienes otra cuenta de administrador abierta en este navegador, puedes cambiar de cuenta aquí.
-              </p>
-              <button onclick="cambiarCuenta()" style="background:#1565c0;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px;margin-bottom:10px;width:100%;">
-                🔄 Cambiar Cuenta
-              </button>
-              <button onclick="location.href='../dashboard/index.html'" style="background:#e2e8f0;color:#334155;border:none;padding:12px 24px;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px;margin-bottom:10px;width:100%;">
-                📊 Ir al Dashboard
-              </button>
-              <button onclick="cerrarSesion()" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;padding:12px 24px;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px;width:100%;">
-                🚪 Cerrar Sesión
-              </button>
-            </div>
-          </div>
-          <script>
-            function cambiarCuenta() {
-              window.location.href = '../auth/account-selector.html?redirect=' + encodeURIComponent(window.location.href);
-            }
-            function cerrarSesion() {
-              firebase.auth().signOut().then(() => {
-                window.location.href = '../auth/login.html';
-              });
-            }
-          </script>
-        `;
+        // No es administrador: mostrar acceso denegado
+        showAccessDenied(user.email);
         return;
       }
 
-      // Es administrador: marcar como validado y cargar el panel
-      adminValidated = true;
+      // Es administrador: cargar el panel completo
+      loadAdminPanel();
+    });
+
+    function showAccessDenied(email) {
+      const app = document.getElementById('admin-app');
+      const emailDisplay = email || 'No identificado';
       
+      app.innerHTML = '<div class="access-denied"><div class="access-denied-card"><div class="access-denied-icon">🔒</div><h1 class="access-denied-title">Acceso Denegado</h1><p class="access-denied-text">Este panel solo es accesible para administradores autorizados.</p><div class="access-denied-email"><strong>Cuenta actual:</strong><br><span class="email">' + emailDisplay + '</span></div><p style="font-size:13px;color:#64748b;margin-bottom:20px;">Si tienes otra cuenta de administrador abierta en este navegador, puedes cambiar de cuenta aquí.</p><button class="btn-denied primary" onclick="cambiarCuenta()">🔄 Cambiar Cuenta</button><button class="btn-denied secondary" onclick="irDashboard()">📊 Ir al Dashboard</button><button class="btn-denied danger" onclick="cerrarSesion()">🚪 Cerrar Sesión</button></div></div>';
+    }
+
+    function cambiarCuenta() {
+      window.location.href = '../auth/account-selector.html?redirect=' + encodeURIComponent(window.location.href);
+    }
+
+    function irDashboard() {
+      window.location.href = '../dashboard/index.html';
+    }
+
+    function cerrarSesion() {
+      firebase.auth().signOut().then(() => {
+        window.location.href = '../auth/login.html';
+      });
+    }
+
+    function loadAdminPanel() {
       // Cargar admin-panel.js solo después de validar
       const script = document.createElement('script');
       script.src = 'admin-panel.js';
       document.body.appendChild(script);
-    });
-  </script>
-</body>
-</html>
+    }
   </script>
 </body>
 </html>
