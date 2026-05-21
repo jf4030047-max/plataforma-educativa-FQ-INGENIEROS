@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Examen | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link href="../assets/css/notifications.css" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f7f9fc; color: #334155; }
+    .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .header { background: #fff; padding: 32px; border-radius: 14px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+    .header h1 { font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    .header p { color: #64748b; font-size: 15px; }
+    .card { background: #fff; padding: 24px; border-radius: 14px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 8px; }
+    input, textarea, select { width: 100%; padding: 10px 12px; border: 1.5px solid #dce3ed; border-radius: 8px; font-size: 14px; font-family: inherit; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #d97706; box-shadow: 0 0 0 3px rgba(217,119,6,.1); }
+    textarea { resize: vertical; min-height: 80px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .btn { padding: 11px 22px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; font-family: inherit; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: all .2s; }
+    .btn-primary { background: #d97706; color: #fff; }
+    .btn-primary:hover { background: #b45309; }
+    .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn-secondary:hover { background: #cbd5e0; }
+    .btn-sm { padding: 8px 14px; font-size: 13px; }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-danger:hover { background: #b91c1c; }
+    
+    .question-item { background: #f7f9fc; padding: 20px; border-radius: 10px; margin-bottom: 16px; border: 2px solid #dce3ed; }
+    .question-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .question-num { font-weight: 700; color: #1565c0; font-size: 18px; }
+    .question-type { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; background: #d97706; color: #fff; text-transform: uppercase; }
+    
+    .option-item { background: #fff; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; border: 1px solid #dce3ed; }
+    .option-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #dce3ed; cursor: pointer; }
+    .option-radio.correct { border-color: #16a34a; background: #16a34a; }
+    .option-text { flex: 1; }
+    .option-delete { background: none; border: none; color: #dc2626; cursor: pointer; font-size: 12px; }
+    
+    .actions { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .preview { background: #eff6ff; padding: 20px; border-radius: 10px; margin-top: 24px; border: 2px solid #1565c0; }
+    .preview h4 { color: #1565c0; margin-bottom: 12px; font-size: 16px; }
+    .empty-state { text-align: center; padding: 40px; color: #64748b; }
+    .empty-state .material-icons-round { font-size: 48px; color: #cbd5e0; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📝 Crear Nuevo Examen</h1>
+      <p>Define las preguntas y opciones de respuesta para tu examen</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 20px; color: #0f172a;">Información del Examen</h3>
+      
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Nombre del examen *</label>
+          <input type="text" id="examName" placeholder="Ej: Evaluación Tema 1" required>
+        </div>
+        <div class="form-group">
+          <label>Curso *</label>
+          <select id="examCourse" required>
+            <option value="">-- Seleccionar curso --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Descripción (opcional)</label>
+        <textarea id="examDescription" placeholder="Describe el tema o contenido del examen"></textarea>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Puntuación total *</label>
+          <input type="number" id="examScore" placeholder="100" value="100" min="1" required>
+        </div>
+        <div class="form-group">
+          <label>Puntuación mínima para aprobar *</label>
+          <input type="number" id="examPassScore" placeholder="70" value="70" min="0" required>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        <h3 style="color: #0f172a;">Preguntas</h3>
+        <button class="btn btn-primary btn-sm" onclick="addQuestion()">
+          <span class="material-icons-round">add</span> Agregar Pregunta
+        </button>
+      </div>
+
+      <div id="questionsContainer">
+        <div class="empty-state">
+          <span class="material-icons-round">quiz</span>
+          <p>No hay preguntas aún. Haz click en "Agregar Pregunta" para comenzar.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; gap: 12px;">
+        <button class="btn btn-primary" onclick="saveExam()">
+          <span class="material-icons-round">save</span> Guardar Examen
+        </button>
+        <button class="btn btn-secondary" onclick="window.history.back()">
+          <span class="material-icons-round">close</span> Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+
+  <script>
+    let questions = [];
+    let currentCourse = null;
+
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user) {
+        window.location.href = '../auth/login.html';
+        return;
+      }
+      loadCourses();
+    });
+
+    async function loadCourses() {
+      const db = firebase.firestore();
+      const snap = await db.collection('courses').get();
+      
+      const select = document.getElementById('examCourse');
+      snap.forEach(doc => {
+        const option = document.createElement('option');
+        option.value = doc.id;
+        option.textContent = doc.data().name || doc.id;
+        select.appendChild(option);
+      });
+    }
+
+    function addQuestion() {
+      const questionId = 'q-' + Date.now();
+      questions.push({
+        id: questionId,
+        text: '',
+        type: 'multiple',
+        options: ['', ''],
+        correctOption: 0,
+        points: 1
+      });
+      renderQuestions();
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('questionsContainer');
+      
+      if (questions.length === 0) {
+        container.innerHTML = '<div class="empty-state"><span class="material-icons-round">quiz</span><p>No hay preguntas aún. Haz click en "Agregar Pregunta" para comenzar.</p></div>';
+        return;
+      }
+
+      container.innerHTML = questions.map((q, idx) => `
+        <div class="question-item">
+          <div class="question-header">
+            <span class="question-num">Pregunta ${idx + 1}</span>
+            <div style="display: flex; gap: 8px;">
+              <select onchange="updateQuestion('${q.id}', 'type', this.value)" style="width: auto;">
+                <option value="multiple" ${q.type === 'multiple' ? 'selected' : ''}>Opción múltiple</option>
+                <option value="truefalse" ${q.type === 'truefalse' ? 'selected' : ''}>Verdadero/Falso</option>
+              </select>
+              <button class="btn btn-danger btn-sm" onclick="deleteQuestion('${q.id}')">
+                <span class="material-icons-round" style="font-size: 16px;">delete</span> Eliminar
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Texto de la pregunta *</label>
+            <textarea onchange="updateQuestion('${q.id}', 'text', this.value)" placeholder="¿Cuál es la pregunta?">${q.text}</textarea>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Puntos</label>
+              <input type="number" value="${q.points}" onchange="updateQuestion('${q.id}', 'points', parseInt(this.value))" min="1">
+            </div>
+            <div></div>
+          </div>
+
+          <div class="form-group">
+            <label>Opciones de respuesta</label>
+            ${renderOptions(q.id, q)}
+          </div>
+
+          <button class="btn btn-secondary btn-sm" onclick="addOption('${q.id}')">
+            <span class="material-icons-round">add</span> Agregar opción
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function renderOptions(questionId, question) {
+      return question.options.map((opt, idx) => `
+        <div class="option-item">
+          <input type="radio" name="correct-${questionId}" 
+            ${question.correctOption === idx ? 'checked' : ''} 
+            onchange="updateQuestion('${questionId}', 'correctOption', ${idx})">
+          <input type="text" value="${opt}" placeholder="Opción ${idx + 1}" 
+            onchange="updateOption('${questionId}', ${idx}, this.value)" 
+            style="flex: 1;">
+          <button class="option-delete" onclick="deleteOption('${questionId}', ${idx})">Eliminar</button>
+        </div>
+      `).join('');
+    }
+
+    function updateQuestion(id, field, value) {
+      const q = questions.find(q => q.id === id);
+      if (q) {
+        q[field] = value;
+        renderQuestions();
+      }
+    }
+
+    function updateOption(questionId, index, value) {
+      const q = questions.find(q => q.id === questionId);
+      if (q && q.options[index] !== undefined) {
+        q.options[index] = value;
+      }
+    }
+
+    function addOption(questionId) {
+      const q = questions.find(q => q.id === questionId);
+      if (q) {
+        q.options.push('');
+        renderQuestions();
+      }
+    }
+
+    function deleteOption(questionId, index) {
+      const q = questions.find(q => q.id === questionId);
+      if (q && q.options.length > 2) {
+        q.options.splice(index, 1);
+        if (q.correctOption >= q.options.length) {
+          q.correctOption = q.options.length - 1;
+        }
+        renderQuestions();
+      } else {
+        showNotification('Mínimo 2 opciones requeridas', 'warning');
+      }
+    }
+
+    function deleteQuestion(id) {
+      questions = questions.filter(q => q.id !== id);
+      renderQuestions();
+    }
+
+    async function saveExam() {
+      const examName = document.getElementById('examName').value.trim();
+      const courseId = document.getElementById('examCourse').value;
+      const totalScore = parseInt(document.getElementById('examScore').value);
+      const passScore = parseInt(document.getElementById('examPassScore').value);
+
+      if (!examName) {
+        showNotification('Ingresa el nombre del examen', 'error');
+        return;
+      }
+      if (!courseId) {
+        showNotification('Selecciona un curso', 'error');
+        return;
+      }
+      if (questions.length === 0) {
+        showNotification('Agrega al menos una pregunta', 'error');
+        return;
+      }
+
+      // Validar que todas las preguntas tengan texto
+      if (questions.some(q => !q.text.trim())) {
+        showNotification('Todas las preguntas deben tener texto', 'error');
+        return;
+      }
+
+      // Validar que todas las opciones tengan texto
+      if (questions.some(q => q.options.some(o => !o.trim()))) {
+        showNotification('Todas las opciones deben tener texto', 'error');
+        return;
+      }
+
+      try {
+        const db = firebase.firestore();
+        const examId = 'exam-' + Date.now();
+
+        const examData = {
+          id: examId,
+          name: examName,
+          courseId: courseId,
+          description: document.getElementById('examDescription').value.trim(),
+          totalScore: totalScore,
+          passScore: passScore,
+          questions: questions.map(q => ({
+            text: q.text,
+            type: q.type,
+            options: q.options,
+            correctOption: q.correctOption,
+            points: q.points
+          })),
+          createdBy: firebase.auth().currentUser.uid,
+          createdAt: new Date(),
+          status: 'active'
+        };
+
+        await db.collection('exams').doc(examId).set(examData);
+
+        showNotification('✅ Examen guardado correctamente', 'success');
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1500);
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al guardar el examen: ' + error.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>

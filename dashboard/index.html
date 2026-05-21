@@ -450,6 +450,16 @@
 
             <!-- Certificados + Evaluaciones -->
             <div class="two-col">
+              <!-- Exámenes Disponibles -->
+              <div class="card">
+                <div class="card-title">
+                  <h2><span class="material-icons-round">quiz</span> Exámenes</h2>
+                </div>
+                <div id="availableExamsList">
+                  <p style="text-align:center;color:#94a3b8;padding:20px">No hay exámenes disponibles.</p>
+                </div>
+              </div>
+
               <!-- Certificados -->
               <div class="card">
                 <div class="card-title">
@@ -457,16 +467,6 @@
                 </div>
                 <div id="certificatesList">
                   <p style="text-align:center;color:#94a3b8;padding:20px">Completa un curso y aprueba el examen para obtener certificados.</p>
-                </div>
-              </div>
-
-              <!-- Evaluaciones del Profesor -->
-              <div class="card">
-                <div class="card-title">
-                  <h2><span class="material-icons-round">grading</span> Evaluaciones</h2>
-                </div>
-                <div id="evaluationsList">
-                  <p style="text-align:center;color:#94a3b8;padding:20px">Sin evaluaciones aún.</p>
                 </div>
               </div>
             </div>
@@ -1604,6 +1604,68 @@ if (statCertsEl) {
             window.location.href = '../index.html';
           });
         }
+      });
+
+      // ══════════════════════════════════════════════════════
+      // NUEVO: Cargar exámenes disponibles
+      // ══════════════════════════════════════════════════════
+      db.collection('enrollments').where('userId', '==', user.uid).get().then(async function(snapshot) {
+        const availableExamsList = document.getElementById('availableExamsList');
+        if (!availableExamsList) return;
+        availableExamsList.innerHTML = '';
+        
+        let courseIds = [];
+        snapshot.forEach(function(doc) {
+          courseIds.push(doc.data().courseId);
+        });
+
+        if (courseIds.length === 0) {
+          availableExamsList.innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px">No hay exámenes disponibles.</p>';
+          return;
+        }
+
+        // Obtener exámenes disponibles para los cursos inscritos
+        db.collection('exams')
+          .where('courseId', 'in', courseIds)
+          .where('status', '==', 'active')
+          .get()
+          .then(function(examsSnap) {
+            let exams = [];
+            examsSnap.forEach(function(doc) {
+              exams.push({ id: doc.id, ...doc.data() });
+            });
+
+            if (exams.length === 0) {
+              availableExamsList.innerHTML = '<p style="text-align:center;color:#94a3b8;padding:20px">No hay exámenes disponibles.</p>';
+              return;
+            }
+
+            let html = '';
+            exams.slice(0, 3).forEach(function(exam) {
+              const courseName = document.querySelector(`[data-course-id="${exam.courseId}"]`)?.textContent || 'Curso';
+              html += '<div style="background:#f7f9fc;padding:16px;border-radius:10px;margin-bottom:12px;border-left:4px solid #1565c0">' +
+                '<div style="font-weight:700;color:#0f172a;margin-bottom:4px">' + exam.name + '</div>' +
+                '<div style="font-size:12px;color:#64748b;margin-bottom:10px">' +
+                  '<span style="margin-right:16px"><strong>' + exam.questions.length + '</strong> preguntas</span>' +
+                  '<span><strong>' + exam.totalScore + '</strong> puntos</span>' +
+                '</div>' +
+                '<a href="../certificado/resolver-examen.html?exam=' + exam.id + '&course=' + exam.courseId + '" ' +
+                  'class="btn btn-primary btn-sm" style="text-decoration:none;display:inline-block">' +
+                  '<span class="material-icons-round" style="font-size:14px">start</span> Resolver' +
+                '</a>' +
+                '</div>';
+            });
+
+            if (exams.length > 3) {
+              html += '<div style="text-align:center"><a href="../certificado/mis-examen.html" style="color:#1565c0;font-size:12px;text-decoration:none;font-weight:600">Ver todos los exámenes →</a></div>';
+            }
+
+            availableExamsList.innerHTML = html;
+          })
+          .catch(function(err) {
+            console.error('Error al cargar exámenes:', err);
+            availableExamsList.innerHTML = '<p style="text-align:center;color:#ef4444;padding:20px">Error al cargar exámenes</p>';
+          });
       });
 
       /* ── Enrollment-aware course link routing ── */

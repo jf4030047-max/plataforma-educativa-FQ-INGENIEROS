@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resolver Examen | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link href="../assets/css/notifications.css" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: #f7f9fc; color: #334155; }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    
+    .exam-header { background: #fff; padding: 28px; border-radius: 14px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+    .exam-title { font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    .exam-info { display: flex; gap: 24px; margin-top: 16px; }
+    .info-item { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748b; }
+    .info-item .material-icons-round { color: #d97706; }
+    
+    .progress-bar { background: #e2e8f0; height: 6px; border-radius: 3px; margin: 16px 0; overflow: hidden; }
+    .progress-fill { background: linear-gradient(90deg, #d97706, #f59e0b); height: 100%; transition: width .3s; }
+    
+    .question-card { background: #fff; padding: 28px; border-radius: 14px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+    .question-num { font-size: 12px; font-weight: 700; color: #d97706; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .question-text { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 20px; }
+    
+    .option { padding: 14px; border: 2px solid #dce3ed; border-radius: 10px; margin-bottom: 12px; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 12px; }
+    .option:hover { border-color: #d97706; background: #fffbeb; }
+    .option.selected { border-color: #d97706; background: #fffbeb; }
+    .option input[type="radio"] { width: 20px; height: 20px; cursor: pointer; }
+    .option-text { flex: 1; font-size: 15px; }
+    
+    .actions { display: flex; gap: 12px; justify-content: space-between; margin-top: 28px; }
+    .btn { padding: 12px 24px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; font-family: inherit; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: all .2s; }
+    .btn-primary { background: #d97706; color: #fff; }
+    .btn-primary:hover { background: #b45309; }
+    .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn-secondary:hover { background: #cbd5e0; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .timer { position: fixed; top: 20px; right: 20px; background: #d97706; color: #fff; padding: 12px 20px; border-radius: 10px; font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(217,119,6,.2); z-index: 100; }
+    .timer .material-icons-round { animation: pulse .6s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    
+    .loading { text-align: center; padding: 40px; }
+    .loading .material-icons-round { font-size: 48px; color: #cbd5e0; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .results { background: #fff; padding: 32px; border-radius: 14px; text-align: center; }
+    .result-score { font-size: 48px; font-weight: 800; color: #0f172a; }
+    .result-status { font-size: 18px; font-weight: 700; margin: 12px 0; }
+    .result-status.passed { color: #16a34a; }
+    .result-status.failed { color: #dc2626; }
+    .result-message { color: #64748b; margin: 12px 0 24px; }
+  </style>
+</head>
+<body>
+  <div id="timerContainer"></div>
+
+  <div class="container">
+    <div id="loadingState" class="loading" style="display: none;">
+      <span class="material-icons-round">loop</span>
+      <p>Cargando examen...</p>
+    </div>
+
+    <div id="examContainer"></div>
+
+    <div id="resultsContainer"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+
+  <script>
+    let currentExam = null;
+    let userAnswers = {};
+    let currentQuestion = 0;
+    let timeLimit = 3600; // 1 hora en segundos
+    let timeRemaining = timeLimit;
+    let timerInterval = null;
+
+    const params = new URLSearchParams(window.location.search);
+    const examId = params.get('exam');
+    const courseId = params.get('course');
+
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (!user) {
+        window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+        return;
+      }
+      loadExam();
+    });
+
+    async function loadExam() {
+      if (!examId) {
+        document.getElementById('examContainer').innerHTML = '<div class="loading"><p>Examen no especificado</p></div>';
+        return;
+      }
+
+      try {
+        const db = firebase.firestore();
+        const snap = await db.collection('exams').doc(examId).get();
+
+        if (!snap.exists) {
+          document.getElementById('examContainer').innerHTML = '<div class="loading"><p>Examen no encontrado</p></div>';
+          return;
+        }
+
+        currentExam = snap.data();
+        currentExam.id = examId;
+
+        // Inicializar respuestas
+        currentExam.questions.forEach((_, idx) => {
+          userAnswers[idx] = null;
+        });
+
+        renderExam();
+        startTimer();
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('examContainer').innerHTML = '<div class="loading"><p>Error al cargar el examen</p></div>';
+      }
+    }
+
+    function renderExam() {
+      const container = document.getElementById('examContainer');
+      
+      container.innerHTML = `
+        <div class="exam-header">
+          <div class="exam-title">${currentExam.name}</div>
+          ${currentExam.description ? `<p style="color: #64748b; margin-top: 8px;">${currentExam.description}</p>` : ''}
+          
+          <div class="exam-info">
+            <div class="info-item">
+              <span class="material-icons-round">help</span>
+              <span>${currentExam.questions.length} pregunta${currentExam.questions.length !== 1 ? 's' : ''}</span>
+            </div>
+            <div class="info-item">
+              <span class="material-icons-round">score</span>
+              <span>Puntuación total: ${currentExam.totalScore}</span>
+            </div>
+            <div class="info-item">
+              <span class="material-icons-round">done_all</span>
+              <span>Mínimo para aprobar: ${currentExam.passScore}</span>
+            </div>
+          </div>
+
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${((currentQuestion + 1) / currentExam.questions.length * 100)}%"></div>
+          </div>
+          <p style="font-size: 12px; color: #64748b;">Pregunta ${currentQuestion + 1} de ${currentExam.questions.length}</p>
+        </div>
+
+        ${renderQuestion()}
+
+        <div class="actions">
+          <button class="btn btn-secondary" onclick="previousQuestion()" ${currentQuestion === 0 ? 'disabled' : ''}>
+            <span class="material-icons-round">arrow_back</span> Anterior
+          </button>
+          <button class="btn btn-secondary" onclick="nextQuestion()" ${currentQuestion === currentExam.questions.length - 1 ? 'disabled' : ''}>
+            Siguiente <span class="material-icons-round">arrow_forward</span>
+          </button>
+          <button class="btn btn-primary" onclick="submitExam()" ${currentQuestion === currentExam.questions.length - 1 ? '' : 'style="display:none;"'}>
+            Enviar Examen <span class="material-icons-round">check</span>
+          </button>
+        </div>
+      `;
+    }
+
+    function renderQuestion() {
+      const q = currentExam.questions[currentQuestion];
+      
+      return `
+        <div class="question-card">
+          <div class="question-num">Pregunta ${currentQuestion + 1}</div>
+          <div class="question-text">${q.text}</div>
+
+          <div>
+            ${q.options.map((opt, idx) => `
+              <label class="option ${userAnswers[currentQuestion] === idx ? 'selected' : ''}">
+                <input type="radio" name="answer" value="${idx}" 
+                  ${userAnswers[currentQuestion] === idx ? 'checked' : ''}
+                  onchange="selectAnswer(${idx})">
+                <span class="option-text">${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function selectAnswer(optionIndex) {
+      userAnswers[currentQuestion] = optionIndex;
+    }
+
+    function previousQuestion() {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        renderExam();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestion < currentExam.questions.length - 1) {
+        currentQuestion++;
+        renderExam();
+      }
+    }
+
+    function startTimer() {
+      const timerContainer = document.getElementById('timerContainer');
+      
+      function updateTimer() {
+        const mins = Math.floor(timeRemaining / 60);
+        const secs = timeRemaining % 60;
+        
+        timerContainer.innerHTML = `
+          <div class="timer">
+            <span class="material-icons-round">schedule</span>
+            ${mins}:${secs.toString().padStart(2, '0')}
+          </div>
+        `;
+
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          submitExam();
+        } else if (timeRemaining <= 60) {
+          timerContainer.querySelector('.timer').style.background = '#dc2626';
+        }
+
+        timeRemaining--;
+      }
+
+      updateTimer();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    async function submitExam() {
+      // Calcular puntuación
+      let score = 0;
+      let answered = 0;
+
+      currentExam.questions.forEach((q, idx) => {
+        if (userAnswers[idx] !== null) {
+          answered++;
+          if (userAnswers[idx] === q.correctOption) {
+            score += q.points;
+          }
+        }
+      });
+
+      // Calcular porcentaje
+      const percentage = Math.round((score / currentExam.totalScore) * 100);
+      const passed = percentage >= currentExam.passScore;
+
+      try {
+        const db = firebase.firestore();
+        const user = firebase.auth().currentUser;
+
+        // Guardar respuestas del estudiante
+        const submissionId = 'subm-' + Date.now();
+        await db.collection('exam_submissions').doc(submissionId).set({
+          id: submissionId,
+          examId: currentExam.id,
+          userId: user.uid,
+          userEmail: user.email,
+          answers: userAnswers,
+          score: score,
+          totalScore: currentExam.totalScore,
+          percentage: percentage,
+          passed: passed,
+          submittedAt: new Date()
+        });
+
+        // Mostrar resultados
+        showResults(score, percentage, passed);
+
+        clearInterval(timerInterval);
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error al guardar el examen: ' + error.message, 'error');
+      }
+    }
+
+    function showResults(score, percentage, passed) {
+      document.getElementById('examContainer').style.display = 'none';
+      document.getElementById('timerContainer').innerHTML = '';
+
+      const resultsContainer = document.getElementById('resultsContainer');
+      resultsContainer.innerHTML = `
+        <div class="results">
+          <div style="font-size: 64px; margin-bottom: 16px;">${passed ? '✅' : '❌'}</div>
+          <div class="result-score">${percentage}%</div>
+          <div class="result-status ${passed ? 'passed' : 'failed'}">
+            ${passed ? 'Examen Aprobado' : 'Examen No Aprobado'}
+          </div>
+          <div class="result-message">
+            Obtuviste <strong>${score} de ${currentExam.totalScore}</strong> puntos.<br>
+            Puntuación mínima requerida: <strong>${currentExam.passScore}</strong>
+          </div>
+          <a href="../dashboard/index.html" class="btn btn-primary" style="text-decoration: none; justify-content: center;">
+            <span class="material-icons-round">home</span> Ir al Dashboard
+          </a>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

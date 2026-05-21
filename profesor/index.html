@@ -273,14 +273,12 @@
         <!-- ═══ EXÁMENES ═══ -->
         <div class="panel" id="panel-examenes">
           <div class="panel-header">
-            <h3>Resultados de exámenes</h3>
+            <h3>Gestión de Exámenes</h3>
+            <button class="btn-sm btn-amber" onclick="window.location.href='crear-examen.html'">
+              <span class="material-icons-round" style="font-size:16px">add</span> Crear Examen
+            </button>
           </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Alumno</th><th>Curso</th><th>Nota</th><th>Estado</th><th>Fecha</th></tr></thead>
-              <tbody id="examsTable"></tbody>
-            </table>
-          </div>
+          <div id="examsManagementContent"></div>
         </div>
 
         <!-- ═══ EVALUAR EXÁMENES ═══ -->
@@ -797,27 +795,36 @@
     }
 
     function renderExams() {
-      var tbody = document.getElementById('examsTable');
-      if (!tbody) return;
+      var container = document.getElementById('examsManagementContent');
+      if (!container) return;
 
-      var exams = myExams();
-      if (exams.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:32px">No hay exámenes registrados.</td></tr>';
+      // Obtener exámenes creados por este profesor
+      var profId = firebase.auth().currentUser?.uid;
+      var myCreatedExams = examsData.filter(function(e) {
+        return e.createdBy === profId && e.questions;
+      });
+
+      if (myCreatedExams.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b"><span class="material-icons-round" style="font-size:48px;color:#cbd5e0;display:block;margin-bottom:12px">quiz</span><p>No has creado exámenes aún.</p></div>';
         return;
       }
 
-      tbody.innerHTML = exams.map(function(e) {
-        var score = e.score || 0;
-        var status = score >= 14 ? 'passed' : 'failed';
-        var label = score >= 14 ? 'Aprobado' : 'Desaprobado';
-        return '<tr>' +
-          '<td><div class="user-cell"><div class="user-avatar">' + getInitials(e.userName || e.userEmail || '?') + '</div><div><div class="user-name">' + escapeHtml(e.userName || 'Sin nombre') + '</div><div class="user-email">' + escapeHtml(e.userEmail || '') + '</div></div></div></td>' +
-          '<td>' + escapeHtml(getCourseName(e.courseId)) + '</td>' +
-          '<td><strong style="font-size:18px">' + score + '</strong>/20</td>' +
-          '<td><span class="status-badge ' + status + '">' + label + '</span></td>' +
-          '<td>' + formatDate(e.createdAt) + '</td>' +
-          '</tr>';
-      }).join('');
+      container.innerHTML = '<div class="card-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">' + 
+        myCreatedExams.map(function(exam) {
+          return '<div style="background:#fff;padding:20px;border-radius:10px;border:1px solid #dce3ed">' +
+            '<div style="font-weight:700;color:#0f172a;margin-bottom:12px">' + escapeHtml(exam.name) + '</div>' +
+            '<div style="font-size:13px;color:#64748b;margin-bottom:12px">' + escapeHtml(getCourseName(exam.courseId)) + '</div>' +
+            '<div style="display:flex;gap:12px;margin-bottom:12px;font-size:13px">' +
+              '<span><strong>' + exam.questions.length + '</strong> preguntas</span>' +
+              '<span><strong>' + exam.totalScore + '</strong> puntos</span>' +
+            '</div>' +
+            '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+              '<button class="btn-sm btn-outline-sm" onclick="viewExamResponses(\'' + exam.id + '\')">Ver respuestas</button>' +
+              '<button class="btn-sm btn-outline-sm" onclick="editExam(\'' + exam.id + '\')">Editar</button>' +
+            '</div>' +
+            '</div>';
+        }).join('') + 
+        '</div>';
     }
 
     // ═══ EVALUAR EXÁMENES ═══
@@ -1144,6 +1151,92 @@
       });
 
       container.innerHTML = html;
+    }
+
+    // ═══ EXAMEN RESPONSES ═══
+    function viewExamResponses(examId) {
+      var exam = examsData.find(function(e) { return e.id === examId; });
+      if (!exam) return;
+
+      showPanel('evaluacion', null);
+
+      var db = firebase.firestore();
+      db.collection('exam_submissions').where('examId', '==', examId).onSnapshot(function(snapshot) {
+        var submissions = [];
+        snapshot.forEach(function(doc) {
+          submissions.push({ id: doc.id, ...doc.data() });
+        });
+
+        var container = document.getElementById('evaluacionContent');
+        if (submissions.length === 0) {
+          container.innerHTML = '<p style="text-align:center;padding:20px;color:#64748b">No hay respuestas aún.</p>';
+          return;
+        }
+
+        var html = '<h4 style="margin-bottom:16px">Respuestas para: ' + escapeHtml(exam.name) + '</h4>' +
+          '<div class="table-wrap"><table>' +
+            '<thead><tr><th>Estudiante</th><th>Puntuación</th><th>Porcentaje</th><th>Estado</th><th>Fecha</th><th>Acción</th></tr></thead>' +
+            '<tbody>';
+
+        submissions.forEach(function(sub) {
+          var passed = sub.passed ? '<span class="status-badge passed">Aprobado</span>' : '<span class="status-badge failed">Desaprobado</span>';
+          html += '<tr>' +
+            '<td>' + escapeHtml(sub.userEmail) + '</td>' +
+            '<td><strong>' + sub.score + '</strong>/' + sub.totalScore + '</td>' +
+            '<td>' + sub.percentage + '%</td>' +
+            '<td>' + passed + '</td>' +
+            '<td>' + formatDate(sub.submittedAt) + '</td>' +
+            '<td><button class="btn-sm btn-outline-sm" onclick="viewSubmissionDetail(\'' + sub.id + '\', \'' + examId + '\')">Ver detalle</button></td>' +
+            '</tr>';
+        });
+
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+      });
+    }
+
+    function viewSubmissionDetail(submissionId, examId) {
+      var exam = examsData.find(function(e) { return e.id === examId; });
+      var db = firebase.firestore();
+
+      db.collection('exam_submissions').doc(submissionId).get().then(function(doc) {
+        if (!doc.exists) return;
+
+        var sub = doc.data();
+        var html = '<div style="margin-bottom:24px">' +
+          '<a href="javascript:void(0)" onclick="viewExamResponses(\'' + examId + '\')" style="color:#0f172a;text-decoration:none"><< Volver</a>' +
+          '</div>';
+
+        html += '<div style="background:#eff6ff;padding:20px;border-radius:10px;margin-bottom:20px">' +
+          '<h3>' + escapeHtml(sub.userEmail) + '</h3>' +
+          '<p>Puntuación: <strong>' + sub.score + '/' + sub.totalScore + '</strong> (' + sub.percentage + '%)</p>' +
+          '<p>Estado: ' + (sub.passed ? '<span style="color:#16a34a;font-weight:700">Aprobado</span>' : '<span style="color:#dc2626;font-weight:700">Desaprobado</span>') + '</p>' +
+          '</div>';
+
+        exam.questions.forEach(function(q, idx) {
+          var userAnswer = sub.answers[idx];
+          var isCorrect = userAnswer === q.correctOption;
+          var color = isCorrect ? '#16a34a' : '#dc2626';
+
+          html += '<div style="background:#fff;padding:20px;border-radius:10px;margin-bottom:16px;border-left:4px solid ' + color + '">' +
+            '<div style="font-weight:700;margin-bottom:12px">Pregunta ' + (idx + 1) + ': ' + escapeHtml(q.text) + '</div>' +
+            '<div style="margin-bottom:12px">' +
+              '<div style="font-size:13px;color:#64748b">Respuesta del estudiante:</div>' +
+              '<div style="color:' + color + ';font-weight:700">' + escapeHtml(q.options[userAnswer] || 'No respondió') + '</div>' +
+            '</div>' +
+            '<div>' +
+              '<div style="font-size:13px;color:#64748b">Respuesta correcta:</div>' +
+              '<div style="color:#16a34a;font-weight:700">' + escapeHtml(q.options[q.correctOption]) + '</div>' +
+            '</div>' +
+            '</div>';
+        });
+
+        document.getElementById('evaluacionContent').innerHTML = html;
+      });
+    }
+
+    function editExam(examId) {
+      FQNotify.toast('Función de edición próximamente disponible', 'info');
     }
   </script>
 </body>
