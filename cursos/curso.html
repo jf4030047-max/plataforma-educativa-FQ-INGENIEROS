@@ -686,10 +686,55 @@
         return;
       }
 
-      /* Get selected schedule */
-      var scheduleInput = document.querySelector('input[name="schedule"]:checked');
-      var selectedSchedule = scheduleInput ? scheduleInput.value : null;
-      var scheduleMeta = null;
+      // NUEVO: Verificar pago requerido
+      db.collection('courses').doc(course.id).get().then(function(courseDoc) {
+        if (!courseDoc.exists) {
+          FQNotify.toast('Error: Curso no encontrado.', 'error');
+          return;
+        }
+
+        const courseData = courseDoc.data();
+        const price = courseData.price || courseData.precio || 0;
+
+        // Si el precio es > 0, verificar pago
+        if (price && price > 0) {
+          db.collection('payments')
+            .where('userId', '==', user.uid)
+            .where('courseId', '==', course.id)
+            .where('status', '==', 'approved')
+            .limit(1)
+            .get()
+            .then(function(paymentSnap) {
+              if (paymentSnap.empty) {
+                // No hay pago aprobado
+                FQNotify.toast('⚠️ Este curso requiere pago de S/ ' + price.toFixed(2), 'warning');
+                
+                setTimeout(function() {
+                  if (confirm('Este curso requiere pago de S/ ' + price.toFixed(2) + '\n\n¿Deseas ir a la página de pago?')) {
+                    window.location.href = '../certificado/pago.html?course=' + course.id;
+                  }
+                }, 500);
+                return;
+              }
+
+              // Pago verificado, proceder con matrícula
+              proceedEnrollment();
+            });
+        } else {
+          // Curso gratis, proceder directamente
+          proceedEnrollment();
+        }
+      }).catch(function(err) {
+        console.error('[Payment check] Error:', err);
+        // Si hay error verificando pago, proceder de todos modos
+        proceedEnrollment();
+      });
+
+      function proceedEnrollment() {
+        /* Get selected schedule */
+        var scheduleInput = document.querySelector('input[name="schedule"]:checked');
+        var selectedSchedule = scheduleInput ? scheduleInput.value : null;
+        var scheduleMeta = null;
       if (selectedSchedule && course.schedules) {
         course.schedules.forEach(function(s) {
           if (s.id === selectedSchedule) scheduleMeta = s;
@@ -785,6 +830,7 @@
           }
           FQNotify.toast(msg, 'error');
         });
+      } // Cierre de proceedEnrollment()
     }
 
     /* ══════════════════════════════════════════════

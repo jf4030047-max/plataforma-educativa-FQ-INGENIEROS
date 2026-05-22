@@ -392,6 +392,7 @@
     var usersData = [];
     var examsData = [];
     var materialsData = [];
+    var enrollmentsData = [];
 
     // Verifica si un curso pertenece al profesor actual
     function courseMatchesProf(course) {
@@ -469,6 +470,16 @@
       if (listenersActive) return;
       listenersActive = true;
 
+      // Enrollments listener (PRIMERO - para sincronizar alumnos)
+      db.collection('enrollments').onSnapshot(function(snapshot) {
+        enrollmentsData = [];
+        snapshot.forEach(function(doc) {
+          enrollmentsData.push({ id: doc.id, ...doc.data() });
+        });
+        renderDashboard();
+        renderAlumnos();
+      });
+
       // Courses listener
       db.collection('courses').onSnapshot(function(snapshot) {
         coursesData = [];
@@ -535,14 +546,29 @@
 
     // ═══ HELPERS: filtros por profesor ═══
     function myAlumnos() {
-      if (!currentProf) return usersData;
+      if (!currentProf) return [];
       var myCids = myCourses().map(function(c) { return c.id; });
-      return usersData.filter(function(u) {
-        if (!u.enrolledCourses) return false;
-        return myCids.some(function(cid) {
-          return u.enrolledCourses.indexOf(cid) !== -1;
-        });
+      
+      // Obtener inscripciones para los cursos del profesor
+      var enrollmentsForMyCourses = enrollmentsData.filter(function(e) {
+        return myCids.indexOf(e.courseId) !== -1;
       });
+
+      // Retornar lista de estudiantes únicos con su información de inscripción
+      var studentMap = {};
+      enrollmentsForMyCourses.forEach(function(e) {
+        if (!studentMap[e.userId]) {
+          studentMap[e.userId] = {
+            userId: e.userId,
+            userEmail: e.userEmail,
+            userName: e.userName || e.userEmail,
+            enrollments: []
+          };
+        }
+        studentMap[e.userId].enrollments.push(e);
+      });
+
+      return Object.values(studentMap);
     }
 
     function myExams() {

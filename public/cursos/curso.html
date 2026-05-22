@@ -166,12 +166,6 @@
             <h2><span class="material-icons-round">verified</span> ¿Qué incluye?</h2>
             <div class="includes-grid" id="includesGrid"></div>
           </div>
-
-          <!-- Grabación de la clase (si existe) -->
-          <div class="section" id="recordingSection" style="display:none">
-            <h2><span class="material-icons-round">play_circle</span> Grabación de la clase</h2>
-            <video id="courseRecording" controls style="width:100%;max-width:700px;border-radius:10px"></video>
-          </div>
         </div>
 
         <!-- Sidebar enrollment -->
@@ -195,8 +189,8 @@
               <span class="material-icons-round">check_circle</span> Ya estás matriculado
             </div>
             <div class="enrolled-schedule" id="enrolledSchedule"></div>
-            <a href="https://meet.jit.si/FQIngenierosClaseEnVivo" class="btn btn-primary" id="btnIrCurso" style="margin-bottom:8px" target="_blank">
-              <span class="material-icons-round">play_circle</span> Acceder a la clase en vivo
+            <a href="../sesiones/index.html" class="btn btn-primary" id="btnIrCurso" style="margin-bottom:8px">
+              <span class="material-icons-round">play_circle</span> Ir al curso
             </a>
             <a href="../dashboard/index.html" class="btn btn-outline">
               <span class="material-icons-round">dashboard</span> Mi dashboard
@@ -231,48 +225,6 @@
   <script src="../assets/js/notifications.js"></script>
 
   <script>
-    // Mostrar grabación si existe en Firestore
-    function showCourseRecording(courseId) {
-      if (!db) return; // Guard: si db no está disponible, no cargar grabación
-      
-      const section = document.getElementById('recordingSection');
-      const video = document.getElementById('courseRecording');
-      
-      // Guard: si los elementos no existen en el DOM, no continuar
-      if (!section || !video) return;
-      
-      db.collection('recordings')
-        .where('courseId', '==', courseId)
-        .orderBy('uploadedAt', 'desc')
-        .limit(1)
-        .get()
-        .then(snapshot => {
-          if (!snapshot.empty) {
-            const data = snapshot.docs[0].data();
-            video.src = data.url;
-            section.style.display = '';
-          } else {
-            section.style.display = 'none';
-          }
-        })
-        .catch(error => {
-          console.error('Error cargando grabación:', error);
-          if (section) section.style.display = 'none';
-        });
-    }
-    // Llamar después de renderizar el curso
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(function() {
-        if (typeof courseId !== 'undefined' && courseId) {
-          showCourseRecording(courseId);
-        }
-      }, 1200); // Espera a que cargue Firestore y el curso
-    });
-  </script>
-
-  <!-- Usar solo la instancia global de auth/db de firebase-config.js -->
-
-  <script>
     /* ══════════════════════════════════════════════
        Course data - Loaded from Firestore
        ══════════════════════════════════════════════ */
@@ -282,58 +234,6 @@
 
     // Cargar cursos desde Firestore
     var FALLBACK_DATA = {
-      'Wa2NuxyWwKyYmaNqP17T': {
-        temario: [
-          { titulo: 'Introducción a la SST', temas: [
-            'Reseña histórica de la Seguridad y Salud en el Trabajo',
-            'Historia de la SST en el Perú',
-            'Términos y definiciones'
-          ]},
-          { titulo: 'Marco Legal en el Perú', temas: [
-            'Ley N° 29783 y su reglamento D.S. 005-2012-TR',
-            'Leyes de SST',
-            'Resoluciones Ministeriales',
-            'Aplicación en diferentes sectores',
-            'Organismos competentes en el Perú',
-            'Modificatorias',
-            'Principios de la ley'
-          ]},
-          { titulo: 'Peligros y Riesgos', temas: [
-            'Peligros',
-            'Riesgos',
-            'Consecuencias',
-            'Jerarquía de control'
-          ]},
-          { titulo: 'Incidentes y Accidentes', temas: [
-            'Tipos',
-            'Causas',
-            'Reportes'
-          ]},
-          { titulo: 'Análisis de Riesgos', temas: [
-            'Conceptos básicos',
-            'Proceso de análisis',
-            'Elaboración',
-            'Registros'
-          ]}
-        ],
-        includes: [
-          { icon: 'videocam', text: '1 sesión en vivo (1 hora)' },
-          { icon: 'play_circle', text: 'Acceso a la grabación después de la capacitación' },
-          { icon: 'description', text: 'Material de apoyo (si aplica)' },
-          { icon: 'verified', text: 'Constancia de participación digital (gratuita)' },
-          { icon: 'workspace_premium', text: 'Certificado opcional (previo examen y pago de S/ 20)' },
-          { icon: 'forum', text: 'Grupo de coordinación opcional (WhatsApp)' }
-        ],
-        schedules: [
-          { id: 'h1', label: 'Viernes (Opción 1)', detail: '5:00 p.m. — 6:00 p.m. • Viernes 22 de mayo' },
-          { id: 'h2', label: 'Viernes (Opción 2)', detail: '7:00 p.m. — 8:00 p.m. • Viernes 22 de mayo' }
-        ],
-        icon: 'health_and_safety',
-        badge: 'new',
-        badgeLabel: 'Nuevo',
-        modality: 'En vivo + Grabado',
-        tags: ['Seguridad', 'Obras Civiles', 'Normativa']
-      },
       'sst-obras-civiles': {
         temario: [
           { titulo: 'Introducción a la SST', temas: [
@@ -377,8 +277,8 @@
           { icon: 'forum', text: 'Grupo de coordinación opcional (WhatsApp)' }
         ],
         schedules: [
-          { id: 'h1', label: 'Viernes (Opción 1)', detail: '5:00 p.m. — 6:00 p.m. • Viernes 22 de mayo' },
-          { id: 'h2', label: 'Viernes (Opción 2)', detail: '7:00 p.m. — 8:00 p.m. • Viernes 22 de mayo' }
+          { id: 'h1', label: '5:00 p.m. – 6:00 p.m.', detail: 'Viernes 22 de mayo' },
+          { id: 'h2', label: '7:00 p.m. – 8:00 p.m.', detail: 'Viernes 22 de mayo' }
         ],
         icon: 'health_and_safety',
         badge: 'new',
@@ -464,8 +364,7 @@
         badgeLabel: 'Pro',
         modality: 'En vivo + Grabado',
         tags: ['Supervisión', 'Control de Calidad', 'Dirección']
-      },
-      'Wa2NuxyWwKyYmaNqP17T': 'sst-obras-civiles' // Referencia al ID de Firestore
+      }
     };
 
     // Fallback dinámico: si el curso no está en FALLBACK_DATA pero tiene
@@ -520,89 +419,20 @@
     };
 
     function loadCoursesFromFirestore() {
-      // Guard: si db no está disponible, usar fallback
-      if (!db) {
-        console.warn('Firestore no disponible, usando datos de fallback');
-        Object.keys(FALLBACK_DATA).forEach(function(id) {
-          var fb = FALLBACK_DATA[id];
-          // Si fb es una string, es una referencia a otro ID
-          if (typeof fb === 'string') {
-            fb = FALLBACK_DATA[fb];
-          }
-          COURSES[id] = {
-            id: id, name: id.replace(/-/g, ' '),
-            price: 0, priceLabel: 'Gratis',
-            desc: '', duration: '', sessions: 1, enrolled: 0,
-            modality: fb.modality, icon: fb.icon,
-            tags: fb.tags, badge: fb.badge, badgeLabel: fb.badgeLabel,
-            zoomLink: '', recordingUrl: '',
-            schedules: fb.schedules, temario: fb.temario, includes: fb.includes
-          };
-        });
-        initCoursePage();
-        return Promise.resolve();
-      }
-
       return db.collection('courses').get({ source: 'server' }).then(function(snapshot) {
         console.log('Firestore: ' + snapshot.size + ' cursos cargados');
         snapshot.forEach(function(doc) {
           const data = doc.data();
           // Detectar fallback: por ID exacto o por keyword en nombre/id
           var fb = FALLBACK_DATA[doc.id] || {};
-          var slugId = null;
-          
-          // Buscar slug alternativo basado en el nombre del curso
-          if (!fb.temario) {
-            var docName = (data.name || '').toLowerCase();
-            // Buscar en FALLBACK_DATA por coincidencia de nombre
-            for (var key in FALLBACK_DATA) {
-              if (key !== doc.id && typeof FALLBACK_DATA[key] === 'object') {
-                // SST coincidencia
-                if (key === 'sst-obras-civiles' && docName.indexOf('seguridad') !== -1) {
-                  slugId = key;
-                  fb = FALLBACK_DATA[key];
-                  console.log('Mapeando ' + doc.id + ' -> ' + slugId);
-                  break;
-                }
-                // Topografía coincidencia
-                if (key === 'topografia-civil-3d' && docName.indexOf('topograf') !== -1) {
-                  slugId = key;
-                  fb = FALLBACK_DATA[key];
-                  break;
-                }
-                // Supervisión coincidencia
-                if (key === 'supervision-obra' && docName.indexOf('supervisi') !== -1) {
-                  slugId = key;
-                  fb = FALLBACK_DATA[key];
-                  break;
-                }
-              }
-            }
-          } else {
-            slugId = doc.id;
+          if (!fb.temario && (doc.id + ' ' + (data.name || '')).toLowerCase().indexOf('topograf') !== -1) {
+            fb = FALLBACK_TOPOGRAFIA;
           }
-          
-          // Determinar precio correcto
-          // Preferencia: data.price > 0, si no, usar priceDisplay, si no Gratis
-          var finalPrice = 0;
-          var priceLabel = 'Gratis';
-          
-          if (data.price && data.price > 0) {
-            // Usar data.price si existe y es > 0
-            finalPrice = data.price;
-            priceLabel = 'S/ ' + finalPrice;
-          } else if (data.priceDisplay && typeof data.priceDisplay === 'string') {
-            // Si priceDisplay existe, usarlo
-            priceLabel = data.priceDisplay;
-            var priceNum = data.priceDisplay.match(/\d+/)?.[0];
-            finalPrice = parseInt(priceNum) || 0;
-          }
-          
-          var courseObj = {
+          COURSES[doc.id] = {
             id: doc.id,
             name: data.name || '',
-            price: finalPrice,
-            priceLabel: priceLabel,
+            price: data.price || 0,
+            priceLabel: 'S/ ' + (data.price || 'Gratis'),
             desc: data.desc || '',
             duration: data.duration || '',
             sessions: data.sessions || 1,
@@ -617,25 +447,17 @@
             startDate: data.startDate || '',
             startTime: data.startTime || '',
             endTime: data.endTime || '',
-            schedules: (fb.schedules && fb.schedules.length > 0) ? fb.schedules : ((data.schedules && data.schedules.length > 0) ? data.schedules : []),
+            schedules: (data.schedules && data.schedules.length > 0) ? data.schedules : (fb.schedules || []),
             temario: (data.temario && data.temario.length > 0) ? data.temario : (fb.temario || []),
             includes: (data.includes && data.includes.length > 0) ? data.includes : (fb.includes || [])
           };
-          
-          // Asignar bajo el ID de Firestore
-          COURSES[doc.id] = courseObj;
-          
-          // Si hay un slug alternativo, también asignar bajo ese slug
-          if (slugId && slugId !== doc.id) {
-            COURSES[slugId] = courseObj;
-          }
         });
 
         // Si no hay cursos en Firestore, usar fallback completo
         if (snapshot.size === 0) {
           Object.keys(FALLBACK_DATA).forEach(function(id) {
             var fb = FALLBACK_DATA[id];
-            var courseObj = {
+            COURSES[id] = {
               id: id,
               name: id.replace(/-/g, ' '),
               price: 0, priceLabel: 'Gratis',
@@ -645,11 +467,6 @@
               zoomLink: '', recordingUrl: '',
               schedules: fb.schedules, temario: fb.temario, includes: fb.includes
             };
-            COURSES[id] = courseObj;
-            // Si este ID es un documento Firestore ID (UUID), también asignar slugs alternativos
-            if (id.match(/^[A-Z0-9]{8,}$/) && FALLBACK_DATA['sst-obras-civiles'] === fb) {
-              COURSES['sst-obras-civiles'] = courseObj;
-            }
           });
         }
 
@@ -659,7 +476,7 @@
         // Si falla Firestore, usar datos de respaldo
         Object.keys(FALLBACK_DATA).forEach(function(id) {
           var fb = FALLBACK_DATA[id];
-          var courseObj = {
+          COURSES[id] = {
             id: id, name: id.replace(/-/g, ' '),
             price: 0, priceLabel: 'Gratis',
             desc: '', duration: '', sessions: 1, enrolled: 0,
@@ -668,11 +485,6 @@
             zoomLink: '', recordingUrl: '',
             schedules: fb.schedules, temario: fb.temario, includes: fb.includes
           };
-          COURSES[id] = courseObj;
-          // Si este ID es un documento Firestore ID (UUID), también asignar slugs alternativos
-          if (id.match(/^[A-Z0-9]{8,}$/) && FALLBACK_DATA['sst-obras-civiles'] === fb) {
-            COURSES['sst-obras-civiles'] = courseObj;
-          }
         });
         initCoursePage();
       });
@@ -696,7 +508,7 @@
             name: 'Topografía en Civil 3D',
             price: 0, priceLabel: 'Por definir',
             desc: 'Domina el levantamiento topográfico y el modelamiento digital del terreno con Civil 3D. Aprende diseño vial, cálculo de volúmenes y generación de planos profesionales.',
-            duration: '8 horas', sessions: 4, enrolled: 0,
+            duration: '8 horas', sessions: 8, enrolled: 0,
             modality: FALLBACK_TOPOGRAFIA.modality,
             icon: FALLBACK_TOPOGRAFIA.icon,
             tags: FALLBACK_TOPOGRAFIA.tags,
@@ -742,11 +554,6 @@
     /* ═══════════════════════════════════════════════ */
 
     function renderCourse(c) {
-        // DEBUG: Mostrar estado de inscripción en consola
-        console.log('[DEBUG] renderCourse:', c.id);
-      // Al renderizar, ocultar ambos estados hasta verificar inscripción
-      document.getElementById('enrolledState').style.display = 'none';
-      document.getElementById('enrollActions').style.display = 'none';
       document.title = c.name + ' | FQ INGENIEROS';
       document.getElementById('breadcrumbName').textContent = c.name;
 
@@ -856,56 +663,8 @@
         if (firstOpt) firstOpt.classList.add('selected');
       }
 
-      // Botón acción (siempre preparar, pero mostrar solo si corresponde)
+      // Botón acción (siempre mostrar)
       document.getElementById('enrollActions').innerHTML = '<button class="btn btn-primary" id="btnMatricular" onclick="handleEnroll()"><span class="material-icons-round">how_to_reg</span> Matricularme</button><div class="enroll-hint"><span class="material-icons-round">lock</span> Inscripción segura</div>';
-
-      // Verificar inscripción real en Firestore y localStorage
-      firebase.auth().onAuthStateChanged(function(user) {
-        console.log('[DEBUG] Usuario:', user ? user.uid : null);
-        if (!user || !c) {
-          document.getElementById('enrolledState').style.display = 'none';
-          document.getElementById('enrollActions').style.display = '';
-          return;
-        }
-        
-        // Guard: si db no está disponible, no cargar estado de inscripción desde Firestore
-        if (!db) {
-          console.log('[DEBUG] Firestore no disponible, usando estado local');
-          return;
-        }
-        
-        var docId = user.uid + '_' + courseId;
-        // Primero, revisar localStorage para experiencia instantánea
-        // Ya no se usa localStorage para mostrar botones, solo Firestore
-        // Siempre consultar Firestore para sincronizar el estado real
-        db.collection('enrollments').doc(docId).onSnapshot(function(doc) {
-          // Usar onSnapshot para reflejar cambios en tiempo real
-          console.log('[DEBUG] Firestore', docId, doc.exists ? doc.data() : null);
-          if (doc.exists && doc.data().status === 'active') {
-            document.getElementById('enrolledState').style.display = '';
-            document.getElementById('enrollActions').style.display = 'none';
-            var fbData = doc.data();
-            if (fbData.schedule && fbData.schedule.label) {
-              document.getElementById('enrolledSchedule').innerHTML =
-                '<span class="material-icons-round">schedule</span> Horario: ' + fbData.schedule.label + ' (' + (fbData.schedule.detail || '') + ')';
-            }
-            try {
-              localStorage.setItem('enrollment_' + user.uid + '_' + courseId, JSON.stringify({
-                enrolled: true,
-                schedule: fbData.schedule || null,
-                fecha: fbData.schedule ? fbData.schedule.detail : null,
-                ts: Date.now()
-              }));
-            } catch (_) {}
-          } else {
-            document.getElementById('enrolledState').style.display = 'none';
-            document.getElementById('enrollActions').style.display = '';
-            try { localStorage.removeItem('enrollment_' + user.uid + '_' + courseId); } catch (_) {}
-          }
-        }, function() {
-          // Si falla, mantener el estado local
-        });
-      });
     }
 
     function selectSchedule(el) {
@@ -919,12 +678,6 @@
        ══════════════════════════════════════════════ */
     function handleEnroll() {
       if (!course) return;
-      
-      // Guard: si db no está disponible, mostrar error
-      if (!db) {
-        FQNotify.toast('No hay conexión a la base de datos', 'error');
-        return;
-      }
 
       var user = auth.currentUser;
       if (!user) {
@@ -933,22 +686,59 @@
         return;
       }
 
-      /* Get selected schedule */
-      var scheduleInput = document.querySelector('input[name="schedule"]:checked');
-      var selectedSchedule = scheduleInput ? scheduleInput.value : null;
-      var scheduleMeta = null;
+      // NUEVO: Verificar pago requerido
+      db.collection('courses').doc(course.id).get().then(function(courseDoc) {
+        if (!courseDoc.exists) {
+          FQNotify.toast('Error: Curso no encontrado.', 'error');
+          return;
+        }
+
+        const courseData = courseDoc.data();
+        const price = courseData.price || courseData.precio || 0;
+
+        // Si el precio es > 0, verificar pago
+        if (price && price > 0) {
+          db.collection('payments')
+            .where('userId', '==', user.uid)
+            .where('courseId', '==', course.id)
+            .where('status', '==', 'approved')
+            .limit(1)
+            .get()
+            .then(function(paymentSnap) {
+              if (paymentSnap.empty) {
+                // No hay pago aprobado
+                FQNotify.toast('⚠️ Este curso requiere pago de S/ ' + price.toFixed(2), 'warning');
+                
+                setTimeout(function() {
+                  if (confirm('Este curso requiere pago de S/ ' + price.toFixed(2) + '\n\n¿Deseas ir a la página de pago?')) {
+                    window.location.href = '../certificado/pago.html?course=' + course.id;
+                  }
+                }, 500);
+                return;
+              }
+
+              // Pago verificado, proceder con matrícula
+              proceedEnrollment();
+            });
+        } else {
+          // Curso gratis, proceder directamente
+          proceedEnrollment();
+        }
+      }).catch(function(err) {
+        console.error('[Payment check] Error:', err);
+        // Si hay error verificando pago, proceder de todos modos
+        proceedEnrollment();
+      });
+
+      function proceedEnrollment() {
+        /* Get selected schedule */
+        var scheduleInput = document.querySelector('input[name="schedule"]:checked');
+        var selectedSchedule = scheduleInput ? scheduleInput.value : null;
+        var scheduleMeta = null;
       if (selectedSchedule && course.schedules) {
         course.schedules.forEach(function(s) {
           if (s.id === selectedSchedule) scheduleMeta = s;
         });
-      }
-      // Limpiar scheduleMeta: eliminar detail si es undefined (definitivo)
-      var cleanSchedule = null;
-      if (scheduleMeta) {
-        cleanSchedule = { id: scheduleMeta.id, label: scheduleMeta.label };
-        if (typeof scheduleMeta.detail !== 'undefined' && scheduleMeta.detail !== null) {
-          cleanSchedule.detail = scheduleMeta.detail;
-        }
       }
 
       /* Validate schedule selection when course has schedules */
@@ -972,9 +762,8 @@
       document.getElementById('enrolledState').style.display = '';
 
       if (scheduleMeta) {
-        var safeDetail = scheduleMeta.detail !== undefined ? scheduleMeta.detail : "";
         document.getElementById('enrolledSchedule').innerHTML =
-          '<span class="material-icons-round">schedule</span> Horario: ' + scheduleMeta.label + ' (' + safeDetail + ')';
+          '<span class="material-icons-round">schedule</span> Horario: ' + scheduleMeta.label + ' (' + scheduleMeta.detail + ')';
       }
       document.getElementById('btnIrCurso').href = '../sesiones/index.html?course=' + course.id;
 
@@ -982,11 +771,11 @@
 
       /* ── Persist to localStorage for instant load next time ── */
       try {
-        var cacheKey = 'enrollment_' + user.uid + '_' + courseId;
+        var cacheKey = 'enrollment_' + user.uid + '_' + course.id;
         localStorage.setItem(cacheKey, JSON.stringify({
           enrolled: true,
-          schedule: scheduleMeta ? { id: scheduleMeta.id, label: scheduleMeta.label, detail: scheduleMeta.detail !== undefined ? scheduleMeta.detail : "" } : null,
-          fecha: scheduleMeta ? (scheduleMeta.detail !== undefined ? scheduleMeta.detail : "") : null,
+          schedule: scheduleMeta ? { id: scheduleMeta.id, label: scheduleMeta.label, detail: scheduleMeta.detail } : null,
+          fecha: scheduleMeta ? scheduleMeta.detail : null,
           ts: Date.now()
         }));
       } catch (_) {}
@@ -995,24 +784,20 @@
       var enrollmentData = {
         userId: user.uid,
         userEmail: user.email,
-        courseId: courseId,
+        courseId: course.id,
         courseName: course.name,
-        schedule: cleanSchedule,
+        schedule: scheduleMeta ? { id: scheduleMeta.id, label: scheduleMeta.label, detail: scheduleMeta.detail } : null,
         enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
         status: 'active',
         progress: 0
       };
 
-      var docId = user.uid + '_' + courseId;
+      var docId = user.uid + '_' + course.id;
       console.log('[Matrícula] Guardando en enrollments/' + docId, enrollmentData);
 
       db.collection('enrollments').doc(docId).set(enrollmentData)
         .then(function() {
           console.log('[Matrícula] ✅ Guardado exitoso');
-          // Forzar recarga de la UI de inscripción para reflejar el estado real
-          setTimeout(function() {
-            if (typeof renderCourse === 'function') renderCourse(course);
-          }, 500);
         })
         .catch(function(err) {
           console.error('[Matrícula] ❌ Error de Firestore:', err);
@@ -1027,7 +812,7 @@
           FQNotify.btnReset(btn);
 
           /* Clear localStorage cache */
-          try { localStorage.removeItem('enrollment_' + user.uid + '_' + courseId); } catch (_) {}
+          try { localStorage.removeItem('enrollment_' + user.uid + '_' + course.id); } catch (_) {}
 
           var msg;
           switch (err.code) {
@@ -1045,6 +830,7 @@
           }
           FQNotify.toast(msg, 'error');
         });
+      } // Cierre de proceedEnrollment()
     }
 
     /* ══════════════════════════════════════════════
@@ -1082,55 +868,42 @@
           };
           document.getElementById('cancelToastYes').onclick = function() {
             toast.remove();
-            
-            // Guard: si db no está disponible
-            if (!db) {
-              FQNotify.toast('No hay conexión a la base de datos', 'error');
-              return;
-            }
-            
             var authInstance = window.auth || firebase.auth();
             var user = authInstance.currentUser;
             if (!user) {
               FQNotify.toast('No se pudo cancelar la inscripción. Sesión no encontrada.', 'error');
               return;
             }
-            var docId = user.uid + '_' + courseId;
+            var docId = user.uid + '_' + course.id;
             db.collection('enrollments').doc(docId).delete().then(function() {
-              try { localStorage.removeItem('enrollment_' + user.uid + '_' + courseId); } catch (_) {}
-              // Refrescar estado desde Firestore para asegurar UI correcta
-              setTimeout(function() {
-                db.collection('enrollments').doc(docId).get().then(function(doc) {
-                  if (!doc.exists) {
-                    document.getElementById('enrolledState').style.display = 'none';
-                    document.getElementById('enrollActions').style.display = '';
-                    if (course.schedules && course.schedules.length > 0) {
-                      document.getElementById('scheduleSection').style.display = '';
-                      // Restaurar opciones de horario
-                      var schedHtml = '';
-                      course.schedules.forEach(function(s, i) {
-                        schedHtml +=
-                          '<label class="schedule-opt" onclick="selectSchedule(this)">' +
-                          '<input type="radio" name="schedule" value="' + s.id + '"' + (i === 0 ? ' checked' : '') + ' />' +
-                          '<div class="schedule-radio"></div>' +
-                          '<div class="schedule-opt-text">' + s.label + '<small>' + (s.detail || '') + '</small></div>' +
-                          '</label>';
-                      });
-                      document.getElementById('scheduleOptions').innerHTML = schedHtml;
-                      var firstOpt = document.querySelector('.schedule-opt');
-                      if (firstOpt) firstOpt.classList.add('selected');
-                    }
-                    document.getElementById('enrollActions').innerHTML = '<button class="btn btn-primary" id="btnMatricular" onclick="handleEnroll()"><span class="material-icons-round">how_to_reg</span> Matricularme</button><div class="enroll-hint"><span class="material-icons-round">lock</span> Inscripción segura</div>';
-                    var btnMatricular = document.getElementById('btnMatricular');
-                    if (btnMatricular) {
-                      btnMatricular.onclick = handleEnroll;
-                    }
-                    FQNotify.toast('Inscripción cancelada correctamente.', 'success');
-                  } else {
-                    FQNotify.toast('No se pudo cancelar la inscripción. Intenta nuevamente.', 'error');
-                  }
+              try { localStorage.removeItem('enrollment_' + user.uid + '_' + course.id); } catch (_) {}
+              // Restaurar UI: mostrar botón de inscripción y horarios
+              document.getElementById('enrolledState').style.display = 'none';
+              document.getElementById('enrollActions').style.display = '';
+              if (course.schedules && course.schedules.length > 0) {
+                document.getElementById('scheduleSection').style.display = '';
+                // Restaurar opciones de horario
+                var schedHtml = '';
+                course.schedules.forEach(function(s, i) {
+                  schedHtml +=
+                    '<label class="schedule-opt" onclick="selectSchedule(this)">' +
+                    '<input type="radio" name="schedule" value="' + s.id + '"' + (i === 0 ? ' checked' : '') + ' />' +
+                    '<div class="schedule-radio"></div>' +
+                    '<div class="schedule-opt-text">' + s.label + '<small>' + s.detail + '</small></div>' +
+                    '</label>';
                 });
-              }, 500);
+                document.getElementById('scheduleOptions').innerHTML = schedHtml;
+                var firstOpt = document.querySelector('.schedule-opt');
+                if (firstOpt) firstOpt.classList.add('selected');
+              }
+              // Restaurar botón de inscripción
+              document.getElementById('enrollActions').innerHTML = '<button class="btn btn-primary" id="btnMatricular" onclick="handleEnroll()"><span class="material-icons-round">how_to_reg</span> Matricularme</button><div class="enroll-hint"><span class="material-icons-round">lock</span> Inscripción segura</div>';
+              // Reasignar evento al nuevo botón
+              var btnMatricular = document.getElementById('btnMatricular');
+              if (btnMatricular) {
+                btnMatricular.onclick = handleEnroll;
+              }
+              FQNotify.toast('Inscripción cancelada correctamente.', 'success');
             }).catch(function(err) {
               FQNotify.toast('No se pudo cancelar la inscripción. Intenta nuevamente.', 'error');
               console.error('[Cancelación] Error:', err);
@@ -1160,7 +933,7 @@
     (window.auth || firebase.auth()).onAuthStateChanged(function(user) {
       if (!user || !course) return;
 
-      var cacheKey = 'enrollment_' + user.uid + '_' + courseId;
+      var cacheKey = 'enrollment_' + user.uid + '_' + course.id;
 
       /* 1️⃣ Instant: check localStorage first */
       try {
@@ -1172,7 +945,7 @@
       } catch (_) {}
 
       /* 2️⃣ Background: validate with Firestore */
-      db.collection('enrollments').doc(user.uid + '_' + courseId).get()
+      db.collection('enrollments').doc(user.uid + '_' + course.id).get()
         .then(function(doc) {
           if (doc.exists && doc.data().status === 'active') {
             var fbData = doc.data();
@@ -1197,10 +970,9 @@
             }
           }
         })
-        .catch(function(error) {
-          /* Offline or permission denied: trust localStorage cache, don't wipe UI */
-          if (!navigator.onLine || error.code === 'permission-denied') return;
-          console.error('Enrollment check error:', error);
+        .catch(function() {
+          /* Offline: trust localStorage cache, don't wipe UI */
+          if (!navigator.onLine) return;
         });
     });
 
@@ -1225,8 +997,8 @@
       /* Re-sync enrollment state */
       var user = auth.currentUser;
       if (user && course) {
-        var cacheKey = 'enrollment_' + user.uid + '_' + courseId;
-        db.collection('enrollments').doc(user.uid + '_' + courseId).get()
+        var cacheKey = 'enrollment_' + user.uid + '_' + course.id;
+        db.collection('enrollments').doc(user.uid + '_' + course.id).get()
           .then(function(doc) {
             if (doc.exists && doc.data().status === 'active') {
               var fbData = doc.data();
@@ -1239,11 +1011,13 @@
                   ts: Date.now()
                 }));
               } catch (_) {}
-            }
-          })
-          .catch(function(error) {
-            if (error.code === 'permission-denied') {
-              console.log('Permission denied for enrollment check (expected if not authenticated)');
+            } else {
+              try { localStorage.removeItem(cacheKey); } catch (_) {}
+              document.getElementById('enrolledState').style.display = 'none';
+              document.getElementById('enrollActions').style.display = '';
+              if (course.schedules && course.schedules.length > 0) {
+                document.getElementById('scheduleSection').style.display = '';
+              }
             }
           });
       }
