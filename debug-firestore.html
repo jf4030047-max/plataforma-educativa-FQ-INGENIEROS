@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug: Verificar Datos de Firestore</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 20px;
+        }
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .error-box {
+            background: #ffe7e7;
+            border-left: 4px solid #ff0000;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success-box {
+            background: #e7ffe7;
+            border-left: 4px solid #00aa00;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug: Verificar Datos de Firestore</h1>
+        
+        <h2>Datos del Curso: Topografía Civil 3D</h2>
+        <div id="courseInfo"></div>
+
+        <h2>Pagos Registrados del Usuario Actual</h2>
+        <div id="paymentsInfo"></div>
+
+        <h2>Enrollments en la Colección</h2>
+        <div id="enrollmentsInfo"></div>
+
+        <h2>Acciones</h2>
+        <button class="btn" onclick="refreshData()">🔄 Recargar Datos</button>
+        <button class="btn btn-danger" onclick="logOut()">🚪 Salir</button>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
+
+    <script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUBUZgLeXdJN2qfP_YfwOVVp3NhXW3TIE",
+            authDomain: "plataforma-fq-ingenieros.firebaseapp.com",
+            projectId: "plataforma-fq-ingenieros",
+            storageBucket: "plataforma-fq-ingenieros.appspot.com",
+            messagingSenderId: "868151896039",
+            appId: "1:868151896039:web:8c4c76a3a6e91c24d36f79"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                console.log('Usuario autenticado:', user.uid, user.email);
+                refreshData();
+            } else {
+                document.getElementById('courseInfo').innerHTML = '<div class="error-box">❌ No hay usuario autenticado. Por favor inicia sesión primero.</div>';
+                document.getElementById('paymentsInfo').innerHTML = '';
+                document.getElementById('enrollmentsInfo').innerHTML = '';
+            }
+        });
+
+        function refreshData() {
+            if (!currentUser) {
+                alert('Debes estar autenticado');
+                return;
+            }
+
+            getCourseInfo();
+            getPaymentsInfo();
+            getEnrollmentsInfo();
+        }
+
+        function getCourseInfo() {
+            const courseId = 'topografia-civil-3d';
+            
+            db.collection('courses').doc(courseId).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        let html = '<div class="success-box">';
+                        html += '<strong>✅ Curso encontrado en Firestore</strong><br>';
+                        html += '<table>';
+                        html += '<tr><th>Campo</th><th>Valor</th></tr>';
+                        
+                        Object.entries(data).forEach(([key, value]) => {
+                            if (typeof value === 'object') {
+                                html += `<tr><td><code>${key}</code></td><td><pre>${JSON.stringify(value, null, 2)}</pre></td></tr>`;
+                            } else {
+                                html += `<tr><td><code>${key}</code></td><td><strong>${value}</strong></td></tr>`;
+                            }
+                        });
+                        
+                        html += '</table>';
+                        html += '</div>';
+                        document.getElementById('courseInfo').innerHTML = html;
+                    } else {
+                        document.getElementById('courseInfo').innerHTML = '<div class="error-box">❌ Curso NO encontrado en Firestore</div>';
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('courseInfo').innerHTML = `<div class="error-box">❌ Error: ${err.message}</div>`;
+                    console.error('Error:', err);
+                });
+        }
+
+        function getPaymentsInfo() {
+            const userId = currentUser.uid;
+            const courseId = 'topografia-civil-3d';
+            
+            // Buscar TODOS los pagos de este usuario para este curso
+            db.collection('payments')
+                .where('userId', '==', userId)
+                .where('courseId', '==', courseId)
+                .get()
+                .then(querySnapshot => {
+                    let html = '';
+                    
+                    if (querySnapshot.empty) {
+                        html = '<div class="info-box">⚠️ No hay pagos registrados para este curso</div>';
+                    } else {
+                        html = `<div class="success-box">✅ Se encontraron ${querySnapshot.size} pago(s) registrado(s)</div>`;
+                        html += '<table>';
+                        html += '<tr><th>ID</th><th>Estado</th><th>Monto</th><th>Fecha</th><th>Otros</th></tr>';
+                        
+                        querySnapshot.forEach(doc => {
+                            const data = doc.data();
+                            html += '<tr>';
+                            html += `<td><code>${doc.id}</code></td>`;
+                            html += `<td><strong>${data.status || 'N/A'}</strong></td>`;
+                            html += `<td>${data.amount || 'N/A'}</td>`;
+                            html += `<td>${data.createdAt ? new Date(data.createdAt.toDate()).toLocaleString() : 'N/A'}</td>`;
+                            html += `<td><pre>${JSON.stringify(data, null, 2)}</pre></td>`;
+                            html += '</tr>';
+                        });
+                        
+                        html += '</table>';
+                    }
+                    
+                    document.getElementById('paymentsInfo').innerHTML = html;
+                })
+                .catch(err => {
+                    document.getElementById('paymentsInfo').innerHTML = `<div class="error-box">❌ Error: ${err.message}</div>`;
+                    console.error('Error:', err);
+                });
+        }
+
+        function getEnrollmentsInfo() {
+            const userId = currentUser.uid;
+            const courseId = 'topografia-civil-3d';
+            
+            // Buscar inscripción para este usuario en este curso
+            db.collection('enrollments')
+                .where('userId', '==', userId)
+                .where('courseId', '==', courseId)
+                .get()
+                .then(querySnapshot => {
+                    let html = '';
+                    
+                    if (querySnapshot.empty) {
+                        html = '<div class="info-box">⚠️ No hay inscripción en este curso</div>';
+                    } else {
+                        html = `<div class="success-box">✅ Tienes ${querySnapshot.size} inscripción(es) en este curso</div>`;
+                        html += '<table>';
+                        html += '<tr><th>ID Documento</th><th>Fecha Inscripción</th><th>Detalles</th></tr>';
+                        
+                        querySnapshot.forEach(doc => {
+                            const data = doc.data();
+                            html += '<tr>';
+                            html += `<td><code>${doc.id}</code></td>`;
+                            html += `<td>${data.enrolledAt ? new Date(data.enrolledAt.toDate()).toLocaleString() : 'N/A'}</td>`;
+                            html += `<td><pre>${JSON.stringify(data, null, 2)}</pre></td>`;
+                            html += '</tr>';
+                        });
+                        
+                        html += '</table>';
+                    }
+                    
+                    document.getElementById('enrollmentsInfo').innerHTML = html;
+                })
+                .catch(err => {
+                    document.getElementById('enrollmentsInfo').innerHTML = `<div class="error-box">❌ Error: ${err.message}</div>`;
+                    console.error('Error:', err);
+                });
+        }
+
+        function logOut() {
+            auth.signOut()
+                .then(() => {
+                    window.location.href = '../auth/login.html';
+                })
+                .catch(err => alert('Error: ' + err.message));
+        }
+    </script>
+</body>
+</html>

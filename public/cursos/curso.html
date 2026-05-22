@@ -686,18 +686,24 @@
         return;
       }
 
-      // NUEVO: Verificar pago requerido
+      // VERIFICAR PAGO REQUERIDO
+      console.log('[Matrícula] Verificando pago para curso:', course.id);
+      
       db.collection('courses').doc(course.id).get().then(function(courseDoc) {
         if (!courseDoc.exists) {
-          FQNotify.toast('Error: Curso no encontrado.', 'error');
+          FQNotify.toast('Error: Curso no encontrado en el sistema.', 'error');
+          console.error('[Matrícula] Curso no existe:', course.id);
           return;
         }
 
         const courseData = courseDoc.data();
         const price = courseData.price || courseData.precio || 0;
+        console.log('[Matrícula] Precio del curso:', price);
 
-        // Si el precio es > 0, verificar pago
+        // Si el precio es > 0, OBLIGAR verificación de pago
         if (price && price > 0) {
+          console.log('[Matrícula] Curso de pago, verificando pagos en Firestore...');
+          
           db.collection('payments')
             .where('userId', '==', user.uid)
             .where('courseId', '==', course.id)
@@ -706,28 +712,35 @@
             .get()
             .then(function(paymentSnap) {
               if (paymentSnap.empty) {
-                // No hay pago aprobado
-                FQNotify.toast('⚠️ Este curso requiere pago de S/ ' + price.toFixed(2), 'warning');
+                // NO HAY PAGO APROBADO - RECHAZAR MATRÍCULA
+                console.warn('[Matrícula] NO HAY PAGO APROBADO para:', user.uid, course.id);
+                FQNotify.toast('❌ Este curso requiere pago de S/ ' + price.toFixed(2), 'error');
                 
                 setTimeout(function() {
-                  if (confirm('Este curso requiere pago de S/ ' + price.toFixed(2) + '\n\n¿Deseas ir a la página de pago?')) {
-                    window.location.href = '../certificado/pago.html?course=' + course.id;
+                  var goToPay = confirm('Este curso requiere pago de S/ ' + price.toFixed(2) + '\n\n¿Ir a realizar el pago ahora?');
+                  if (goToPay) {
+                    window.location.href = '../certificado/pago.html?course=' + course.id + '&price=' + price;
                   }
-                }, 500);
+                }, 200);
                 return;
               }
 
-              // Pago verificado, proceder con matrícula
+              // PAGO APROBADO - PROCEDER CON MATRÍCULA
+              console.log('[Matrícula] ✅ Pago aprobado, procediendo con matrícula...');
               proceedEnrollment();
+            })
+            .catch(function(err) {
+              console.error('[Matrícula] Error verificando pagos:', err);
+              FQNotify.toast('❌ Error al verificar el pago. Intenta de nuevo.', 'error');
             });
         } else {
-          // Curso gratis, proceder directamente
+          // CURSO GRATUITO - PERMITIR MATRÍCULA INMEDIATA
+          console.log('[Matrícula] Curso gratuito, procediendo directamente...');
           proceedEnrollment();
         }
       }).catch(function(err) {
-        console.error('[Payment check] Error:', err);
-        // Si hay error verificando pago, proceder de todos modos
-        proceedEnrollment();
+        console.error('[Matrícula] Error obteniendo datos del curso:', err);
+        FQNotify.toast('❌ Error al cargar el curso. Intenta de nuevo.', 'error');
       });
 
       function proceedEnrollment() {
