@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Corregir Precio - Topografía Civil 3D</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .info-section {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+        .info-section p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 5px 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        input[type="text"],
+        input[type="number"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .status-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .status-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+        .status-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+        .status-loading {
+            background: #cce5ff;
+            border: 1px solid #b3d9ff;
+            color: #004085;
+            display: block;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #004085;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .course-info {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 25px;
+            border: 1px solid #e0e0e0;
+        }
+        .course-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        .course-info-item:last-child {
+            border-bottom: none;
+        }
+        .label {
+            color: #666;
+            font-weight: 500;
+        }
+        .value {
+            color: #333;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Actualizar Precio del Curso</h1>
+        <p class="subtitle">Corrección rápida para Topografía Civil 3D</p>
+
+        <div class="info-section">
+            <p><strong>📌 Curso:</strong> Topografía en Civil 3D</p>
+            <p><strong>🆔 ID:</strong> topografia-civil-3d</p>
+            <p><strong>💰 Nuevo precio:</strong> S/ 200.00</p>
+        </div>
+
+        <form id="fixForm">
+            <div class="form-group">
+                <label>Confirmación de ID del curso:</label>
+                <input type="text" id="courseId" value="topografia-civil-3d" readonly style="background: #f5f5f5; cursor: not-allowed;">
+            </div>
+
+            <div class="form-group">
+                <label>Nuevo precio (en soles):</label>
+                <input type="number" id="newPrice" value="200" step="0.01" min="0" required readonly style="background: #f5f5f5; cursor: not-allowed;">
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="submitBtn">✅ Ejecutar Actualización</button>
+        </form>
+
+        <div class="status-box" id="statusBox"></div>
+
+        <div class="course-info" id="courseInfo" style="display: none;">
+            <h3 style="margin-bottom: 12px; font-size: 16px;">📊 Información Actual del Curso</h3>
+            <div class="course-info-item">
+                <span class="label">Nombre:</span>
+                <span class="value" id="courseName">-</span>
+            </div>
+            <div class="course-info-item">
+                <span class="label">Precio actual:</span>
+                <span class="value" id="currentPrice">-</span>
+            </div>
+            <div class="course-info-item">
+                <span class="label">Módulos:</span>
+                <span class="value" id="courseSessions">-</span>
+            </div>
+            <div class="course-info-item">
+                <span class="label">Estado:</span>
+                <span class="value" id="courseStatus">-</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUBUZgLeXdJN2qfP_YfwOVVp3NhXW3TIE",
+            authDomain: "plataforma-fq-ingenieros.firebaseapp.com",
+            projectId: "plataforma-fq-ingenieros",
+            storageBucket: "plataforma-fq-ingenieros.appspot.com",
+            messagingSenderId: "868151896039",
+            appId: "1:868151896039:web:8c4c76a3a6e91c24d36f79"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const courseId = 'topografia-civil-3d';
+        const newPrice = 200;
+
+        // Cargar información del curso al iniciar
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadCourseInfo();
+        });
+
+        async function loadCourseInfo() {
+            try {
+                const doc = await db.collection('courses').doc(courseId).get();
+                
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById('courseName').textContent = data.name || 'N/A';
+                    document.getElementById('currentPrice').textContent = 'S/ ' + (data.price || data.precio || 0).toFixed(2);
+                    document.getElementById('courseSessions').textContent = (data.sessions || 0) + ' módulos';
+                    document.getElementById('courseStatus').textContent = data.status || 'Disponible';
+                    document.getElementById('courseInfo').style.display = 'block';
+                }
+            } catch (err) {
+                console.error('Error cargando curso:', err);
+            }
+        }
+
+        document.getElementById('fixForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const form = document.getElementById('fixForm');
+            const statusBox = document.getElementById('statusBox');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Deshabilitar botón
+            submitBtn.disabled = true;
+
+            // Mostrar loading
+            statusBox.className = 'status-box status-loading';
+            statusBox.innerHTML = '<span class="loading-spinner"></span>Actualizando precio en Firestore...';
+
+            try {
+                // Actualizar el documento
+                await db.collection('courses').doc(courseId).update({
+                    price: newPrice,
+                    precio: newPrice,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: 'admin-price-fix'
+                });
+
+                // Mostrar éxito
+                statusBox.className = 'status-box status-success';
+                statusBox.innerHTML = `
+                    <strong>✅ ¡Éxito!</strong><br>
+                    El precio de "${courseId}" ha sido actualizado a <strong>S/ ${newPrice.toFixed(2)}</strong><br>
+                    <small style="opacity: 0.8;">Cambios aplicados. Los estudiantes verán el nuevo precio en el catálogo.</small>
+                `;
+
+                // Recargar información
+                await new Promise(r => setTimeout(r, 1500));
+                await loadCourseInfo();
+
+                // Mostrar botón de verificación
+                submitBtn.textContent = '✔️ Actualización Completa';
+                submitBtn.style.background = '#28a745';
+
+            } catch (error) {
+                statusBox.className = 'status-box status-error';
+                statusBox.innerHTML = `
+                    <strong>❌ Error:</strong><br>
+                    ${error.message || 'No se pudo actualizar el precio'}
+                `;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

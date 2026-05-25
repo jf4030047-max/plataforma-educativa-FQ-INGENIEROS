@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin: Corregir Precio del Curso</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #dc3545;
+            border-bottom: 3px solid #dc3545;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin: 20px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.5);
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .success-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .error-box {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .course-list {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .course-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .course-item:last-child {
+            border-bottom: none;
+        }
+        .course-name {
+            font-weight: 600;
+            color: #333;
+        }
+        .course-price {
+            background: #007bff;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚙️ Corrección de Precio del Curso</h1>
+        
+        <div class="info-box">
+            <strong>⚠️ ADVERTENCIA:</strong> Esta página solo debe ser utilizada por administradores. Asegúrate de usar los valores correctos.
+        </div>
+
+        <form id="updateForm">
+            <div class="form-group">
+                <label for="courseId">ID del Curso:</label>
+                <select id="courseId" required>
+                    <option value="">-- Seleccionar curso --</option>
+                    <option value="topografia-civil-3d">Topografía Civil 3D</option>
+                    <option value="otro">Otro curso</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="newPrice">Nuevo Precio (en Soles):</label>
+                <input type="number" id="newPrice" placeholder="ej: 200" min="0" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+                <label for="adminPassword">Contraseña de Admin (confirmar):</label>
+                <input type="password" id="adminPassword" placeholder="Escribir contraseña" required>
+            </div>
+
+            <button type="submit" class="btn">✅ Actualizar Precio en Firestore</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Actualizando en Firestore...</p>
+        </div>
+
+        <div class="success-box" id="successBox"></div>
+        <div class="error-box" id="errorBox"></div>
+
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd;">
+            <h3>Cursos Actuales</h3>
+            <div class="course-list" id="coursesList">
+                <p style="color: #999; text-align: center;">Cargando cursos...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUBUZgLeXdJN2qfP_YfwOVVp3NhXW3TIE",
+            authDomain: "plataforma-fq-ingenieros.firebaseapp.com",
+            projectId: "plataforma-fq-ingenieros",
+            storageBucket: "plataforma-fq-ingenieros.appspot.com",
+            messagingSenderId: "868151896039",
+            appId: "1:868151896039:web:8c4c76a3a6e91c24d36f79"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Contraseña admin (EN PRODUCCIÓN USAR MEJOR SISTEMA)
+        const ADMIN_PASSWORD = "FQ2024Admin!";
+
+        // Cargar lista de cursos
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCoursesList();
+        });
+
+        function loadCoursesList() {
+            db.collection('courses')
+                .get()
+                .then(snapshot => {
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const price = data.price || data.precio || 0;
+                        html += `
+                            <div class="course-item">
+                                <div>
+                                    <div class="course-name">${data.name}</div>
+                                    <small style="color: #999;">${doc.id}</small>
+                                </div>
+                                <div class="course-price">S/ ${price.toFixed(2)}</div>
+                            </div>
+                        `;
+                    });
+                    document.getElementById('coursesList').innerHTML = html;
+                })
+                .catch(err => {
+                    document.getElementById('coursesList').innerHTML = `<p style="color: red;">Error: ${err.message}</p>`;
+                });
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('updateForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const courseId = document.getElementById('courseId').value;
+            const newPrice = parseFloat(document.getElementById('newPrice').value);
+            const password = document.getElementById('adminPassword').value;
+
+            // Verificar contraseña
+            if (password !== ADMIN_PASSWORD) {
+                showError('❌ Contraseña de administrador incorrecta');
+                return;
+            }
+
+            if (!courseId || isNaN(newPrice) || newPrice < 0) {
+                showError('❌ Por favor completa todos los campos correctamente');
+                return;
+            }
+
+            // Mostrar loading
+            document.getElementById('loading').style.display = 'block';
+
+            // Actualizar en Firestore
+            db.collection('courses').doc(courseId).update({
+                price: newPrice,
+                precio: newPrice,
+                updatedAt: new Date()
+            })
+            .then(() => {
+                document.getElementById('loading').style.display = 'none';
+                showSuccess(`✅ Precio actualizado a S/ ${newPrice.toFixed(2)} para el curso: ${courseId}`);
+                document.getElementById('updateForm').reset();
+                
+                // Recargar lista de cursos
+                setTimeout(loadCoursesList, 1000);
+            })
+            .catch(err => {
+                document.getElementById('loading').style.display = 'none';
+                showError(`❌ Error al actualizar: ${err.message}`);
+                console.error('Error:', err);
+            });
+        });
+
+        function showSuccess(message) {
+            const box = document.getElementById('successBox');
+            box.textContent = message;
+            box.style.display = 'block';
+            document.getElementById('errorBox').style.display = 'none';
+
+            setTimeout(() => {
+                box.style.display = 'none';
+            }, 5000);
+        }
+
+        function showError(message) {
+            const box = document.getElementById('errorBox');
+            box.textContent = message;
+            box.style.display = 'block';
+            document.getElementById('successBox').style.display = 'none';
+
+            setTimeout(() => {
+                box.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
