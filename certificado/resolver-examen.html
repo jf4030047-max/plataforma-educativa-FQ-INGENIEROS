@@ -1,314 +1,835 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Resolver Examen | FQ INGENIEROS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
-  <link href="../assets/css/notifications.css" rel="stylesheet" />
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', system-ui, sans-serif; background: #f7f9fc; color: #334155; }
-    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-    
-    .exam-header { background: #fff; padding: 28px; border-radius: 14px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
-    .exam-title { font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
-    .exam-info { display: flex; gap: 24px; margin-top: 16px; }
-    .info-item { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748b; }
-    .info-item .material-icons-round { color: #d97706; }
-    
-    .progress-bar { background: #e2e8f0; height: 6px; border-radius: 3px; margin: 16px 0; overflow: hidden; }
-    .progress-fill { background: linear-gradient(90deg, #d97706, #f59e0b); height: 100%; transition: width .3s; }
-    
-    .question-card { background: #fff; padding: 28px; border-radius: 14px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
-    .question-num { font-size: 12px; font-weight: 700; color: #d97706; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-    .question-text { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 20px; }
-    
-    .option { padding: 14px; border: 2px solid #dce3ed; border-radius: 10px; margin-bottom: 12px; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 12px; }
-    .option:hover { border-color: #d97706; background: #fffbeb; }
-    .option.selected { border-color: #d97706; background: #fffbeb; }
-    .option input[type="radio"] { width: 20px; height: 20px; cursor: pointer; }
-    .option-text { flex: 1; font-size: 15px; }
-    
-    .actions { display: flex; gap: 12px; justify-content: space-between; margin-top: 28px; }
-    .btn { padding: 12px 24px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; font-family: inherit; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: all .2s; }
-    .btn-primary { background: #d97706; color: #fff; }
-    .btn-primary:hover { background: #b45309; }
-    .btn-secondary { background: #e2e8f0; color: #334155; }
-    .btn-secondary:hover { background: #cbd5e0; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    
-    .timer { position: fixed; top: 20px; right: 20px; background: #d97706; color: #fff; padding: 12px 20px; border-radius: 10px; font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(217,119,6,.2); z-index: 100; }
-    .timer .material-icons-round { animation: pulse .6s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-    
-    .loading { text-align: center; padding: 40px; }
-    .loading .material-icons-round { font-size: 48px; color: #cbd5e0; animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    
-    .results { background: #fff; padding: 32px; border-radius: 14px; text-align: center; }
-    .result-score { font-size: 48px; font-weight: 800; color: #0f172a; }
-    .result-status { font-size: 18px; font-weight: 700; margin: 12px 0; }
-    .result-status.passed { color: #16a34a; }
-    .result-status.failed { color: #dc2626; }
-    .result-message { color: #64748b; margin: 12px 0 24px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .exam-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .exam-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .exam-header h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .exam-header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .exam-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+      font-size: 13px;
+    }
+
+    .info-item {
+      text-align: center;
+    }
+
+    .info-item strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .timer {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .timer.warning {
+      color: #ff6b6b;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .exam-progress {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 15px;
+      font-size: 13px;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #4ade80;
+      transition: width 0.3s ease;
+    }
+
+    .exam-body {
+      padding: 40px;
+    }
+
+    .questions-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .question-btn {
+      width: 36px;
+      height: 36px;
+      border: 2px solid #dce3ed;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .question-btn:hover {
+      border-color: #667eea;
+      color: #667eea;
+    }
+
+    .question-btn.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .question-btn.answered {
+      border-color: #4ade80;
+      background: #f0fdf4;
+    }
+
+    .question-btn.answered.active {
+      background: #4ade80;
+      color: white;
+      border-color: #4ade80;
+    }
+
+    .question-section {
+      display: none;
+    }
+
+    .question-section.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 20px;
+    }
+
+    .question-title strong {
+      color: #667eea;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border: 2px solid #dce3ed;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+
+    .option input[type="radio"] {
+      margin-right: 12px;
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+    }
+
+    .option.selected {
+      background: #f0f4ff;
+      border-color: #667eea;
+    }
+
+    .option label {
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .true-false-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .exam-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 30px 40px;
+      border-top: 1px solid #dce3ed;
+      background: #f8f9fc;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #f0f4ff;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #764ba2;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+
+    .modal-icon.success {
+      color: #4ade80;
+    }
+
+    .modal-icon.warning {
+      color: #eab308;
+    }
+
+    .modal-icon.error {
+      color: #ef4444;
+    }
+
+    .modal-content h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #1e293b;
+    }
+
+    .modal-content p {
+      color: #64748b;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .modal-score {
+      font-size: 48px;
+      font-weight: 700;
+      color: #667eea;
+      margin: 20px 0;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .modal-buttons .btn {
+      flex: 1;
+    }
+
+    .loading {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      z-index: 1001;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading.active {
+      display: flex;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      .exam-body {
+        padding: 20px;
+      }
+
+      .exam-footer {
+        padding: 20px;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .nav-buttons {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .nav-buttons .btn {
+        flex: 1;
+      }
+
+      .question-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 11px;
+      }
+
+      .exam-info {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
   </style>
 </head>
 <body>
-  <div id="timerContainer"></div>
+  <div class="exam-container">
+    <div class="exam-header">
+      <h1 id="examTitle">Cargando examen...</h1>
+      <p id="examDesc">Por favor espera</p>
+      
+      <div class="exam-info">
+        <div class="info-item">
+          <strong id="totalQuestions">0</strong> preguntas
+        </div>
+        <div class="info-item">
+          <strong id="durationInfo">0</strong> minutos
+        </div>
+        <div class="info-item">
+          Aprobación: <strong id="passingScore">0</strong>%
+        </div>
+      </div>
 
-  <div class="container">
-    <div id="loadingState" class="loading" style="display: none;">
-      <span class="material-icons-round">loop</span>
-      <p>Cargando examen...</p>
+      <div class="timer" id="timer">00:00</div>
+      
+      <div class="exam-progress">
+        <span id="progressText">0/0 preguntas respondidas</span>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+      </div>
     </div>
 
-    <div id="examContainer"></div>
+    <div class="exam-body">
+      <div class="questions-nav" id="questionsNav"></div>
+      <div id="questionsContainer"></div>
+    </div>
 
-    <div id="resultsContainer"></div>
+    <div class="exam-footer">
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" disabled>
+          <span class="material-icons-round">arrow_back</span> Anterior
+        </button>
+        <button class="btn btn-secondary" id="nextBtn" onclick="nextQuestion()">
+          Siguiente <span class="material-icons-round">arrow_forward</span>
+        </button>
+      </div>
+      <button class="btn btn-primary" id="submitBtn" onclick="submitExam()">
+        <span class="material-icons-round">check_circle</span> Enviar Examen
+      </button>
+    </div>
+  </div>
+
+  <div class="modal" id="confirmSubmitModal">
+    <div class="modal-content">
+      <div class="modal-icon warning">
+        <span class="material-icons-round">warning</span>
+      </div>
+      <h2>¿Enviar examen?</h2>
+      <p id="unansweredMsg">Aún hay preguntas sin responder.</p>
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closeConfirmModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmSubmit()">Enviar ahora</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="resultModal">
+    <div class="modal-content">
+      <div class="modal-icon success" id="resultIcon">
+        <span class="material-icons-round">check_circle</span>
+      </div>
+      <h2 id="resultTitle">¡Excelente!</h2>
+      <p id="resultMsg">Has aprobado el examen</p>
+      <div class="modal-score" id="resultScore">85%</div>
+      <p id="resultDetails">Respondiste correctamente: 17 de 20 preguntas</p>
+      <div class="modal-buttons">
+        <button class="btn btn-primary" onclick="goToDashboard()">
+          Volver al dashboard <span class="material-icons-round">home</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/exams-config.js"></script>
+  <script src="../assets/js/certificate-generator.js"></script>
   <script src="../assets/js/notifications.js"></script>
 
   <script>
-    let currentExam = null;
-    let userAnswers = {};
     let currentQuestion = 0;
-    let timeLimit = 3600; // 1 hora en segundos
-    let timeRemaining = timeLimit;
+    let examConfig = null;
+    let courseId = null;
+    let answers = {};
+    let examStartTime = null;
     let timerInterval = null;
 
-    const params = new URLSearchParams(window.location.search);
-    const examId = params.get('exam');
-    const courseId = params.get('course');
-
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (!user) {
-        window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
-        return;
-      }
-      loadExam();
-    });
-
-    async function loadExam() {
-      if (!examId) {
-        document.getElementById('examContainer').innerHTML = '<div class="loading"><p>Examen no especificado</p></div>';
+    document.addEventListener('DOMContentLoaded', async () => {
+      courseId = new URLSearchParams(window.location.search).get('course');
+      
+      if (!courseId) {
+        alert('No se especificó un curso');
+        window.location.href = '../dashboard/index.html';
         return;
       }
 
-      try {
-        const db = firebase.firestore();
-        const snap = await db.collection('exams').doc(examId).get();
-
-        if (!snap.exists) {
-          document.getElementById('examContainer').innerHTML = '<div class="loading"><p>Examen no encontrado</p></div>';
+      firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
           return;
         }
+        loadExam();
+      });
+    });
 
-        currentExam = snap.data();
-        currentExam.id = examId;
+    function loadExam() {
+      examConfig = getExamConfig(courseId);
+      
+      if (!examConfig) {
+        alert('No se encontró el examen para este curso');
+        window.location.href = '../dashboard/index.html';
+        return;
+      }
 
-        // Inicializar respuestas
-        currentExam.questions.forEach((_, idx) => {
-          userAnswers[idx] = null;
-        });
+      document.getElementById('examTitle').textContent = examConfig.name;
+      document.getElementById('examDesc').textContent = examConfig.description;
+      document.getElementById('totalQuestions').textContent = examConfig.totalQuestions;
+      document.getElementById('durationInfo').textContent = examConfig.duration;
+      document.getElementById('passingScore').textContent = examConfig.passingScore;
 
-        renderExam();
-        startTimer();
-      } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('examContainer').innerHTML = '<div class="loading"><p>Error al cargar el examen</p></div>';
+      examStartTime = Date.now();
+      startTimer();
+      renderQuestions();
+      showQuestion(0);
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('questionsContainer');
+      const nav = document.getElementById('questionsNav');
+
+      examConfig.questions.forEach((question, index) => {
+        const navBtn = document.createElement('button');
+        navBtn.className = 'question-btn';
+        navBtn.textContent = index + 1;
+        navBtn.onclick = () => showQuestion(index);
+        nav.appendChild(navBtn);
+
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-section';
+        questionDiv.id = 'question-' + index;
+
+        const title = document.createElement('div');
+        title.className = 'question-title';
+        title.innerHTML = `<strong>Pregunta ${index + 1}:</strong> ${escapeHtml(question.text)}`;
+        questionDiv.appendChild(title);
+
+        const options = document.createElement('div');
+        options.className = 'options';
+
+        if (question.type === 'true-false') {
+          options.className += ' true-false-options';
+          
+          ['Verdadero', 'Falso'].forEach((label, i) => {
+            const option = document.createElement('label');
+            option.className = 'option';
+            option.innerHTML = `
+              <input type="radio" name="question-${index}" value="${i}" 
+                onchange="handleAnswer(${index}, ${i})">
+              <span>${label}</span>
+            `;
+            options.appendChild(option);
+          });
+        } else {
+          question.options.forEach((opt, i) => {
+            const option = document.createElement('label');
+            option.className = 'option';
+            option.innerHTML = `
+              <input type="radio" name="question-${index}" value="${i}" 
+                onchange="handleAnswer(${index}, ${i})">
+              <span>${escapeHtml(opt.text)}</span>
+            `;
+            options.appendChild(option);
+          });
+        }
+
+        questionDiv.appendChild(options);
+        container.appendChild(questionDiv);
+      });
+    }
+
+    function showQuestion(index) {
+      document.querySelectorAll('.question-section').forEach(el => {
+        el.classList.remove('active');
+      });
+
+      document.getElementById('question-' + index).classList.add('active');
+      currentQuestion = index;
+
+      updateNav();
+      updateButtons();
+
+      if (answers[index] !== undefined) {
+        const input = document.querySelector(`input[name="question-${index}"][value="${answers[index]}"]`);
+        if (input) input.checked = true;
       }
     }
 
-    function renderExam() {
-      const container = document.getElementById('examContainer');
-      
-      container.innerHTML = `
-        <div class="exam-header">
-          <div class="exam-title">${currentExam.name}</div>
-          ${currentExam.description ? `<p style="color: #64748b; margin-top: 8px;">${currentExam.description}</p>` : ''}
-          
-          <div class="exam-info">
-            <div class="info-item">
-              <span class="material-icons-round">help</span>
-              <span>${currentExam.questions.length} pregunta${currentExam.questions.length !== 1 ? 's' : ''}</span>
-            </div>
-            <div class="info-item">
-              <span class="material-icons-round">score</span>
-              <span>Puntuación total: ${currentExam.totalScore}</span>
-            </div>
-            <div class="info-item">
-              <span class="material-icons-round">done_all</span>
-              <span>Mínimo para aprobar: ${currentExam.passScore}</span>
-            </div>
-          </div>
-
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: ${((currentQuestion + 1) / currentExam.questions.length * 100)}%"></div>
-          </div>
-          <p style="font-size: 12px; color: #64748b;">Pregunta ${currentQuestion + 1} de ${currentExam.questions.length}</p>
-        </div>
-
-        ${renderQuestion()}
-
-        <div class="actions">
-          <button class="btn btn-secondary" onclick="previousQuestion()" ${currentQuestion === 0 ? 'disabled' : ''}>
-            <span class="material-icons-round">arrow_back</span> Anterior
-          </button>
-          <button class="btn btn-secondary" onclick="nextQuestion()" ${currentQuestion === currentExam.questions.length - 1 ? 'disabled' : ''}>
-            Siguiente <span class="material-icons-round">arrow_forward</span>
-          </button>
-          <button class="btn btn-primary" onclick="submitExam()" ${currentQuestion === currentExam.questions.length - 1 ? '' : 'style="display:none;"'}>
-            Enviar Examen <span class="material-icons-round">check</span>
-          </button>
-        </div>
-      `;
+    function updateNav() {
+      document.querySelectorAll('.question-btn').forEach((btn, index) => {
+        btn.classList.remove('active', 'answered');
+        if (index === currentQuestion) {
+          btn.classList.add('active');
+        }
+        if (answers[index] !== undefined) {
+          btn.classList.add('answered');
+        }
+      });
     }
 
-    function renderQuestion() {
-      const q = currentExam.questions[currentQuestion];
-      
-      return `
-        <div class="question-card">
-          <div class="question-num">Pregunta ${currentQuestion + 1}</div>
-          <div class="question-text">${q.text}</div>
-
-          <div>
-            ${q.options.map((opt, idx) => `
-              <label class="option ${userAnswers[currentQuestion] === idx ? 'selected' : ''}">
-                <input type="radio" name="answer" value="${idx}" 
-                  ${userAnswers[currentQuestion] === idx ? 'checked' : ''}
-                  onchange="selectAnswer(${idx})">
-                <span class="option-text">${opt}</span>
-              </label>
-            `).join('')}
-          </div>
-        </div>
-      `;
+    function updateButtons() {
+      document.getElementById('prevBtn').disabled = currentQuestion === 0;
+      document.getElementById('nextBtn').disabled = currentQuestion === examConfig.questions.length - 1;
     }
 
-    function selectAnswer(optionIndex) {
-      userAnswers[currentQuestion] = optionIndex;
+    function updateProgress() {
+      const answered = Object.keys(answers).length;
+      const total = examConfig.questions.length;
+      const percentage = (answered / total) * 100;
+
+      document.getElementById('progressText').textContent = `${answered}/${total} preguntas respondidas`;
+      document.getElementById('progressFill').style.width = percentage + '%';
+    }
+
+    function handleAnswer(questionIndex, optionIndex) {
+      answers[questionIndex] = optionIndex;
+      updateProgress();
+      updateNav();
     }
 
     function previousQuestion() {
       if (currentQuestion > 0) {
-        currentQuestion--;
-        renderExam();
+        showQuestion(currentQuestion - 1);
       }
     }
 
     function nextQuestion() {
-      if (currentQuestion < currentExam.questions.length - 1) {
-        currentQuestion++;
-        renderExam();
+      if (currentQuestion < examConfig.questions.length - 1) {
+        showQuestion(currentQuestion + 1);
       }
+    }
+
+    function submitExam() {
+      const answered = Object.keys(answers).length;
+      const total = examConfig.questions.length;
+
+      let msg = `Has respondido ${answered} de ${total} preguntas.`;
+      if (answered < total) {
+        msg += ' ¿Deseas continuar sin responder todas?';
+      }
+
+      document.getElementById('unansweredMsg').textContent = msg;
+      document.getElementById('confirmSubmitModal').classList.add('active');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmSubmitModal').classList.remove('active');
+    }
+
+    async function confirmSubmit() {
+      document.getElementById('loading').classList.add('active');
+      closeConfirmModal();
+
+      try {
+        const user = firebase.auth().currentUser;
+        const result = calculateScore(courseId, answers);
+
+        const examId = 'exam_' + user.uid + '_' + courseId + '_' + Date.now();
+        
+        await firebase.firestore().collection('exams').doc(examId).set({
+          id: examId,
+          userId: user.uid,
+          userEmail: user.email,
+          courseId: courseId,
+          courseName: examConfig.name,
+          score: result.correct,
+          total: result.total,
+          percentage: result.percentage,
+          passed: result.passed,
+          answers: answers,
+          completedAt: new Date(),
+          createdAt: new Date()
+        });
+
+        // Obtener datos del usuario
+        const userSnap = await firebase.firestore().collection('users').doc(user.uid).get();
+        const userData = userSnap.data();
+
+        // Obtener datos del curso
+        const courseSnap = await firebase.firestore().collection('courses').doc(courseId).get();
+        const courseData = courseSnap.data();
+
+        // GENERAR CERTIFICADOS AUTOMÁTICAMENTE
+        // 1. Generar Constancia (siempre)
+        try {
+          await CertificateGenerator.generateAndSave(
+            {
+              uid: user.uid,
+              email: user.email,
+              name: userData.name || user.email.split('@')[0]
+            },
+            {
+              id: courseId,
+              name: courseData.name
+            },
+            null,
+            'constancia'
+          );
+        } catch (error) {
+          console.warn('Error generando constancia:', error);
+        }
+
+        // 2. Generar Certificado (si aprobó)
+        if (result.passed) {
+          try {
+            await CertificateGenerator.generateAndSave(
+              {
+                uid: user.uid,
+                email: user.email,
+                name: userData.name || user.email.split('@')[0]
+              },
+              {
+                id: courseId,
+                name: courseData.name
+              },
+              result,
+              'certificado'
+            );
+          } catch (error) {
+            console.warn('Error generando certificado:', error);
+          }
+
+          // Marcar enrollment como completado
+          const enrollmentQuery = await firebase.firestore()
+            .collection('enrollments')
+            .where('userId', '==', user.uid)
+            .where('courseId', '==', courseId)
+            .get();
+
+          if (!enrollmentQuery.empty) {
+            const enrollmentDoc = enrollmentQuery.docs[0];
+            await enrollmentDoc.ref.update({
+              status: 'completed',
+              completedAt: new Date(),
+              progress: 100
+            });
+          }
+        }
+
+        showResult(result);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error al guardar el examen: ' + error.message);
+      } finally {
+        document.getElementById('loading').classList.remove('active');
+      }
+    }
+
+    function showResult(result) {
+      const modal = document.getElementById('resultModal');
+      const icon = document.getElementById('resultIcon');
+      const title = document.getElementById('resultTitle');
+      const msg = document.getElementById('resultMsg');
+      const score = document.getElementById('resultScore');
+      const details = document.getElementById('resultDetails');
+
+      score.textContent = result.percentage + '%';
+      details.textContent = `Respondiste correctamente: ${result.correct} de ${result.total} preguntas`;
+
+      if (result.passed) {
+        icon.innerHTML = '<span class="material-icons-round">check_circle</span>';
+        icon.className = 'modal-icon success';
+        title.textContent = '¡Excelente!';
+        msg.textContent = 'Has aprobado el examen y completado el curso.';
+      } else {
+        icon.innerHTML = '<span class="material-icons-round">close_circle</span>';
+        icon.className = 'modal-icon error';
+        title.textContent = 'No aprobado';
+        msg.textContent = `Necesitas ${examConfig.passingScore}% para aprobar. Puedes intentarlo nuevamente.`;
+      }
+
+      modal.classList.add('active');
     }
 
     function startTimer() {
-      const timerContainer = document.getElementById('timerContainer');
+      const durationMs = examConfig.duration * 60 * 1000;
       
-      function updateTimer() {
-        const mins = Math.floor(timeRemaining / 60);
-        const secs = timeRemaining % 60;
-        
-        timerContainer.innerHTML = `
-          <div class="timer">
-            <span class="material-icons-round">schedule</span>
-            ${mins}:${secs.toString().padStart(2, '0')}
-          </div>
-        `;
+      timerInterval = setInterval(() => {
+        const elapsed = Date.now() - examStartTime;
+        const remaining = Math.max(0, durationMs - elapsed);
+        const minutes = Math.floor(remaining / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
 
-        if (timeRemaining <= 0) {
+        const timerEl = document.getElementById('timer');
+        timerEl.textContent = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+        if (minutes <= 5) {
+          timerEl.classList.add('warning');
+        }
+
+        if (remaining === 0) {
           clearInterval(timerInterval);
-          submitExam();
-        } else if (timeRemaining <= 60) {
-          timerContainer.querySelector('.timer').style.background = '#dc2626';
+          confirmSubmit();
         }
-
-        timeRemaining--;
-      }
-
-      updateTimer();
-      timerInterval = setInterval(updateTimer, 1000);
+      }, 1000);
     }
 
-    async function submitExam() {
-      // Calcular puntuación
-      let score = 0;
-      let answered = 0;
-
-      currentExam.questions.forEach((q, idx) => {
-        if (userAnswers[idx] !== null) {
-          answered++;
-          if (userAnswers[idx] === q.correctOption) {
-            score += q.points;
-          }
-        }
-      });
-
-      // Calcular porcentaje
-      const percentage = Math.round((score / currentExam.totalScore) * 100);
-      const passed = percentage >= currentExam.passScore;
-
-      try {
-        const db = firebase.firestore();
-        const user = firebase.auth().currentUser;
-
-        // Guardar respuestas del estudiante
-        const submissionId = 'subm-' + Date.now();
-        await db.collection('exam_submissions').doc(submissionId).set({
-          id: submissionId,
-          examId: currentExam.id,
-          userId: user.uid,
-          userEmail: user.email,
-          answers: userAnswers,
-          score: score,
-          totalScore: currentExam.totalScore,
-          percentage: percentage,
-          passed: passed,
-          submittedAt: new Date()
-        });
-
-        // Mostrar resultados
-        showResults(score, percentage, passed);
-
-        clearInterval(timerInterval);
-      } catch (error) {
-        console.error('Error:', error);
-        showNotification('Error al guardar el examen: ' + error.message, 'error');
-      }
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
     }
 
-    function showResults(score, percentage, passed) {
-      document.getElementById('examContainer').style.display = 'none';
-      document.getElementById('timerContainer').innerHTML = '';
-
-      const resultsContainer = document.getElementById('resultsContainer');
-      resultsContainer.innerHTML = `
-        <div class="results">
-          <div style="font-size: 64px; margin-bottom: 16px;">${passed ? '✅' : '❌'}</div>
-          <div class="result-score">${percentage}%</div>
-          <div class="result-status ${passed ? 'passed' : 'failed'}">
-            ${passed ? 'Examen Aprobado' : 'Examen No Aprobado'}
-          </div>
-          <div class="result-message">
-            Obtuviste <strong>${score} de ${currentExam.totalScore}</strong> puntos.<br>
-            Puntuación mínima requerida: <strong>${currentExam.passScore}</strong>
-          </div>
-          <a href="../dashboard/index.html" class="btn btn-primary" style="text-decoration: none; justify-content: center;">
-            <span class="material-icons-round">home</span> Ir al Dashboard
-          </a>
-        </div>
-      `;
+    function goToDashboard() {
+      window.location.href = '../dashboard/index.html';
     }
   </script>
 </body>

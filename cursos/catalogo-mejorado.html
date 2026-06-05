@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo de Cursos | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f7f9fc; color: #0f172a; }
+
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #dce3ed;
+      height: 64px;
+    }
+
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+    .top-bar .container { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #0f172a; }
+    .brand img { width: 36px; height: 36px; border-radius: 8px; }
+    .brand strong { font-size: 13px; font-weight: 700; }
+
+    main { padding: 88px 0 60px; min-height: 100vh; }
+
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+    .header h1 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+    .header p { opacity: 0.9; }
+
+    .search-bar {
+      background: white;
+      border: 1px solid #dce3ed;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .search-bar input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    .search-bar button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: #667eea;
+      font-size: 20px;
+    }
+
+    .filters-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .filter-select {
+      padding: 8px 12px;
+      border: 1px solid #dce3ed;
+      border-radius: 8px;
+      background: white;
+      font-size: 13px;
+      cursor: pointer;
+      min-width: 140px;
+    }
+
+    .btn-clear {
+      padding: 8px 12px;
+      background: #f7f9fc;
+      border: 1px solid #dce3ed;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #dce3ed;
+    }
+
+    .results-count { font-size: 14px; color: #64748b; }
+
+    .sort-select {
+      padding: 8px 12px;
+      border: 1px solid #dce3ed;
+      border-radius: 8px;
+      background: white;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .course-card {
+      background: white;
+      border: 1px solid #dce3ed;
+      border-radius: 14px;
+      overflow: hidden;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .course-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+      border-color: #667eea;
+    }
+
+    .course-image {
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 60px;
+    }
+
+    .course-body { padding: 20px; }
+    .course-name { font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+    .course-instructor { font-size: 12px; color: #64748b; margin-bottom: 12px; }
+
+    .course-meta {
+      display: flex;
+      gap: 8px;
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 12px;
+    }
+
+    .course-meta span { display: flex; align-items: center; gap: 4px; }
+
+    .course-price { font-size: 18px; font-weight: 800; color: #667eea; margin-bottom: 12px; }
+
+    .course-rating {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .stars { color: #fbbf24; }
+
+    .course-button {
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .course-button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #94a3b8;
+    }
+
+    .empty-state .material-icons-round { font-size: 64px; opacity: 0.3; margin-bottom: 16px; }
+
+    @media (max-width: 768px) {
+      .courses-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+      .filters-row { flex-wrap: wrap; }
+      .search-bar { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/search-service.js"></script>
+
+  <header class="top-bar">
+    <div class="container">
+      <a class="brand" href="../index.html">
+        <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        <div><strong>FQ INGENIEROS</strong></div>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="header">
+        <h1>Catálogo de Cursos</h1>
+        <p>Explora nuestros cursos de ingeniería y capacitación profesional</p>
+      </div>
+
+      <!-- Búsqueda -->
+      <div class="search-bar">
+        <span class="material-icons-round">search</span>
+        <input type="text" id="searchInput" placeholder="Buscar cursos..." onkeyup="buscar()" />
+      </div>
+
+      <!-- Filtros -->
+      <div class="filters-row">
+        <select class="filter-select" id="difficultyFilter" onchange="aplicarFiltros()">
+          <option value="">Todas las dificultades</option>
+        </select>
+
+        <select class="filter-select" id="priceFilter" onchange="aplicarFiltros()">
+          <option value="">Todos los precios</option>
+          <option value="0-100">Hasta S/ 100</option>
+          <option value="100-500">S/ 100 - S/ 500</option>
+          <option value="500-1000">S/ 500 - S/ 1000</option>
+          <option value="1000+">Más de S/ 1000</option>
+        </select>
+
+        <select class="filter-select" id="instructorFilter" onchange="aplicarFiltros()">
+          <option value="">Todos los instructores</option>
+        </select>
+
+        <select class="filter-select" id="sortFilter" onchange="aplicarFiltros()">
+          <option value="name">Ordenar por: Nombre</option>
+          <option value="price_asc">Precio: Menor a Mayor</option>
+          <option value="price_desc">Precio: Mayor a Menor</option>
+          <option value="rating">Mejor Calificación</option>
+          <option value="newest">Más Recientes</option>
+          <option value="students">Más Populares</option>
+        </select>
+
+        <button class="btn-clear" onclick="limpiarFiltros()">
+          <span class="material-icons-round">clear</span> Limpiar
+        </button>
+      </div>
+
+      <!-- Resultados -->
+      <div class="results-header">
+        <div class="results-count">
+          Se encontraron <strong id="resultCount">0</strong> cursos
+        </div>
+      </div>
+
+      <!-- Grid de cursos -->
+      <div class="courses-grid" id="coursesGrid"></div>
+
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState">
+        <span class="material-icons-round">school</span>
+        <h2>No hay cursos</h2>
+        <p>Intenta con diferentes filtros de búsqueda</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let searchService = null;
+
+    async function init() {
+      try {
+        searchService = new SearchService();
+        await searchService.loadAllCourses();
+
+        // Poblar selectores
+        poblarSelectores();
+
+        // Mostrar todos los cursos
+        mostrarCursos();
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    async function poblarSelectores() {
+      // Dificultades
+      const difficulties = searchService.getDifficultyOptions();
+      const difficultySelect = document.getElementById('difficultyFilter');
+      for (const diff of difficulties) {
+        const option = document.createElement('option');
+        option.value = diff;
+        option.textContent = diff.charAt(0).toUpperCase() + diff.slice(1);
+        difficultySelect.appendChild(option);
+      }
+
+      // Instructores
+      const instructors = searchService.getInstructors();
+      const instructorSelect = document.getElementById('instructorFilter');
+      for (const instructor of instructors) {
+        const option = document.createElement('option');
+        option.value = instructor;
+        option.textContent = instructor;
+        instructorSelect.appendChild(option);
+      }
+    }
+
+    function buscar() {
+      const query = document.getElementById('searchInput').value;
+      searchService.searchByText(query);
+      mostrarCursos();
+    }
+
+    function aplicarFiltros() {
+      const difficulty = document.getElementById('difficultyFilter').value;
+      const priceRange = document.getElementById('priceFilter').value;
+      const instructor = document.getElementById('instructorFilter').value;
+      const sortBy = document.getElementById('sortFilter').value;
+
+      if (difficulty) searchService.filterByDifficulty(difficulty);
+      if (priceRange) {
+        const [min, max] = priceRange === '1000+' 
+          ? [1000, 999999] 
+          : priceRange.split('-').map(Number);
+        searchService.filterByPrice(min, max);
+      }
+      if (instructor) searchService.filterByInstructor(instructor);
+
+      searchService.sortResults(sortBy);
+      mostrarCursos();
+    }
+
+    function limpiarFiltros() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('difficultyFilter').value = '';
+      document.getElementById('priceFilter').value = '';
+      document.getElementById('instructorFilter').value = '';
+      document.getElementById('sortFilter').value = 'name';
+
+      searchService.clearFilters();
+      mostrarCursos();
+    }
+
+    function mostrarCursos() {
+      const cursos = searchService.getFilteredCourses();
+      const grid = document.getElementById('coursesGrid');
+      const emptyState = document.getElementById('emptyState');
+      const resultCount = document.getElementById('resultCount');
+
+      resultCount.textContent = cursos.length;
+
+      if (cursos.length === 0) {
+        grid.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+
+      grid.innerHTML = cursos.map(curso => `
+        <div class="course-card" onclick="abrirCurso('${curso.id}')">
+          <div class="course-image">📚</div>
+          <div class="course-body">
+            <div class="course-name">${curso.name}</div>
+            <div class="course-instructor">${curso.professor || 'Sin instructor'}</div>
+
+            <div class="course-meta">
+              <span><span class="material-icons-round" style="font-size: 14px;">schedule</span> ${curso.duration || '8'} horas</span>
+              <span><span class="material-icons-round" style="font-size: 14px;">people</span> ${curso.enrolledStudents || 0}</span>
+            </div>
+
+            <div class="course-rating">
+              <span class="stars">${'⭐'.repeat(Math.round(curso.rating || 5))}</span>
+              <span style="color: #94a3b8;">${curso.rating || 5}</span>
+            </div>
+
+            <div class="course-price">S/ ${curso.price || 0}</div>
+
+            <button class="course-button">
+              <span class="material-icons-round" style="font-size: 16px;">arrow_forward</span>
+              Ver curso
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function abrirCurso(cursoId) {
+      window.location.href = `curso.html?id=${cursoId}`;
+    }
+
+    // Iniciar cuando Firebase esté listo
+    firebase.auth().onAuthStateChanged(user => {
+      init();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sesiones en Vivo | FQ INGENIEROS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f7f9fc; color: #0f172a; }
+
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #dce3ed;
+      height: 64px;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    .top-bar .container { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #0f172a; }
+    .brand img { width: 36px; height: 36px; border-radius: 8px; }
+
+    main { padding: 88px 0 60px; min-height: 100vh; }
+
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+    .header h1 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #dce3ed;
+    }
+
+    .tab {
+      padding: 12px 20px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: #64748b;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab.active { color: #667eea; border-bottom-color: #667eea; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .sessions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .session-card {
+      background: white;
+      border: 1px solid #dce3ed;
+      border-radius: 14px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+
+    .session-card:hover {
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      border-color: #667eea;
+    }
+
+    .session-header {
+      display: flex;
+      align-items: start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .session-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .session-info { flex: 1; }
+    .session-number { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+    .session-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .session-course { font-size: 12px; color: #94a3b8; }
+
+    .session-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 16px 0;
+      padding: 12px 0;
+      border-top: 1px solid #eef2f7;
+      border-bottom: 1px solid #eef2f7;
+    }
+
+    .meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+    .meta-item .material-icons-round { font-size: 18px; color: #667eea; }
+
+    .session-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-live { background: #fecaca; color: #7f1d1d; }
+    .status-upcoming { background: #fed7aa; color: #92400e; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+
+    .session-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+
+    .btn-outline {
+      background: #f7f9fc;
+      border: 1px solid #dce3ed;
+      color: #667eea;
+    }
+
+    .btn-outline:hover { background: #eff6ff; border-color: #667eea; }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      background: white;
+      border-radius: 14px;
+      border: 1px solid #dce3ed;
+    }
+
+    .empty-state .material-icons-round { font-size: 48px; opacity: 0.3; margin-bottom: 12px; }
+
+    @media (max-width: 768px) {
+      .sessions-grid { grid-template-columns: 1fr; }
+      .header { padding: 20px; }
+      .header h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="../assets/js/firebase-config.js"></script>
+  <script src="../assets/js/zoom-service.js"></script>
+
+  <header class="top-bar">
+    <div class="container">
+      <a class="brand" href="../index.html">
+        <img src="../assets/img/logo-fq.png" alt="FQ Ingenieros" />
+        <div><strong>FQ INGENIEROS</strong></div>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="header">
+        <h1>Sesiones en Vivo</h1>
+        <p>Accede a las grabaciones de sesiones completadas</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('proximas')">
+          <span class="material-icons-round">schedule</span> Próximas
+        </button>
+        <button class="tab" onclick="switchTab('en-vivo')">
+          <span class="material-icons-round">videocam</span> En Vivo
+        </button>
+        <button class="tab" onclick="switchTab('grabaciones')">
+          <span class="material-icons-round">video_library</span> Grabaciones
+        </button>
+      </div>
+
+      <!-- Panel: Próximas -->
+      <div class="panel active" id="panel-proximas">
+        <div class="sessions-grid" id="proximasList"></div>
+      </div>
+
+      <!-- Panel: En Vivo -->
+      <div class="panel" id="panel-en-vivo">
+        <div class="sessions-grid" id="vivoList"></div>
+      </div>
+
+      <!-- Panel: Grabaciones -->
+      <div class="panel" id="panel-grabaciones">
+        <div class="sessions-grid" id="grabacionesList"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let userCourses = [];
+
+    async function init() {
+      try {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+          window.location.href = '../auth/login.html';
+          return;
+        }
+
+        // Obtener cursos del usuario
+        const enrollmentsSnap = await firebase.firestore()
+          .collection('enrollments')
+          .where('userId', '==', user.uid)
+          .get();
+
+        userCourses = enrollmentsSnap.docs.map(doc => doc.data());
+
+        await cargarSesiones();
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    async function cargarSesiones() {
+      if (userCourses.length === 0) {
+        mostrarVacio();
+        return;
+      }
+
+      const courseIds = userCourses.map(c => c.courseId);
+
+      // Obtener todas las sesiones
+      const sessionsSnap = await firebase.firestore()
+        .collection('sessions')
+        .where('courseId', 'in', courseIds)
+        .orderBy('startTime')
+        .get();
+
+      const sessions = sessionsSnap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      const now = new Date();
+      const proximas = [];
+      const vivas = [];
+      const grabaciones = [];
+
+      for (const session of sessions) {
+        const startTime = session.startTime?.toDate?.() || new Date(session.startTime);
+        const endTime = new Date(startTime.getTime() + (session.duration || 60) * 60000);
+
+        if (endTime < now) {
+          grabaciones.push(session);
+        } else if (startTime <= now && now <= endTime) {
+          vivas.push(session);
+        } else {
+          proximas.push(session);
+        }
+      }
+
+      mostrarSesiones(proximas, 'proximasList');
+      mostrarSesiones(vivas, 'vivoList');
+      mostrarGrabaciones(grabaciones);
+    }
+
+    async function mostrarSesiones(sessions, containerId) {
+      const container = document.getElementById(containerId);
+
+      if (sessions.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <span class="material-icons-round">videocam</span>
+            <h2>No hay sesiones</h2>
+            <p>No hay sesiones disponibles en este momento</p>
+          </div>
+        `;
+        return;
+      }
+
+      const html = await Promise.all(sessions.map(async session => {
+        const courseData = userCourses.find(c => c.courseId === session.courseId);
+        const zoomLink = session.zoomLink || await ZoomService.getOrCreateSessionLink(session.courseId, session.sessionNumber);
+
+        const now = new Date();
+        const startTime = session.startTime?.toDate?.() || new Date(session.startTime);
+        const isLive = startTime <= now;
+        const status = isLive ? 'live' : 'upcoming';
+
+        return `
+          <div class="session-card">
+            <div class="session-header">
+              <div class="session-icon">🎥</div>
+              <div class="session-info">
+                <div class="session-number">Sesión ${session.sessionNumber}</div>
+                <div class="session-title">${session.topic || 'Sesión en vivo'}</div>
+                <div class="session-course">${courseData?.courseName || 'Curso'}</div>
+              </div>
+            </div>
+
+            <div class="session-meta">
+              <div class="meta-item">
+                <span class="material-icons-round">schedule</span>
+                ${ZoomService.formatDateTime(startTime)}
+              </div>
+              <div class="meta-item">
+                <span class="material-icons-round">timer</span>
+                Duración: ${session.duration || 60} minutos
+              </div>
+            </div>
+
+            <div>
+              <span class="session-status ${status === 'live' ? 'status-live' : 'status-upcoming'}">
+                ${status === 'live' ? '🔴 En vivo ahora' : '⏱️ Próximamente'}
+              </span>
+            </div>
+
+            <div class="session-actions">
+              <a href="${zoomLink}" target="_blank" class="btn btn-primary">
+                <span class="material-icons-round">videocam</span>
+                Unirse
+              </a>
+              <button class="btn btn-outline" onclick="compartir('${zoomLink}')">
+                <span class="material-icons-round">share</span>
+                Compartir
+              </button>
+            </div>
+          </div>
+        `;
+      }));
+
+      container.innerHTML = (await Promise.all(html)).join('');
+    }
+
+    async function mostrarGrabaciones(sessions) {
+      const container = document.getElementById('grabacionesList');
+
+      if (sessions.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <span class="material-icons-round">video_library</span>
+            <h2>No hay grabaciones</h2>
+            <p>Las grabaciones aparecerán aquí después de las sesiones</p>
+          </div>
+        `;
+        return;
+      }
+
+      const html = sessions.map(session => {
+        const courseData = userCourses.find(c => c.courseId === session.courseId);
+
+        return `
+          <div class="session-card">
+            <div class="session-header">
+              <div class="session-icon">📹</div>
+              <div class="session-info">
+                <div class="session-number">Sesión ${session.sessionNumber}</div>
+                <div class="session-title">${session.topic || 'Sesión grabada'}</div>
+                <div class="session-course">${courseData?.courseName || 'Curso'}</div>
+              </div>
+            </div>
+
+            <div class="session-meta">
+              <div class="meta-item">
+                <span class="material-icons-round">access_time</span>
+                ${ZoomService.formatDateTime(session.startTime)}
+              </div>
+              <div class="meta-item">
+                <span class="material-icons-round">video_library</span>
+                ${session.duration || 60} minutos
+              </div>
+            </div>
+
+            <div>
+              <span class="session-status status-completed">✅ Completada</span>
+            </div>
+
+            <div class="session-actions">
+              ${session.recordingUrl ? `
+                <a href="${session.recordingUrl}" target="_blank" class="btn btn-primary">
+                  <span class="material-icons-round">play_circle</span>
+                  Ver grabación
+                </a>
+              ` : `
+                <button class="btn btn-outline" onclick="notificacion()">
+                  <span class="material-icons-round">notifications</span>
+                  Avisar cuando esté
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = html;
+    }
+
+    function compartir(link) {
+      const text = `Únete a la sesión en vivo de FQ INGENIEROS: ${link}`;
+      if (navigator.share) {
+        navigator.share({
+          title: 'Sesión en vivo',
+          text: text,
+          url: link
+        });
+      } else {
+        alert('Link: ' + link);
+      }
+    }
+
+    function notificacion() {
+      alert('Te notificaremos cuando la grabación esté disponible');
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(`panel-${tab}`).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function mostrarVacio() {
+      const template = `
+        <div class="empty-state">
+          <span class="material-icons-round">videocam</span>
+          <h2>No hay sesiones</h2>
+          <p>Matricúlate en un curso para acceder a las sesiones</p>
+        </div>
+      `;
+      document.getElementById('proximasList').innerHTML = template;
+      document.getElementById('vivoList').innerHTML = template;
+      document.getElementById('grabacionesList').innerHTML = template;
+    }
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) init();
+      else window.location.href = '../auth/login.html';
+    });
+  </script>
+</body>
+</html>

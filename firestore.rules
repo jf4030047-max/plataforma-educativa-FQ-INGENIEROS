@@ -2,57 +2,157 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper: is the current user the admin?
+    // ═══════════════════════════════════════════════════════
+    // HELPER FUNCTIONS
+    // ═══════════════════════════════════════════════════════
+    
     function isAdmin() {
       return request.auth != null && (
         request.auth.email == 'fq.ingenieros.empresa@gmail.com'
       );
     }
 
-    // Helper: is the current user authenticated?
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    // Helper: is the current user the owner of the document?
     function isOwner(userId) {
       return request.auth.uid == userId;
     }
 
-    // ADMIN ACCESS: Full read/write for admins
-    match /{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
-    }
-
-    // Allow users to read their own data
+    // ═══════════════════════════════════════════════════════
+    // USERS COLLECTION (Private - only own data + admin)
+    // ═══════════════════════════════════════════════════════
     match /users/{userId} {
+      // Users can read their own profile, admin can read all
       allow read: if isOwner(userId) || isAdmin();
-      allow write: if isOwner(userId) || isAdmin();
+      
+      // Users can create their own profile, admin can update any
+      allow create: if isAuthenticated() && isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
+      
+      // Only admin can delete
+      allow delete: if isAdmin();
     }
 
-    // Allow users to read their own enrollments
+    // ═══════════════════════════════════════════════════════
+    // COURSES COLLECTION (Public read, admin write only)
+    // ═══════════════════════════════════════════════════════
+    match /courses/{courseId} {
+      // All authenticated users can read courses
+      allow read: if isAuthenticated();
+      
+      // Only admin can create/edit/delete courses
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // ENROLLMENTS COLLECTION (Users create own, admin can modify)
+    // ═══════════════════════════════════════════════════════
     match /enrollments/{enrollmentId} {
+      // Authenticated users can read all enrollments (to see course info)
       allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      
+      // Users can only create enrollments for themselves
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      
+      // Users can update their own enrollments, admin can update any
+      allow update: if (isAuthenticated() && request.resource.data.userId == request.auth.uid) || isAdmin();
+      
+      // Only admin can delete enrollments
+      allow delete: if isAdmin();
     }
 
-    // Allow users to read their own exams
-    match /exams/{examId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
-    }
-
-    // Allow users to read their own certificates
-    match /certificates/{certificateId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
-    }
-
-    // Allow users to read payments
+    // ═══════════════════════════════════════════════════════
+    // PAYMENTS COLLECTION (Users create own, admin verifies)
+    // ═══════════════════════════════════════════════════════
     match /payments/{paymentId} {
+      // Users can read their own payments, admin can read all
+      allow read: if (isAuthenticated() && request.resource.data.userId == request.auth.uid) || isAdmin();
+      
+      // Users can create their own payment records
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      
+      // Only admin can update (to approve/reject payments)
+      allow update: if isAdmin();
+      
+      // Only admin can delete
+      allow delete: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // EXAMS COLLECTION (Users submit, professors grade)
+    // ═══════════════════════════════════════════════════════
+    match /exams/{examId} {
+      // Users can read their own exams, admin/professors can read all
+      allow read: if (isAuthenticated() && request.resource.data.userId == request.auth.uid) || isAdmin();
+      
+      // Users can create their own exam submissions
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      
+      // Users can update their own exams (before submission), admin can update any
+      allow update: if (isAuthenticated() && request.resource.data.userId == request.auth.uid) || isAdmin();
+      
+      // Only admin can delete
+      allow delete: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // CERTIFICATES COLLECTION (System generated, users read)
+    // ═══════════════════════════════════════════════════════
+    match /certificates/{certificateId} {
+      // Users can read their own certificates
+      allow read: if (isAuthenticated() && request.resource.data.userId == request.auth.uid) || isAdmin();
+      
+      // Only admin can create (system/backend generates)
+      allow create, update: if isAdmin();
+      
+      // Only admin can delete
+      allow delete: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // NOTIFICATIONS COLLECTION (Users read own)
+    // ═══════════════════════════════════════════════════════
+    match /notifications/{notificationId} {
+      // Users can read their own notifications
+      allow read: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      
+      // Only system/admin can create
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // SESSIONS COLLECTION (Track live sessions)
+    // ═══════════════════════════════════════════════════════
+    match /sessions/{sessionId} {
+      // All authenticated can read
       allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      
+      // Only admin can create/modify
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // ATTENDANCE COLLECTION (Track class attendance)
+    // ═══════════════════════════════════════════════════════
+    match /attendance/{attendanceId} {
+      // Users can read their own attendance
+      allow read: if (isAuthenticated() && request.resource.data.userId == request.auth.uid) || isAdmin();
+      
+      // Users can create attendance records for themselves
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      
+      // Admin can update/delete
+      allow update, delete: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // CATCH-ALL: Deny everything else
+    // ═══════════════════════════════════════════════════════
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
