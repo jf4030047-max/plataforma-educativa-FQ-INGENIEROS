@@ -251,7 +251,7 @@ class AdminAnalyticsService {
 
       const payments = paymentsSnap.docs.map(doc => doc.data());
 
-      if (payments.length === 0) return null;
+      if (payments.length === 0) return [];
 
       const methodCounts = {};
 
