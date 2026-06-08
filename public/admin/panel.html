@@ -154,60 +154,24 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="../assets/js/firebase-config.js"></script>
-  <script src="../assets/js/notifications.js"></script>
-  <script src="../assets/js/auth-ui.js"></script>
 
   <script>
-    // Validar que sea ADMINISTRADOR antes de cargar el panel
-    const ADMIN_EMAILS = ['fq.ingenieros.empresa@gmail.com'];
-
+    // Redirección simple al panel nuevo
     firebase.auth().onAuthStateChanged(function(user) {
       if (!user) {
-        // No autenticado: redirigir a login
-        window.location.href = '../auth/login.html?redirect=' + encodeURIComponent(window.location.href);
+        window.location.href = '../auth/login.html?redirect=panel.html';
         return;
       }
 
-      // Validar que sea administrador
-      const isAdmin = ADMIN_EMAILS.includes(user.email);
-
-      if (!isAdmin) {
-        // No es administrador: mostrar acceso denegado
-        showAccessDenied(user.email);
+      // Verificar que sea admin
+      if (user.email !== 'fq.ingenieros.empresa@gmail.com' && user.email !== 'admin@fqingenieros.com') {
+        window.location.href = '../dashboard/dashboard-improved.html';
         return;
       }
 
-      // Es administrador: cargar el panel completo
-      loadAdminPanel();
+      // Redirigir al panel nuevo
+      window.location.replace('panel-analytics.html');
     });
-
-    function showAccessDenied(email) {
-      const app = document.getElementById('admin-app');
-      const emailDisplay = email || 'No identificado';
-      
-      app.innerHTML = '<div class="access-denied"><div class="access-denied-card"><div class="access-denied-icon">🔒</div><h1 class="access-denied-title">Acceso Denegado</h1><p class="access-denied-text">Este panel solo es accesible para administradores autorizados.</p><div class="access-denied-email"><strong>Cuenta actual:</strong><br><span class="email">' + emailDisplay + '</span></div><p style="font-size:13px;color:#64748b;margin-bottom:20px;">Si tienes otra cuenta de administrador abierta en este navegador, puedes cambiar de cuenta aquí.</p><button class="btn-denied primary" onclick="cambiarCuenta()">🔄 Cambiar Cuenta</button><button class="btn-denied secondary" onclick="irDashboard()">📊 Ir al Dashboard</button><button class="btn-denied danger" onclick="cerrarSesion()">🚪 Cerrar Sesión</button></div></div>';
-    }
-
-    function cambiarCuenta() {
-      window.location.href = '../auth/account-selector.html?redirect=' + encodeURIComponent(window.location.href);
-    }
-
-    function irDashboard() {
-      window.location.href = '../dashboard/index.html';
-    }
-
-    function cerrarSesion() {
-      firebase.auth().signOut().then(() => {
-        window.location.href = '../auth/login.html';
-      });
-    }
-
-    function loadAdminPanel() {
-      // Cargar admin-panel.js solo después de validar
-      const script = document.createElement('script');
-      script.src = 'admin-panel.js';
-      document.body.appendChild(script);
-    }
   </script>
 </body>
 </html>
